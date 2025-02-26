@@ -13,6 +13,13 @@ export default {
         foreground: "var(--foreground)",
       },
     },
+    fontFamily: {
+      primaryLight:['Light'],
+      primaryRegular:['Regular'],
+      primaryMedium:['Medium'],
+      primaryDemibold:['DemiBold'],
+      primaryBold:['Bold']
+    }
   },
   plugins: [],
 } satisfies Config;

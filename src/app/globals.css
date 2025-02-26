@@ -2,20 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: 'Light';
+  src: local('IRANSansX-Light'),
+  url('../font/IRANSansX-Light.woff') format('truetype');
+  font-display: swap;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: 'Medium';
+  src: local('IRANSansX-Medium'),
+  url('../font/IRANSansX-Medium.woff') format('truetype');
+  font-display: swap;
 }
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@font-face {
+  font-family: 'Regular';
+  src: local('IRANSansX-Regular'),
+  url('../font/IRANSansX-Regular.woff') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DemiBold';
+  src: local('IRANSansX-DemiBold'),
+  url('../font/IRANSansX-DemiBold.woff') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bold';
+  src: local('IRANSansX-Bold'),
+  url('../font/IRANSansX-Bold.woff') format('truetype');
+  font-display: swap;
 }
