@@ -37,7 +37,7 @@ const Header = () => {
     ]
 
     return (
-        <nav className="bg-gradient-to-l from-blue-900 to-blue-500 fixed w-full z-20 top-0 start-0 border-b border-gray-200">
+        <nav className="bg-gradient-to-l from-blue-900 to-blue-500 w-full z-20 top-0 start-0 border-b border-gray-200">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 {
                     leftHeader.map((items) => (
