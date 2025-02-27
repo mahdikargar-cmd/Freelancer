@@ -41,14 +41,14 @@ const Footer = () => {
     const newsLetterForm = () => {
         return (
             <div className="mt-6">
-                <h4 className="font-medium text-gray-800 mb-3">عضویت در خبرنامه</h4>
+                <h4 className="font-primaryMedium text-gray-800 mb-3">عضویت در خبرنامه</h4>
                 <div className="flex">
                     <input
                         type="email"
                         placeholder="ایمیل خود را وارد کنید"
-                        className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-r-none rounded-l-md focus:outline-none"
+                        className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-r-md focus:outline-none font-primaryMedium"
                     />
-                    <button className="bg-black text-white px-4 py-2 rounded-l-none rounded-r-md hover:bg-gray-800 transition duration-300">
+                    <button className="bg-black font-primaryMedium text-white px-4 py-2 rounded-l-md hover:bg-gray-800 transition duration-300">
                         عضویت
                     </button>
                 </div>
@@ -62,7 +62,7 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="md:col-span-1">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">لوگوی سایت</h2>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-gray-600 mb-4 font-primaryMedium">
                             فروشگاه آنلاین محصولات با بهترین کیفیت و قیمت مناسب. ما به دنبال جلب رضایت مشتریان عزیز هستیم.
                         </p>
                         <div className="flex space-x-4 rtl:space-x-reverse">
@@ -85,13 +85,13 @@ const Footer = () => {
                     <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
                         {footerLinks.map((column, index) => (
                             <div key={index}>
-                                <h3 className="text-md font-bold text-gray-900 mb-4">{column.title}</h3>
+                                <h3 className="text-md font-primaryDemibold text-gray-900 mb-4">{column.title}</h3>
                                 <ul>
                                     {column.links.map((link, linkIndex) => (
                                         <li key={linkIndex} className="mb-2">
                                             <Link
                                                 href={link.url}
-                                                className="text-gray-600 hover:text-black transition duration-300"
+                                                className="text-gray-600 hover:text-black transition duration-300 font-primaryMedium"
                                             >
                                                 {link.name}
                                             </Link>
@@ -105,7 +105,7 @@ const Footer = () => {
 
                 <div className="border-t border-gray-200 mt-8 pt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-gray-600 text-sm mb-4 md:mb-0">
+                        <p className="text-gray-600 text-sm mb-4 md:mb-0 font-primaryMedium">
                             © ۱۴۰۴ تمامی حقوق این سایت محفوظ است.
                         </p>
                         <div className="flex items-center space-x-4 rtl:space-x-reverse">

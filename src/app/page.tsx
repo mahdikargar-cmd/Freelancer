@@ -1,4 +1,3 @@
-import './Style.css'
 export default function Home() {
     return (
         <div className="h-[200px] flex justify-center items-center text-4xl">
