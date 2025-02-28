@@ -6,9 +6,11 @@ const Footer = () => {
             title: 'لینک‌های سریع',
             links: [
                 { name: 'صفحه اصلی', url: '/' },
-                { name: 'محصولات', url: '/products' },
+                { name: 'کارفرما', url: '/employer' },
+                { name: 'فریلنسر', url: '/freelancer' },
                 { name: 'درباره ما', url: '/about' },
-                { name: 'تماس با ما', url: '/contact' }
+                { name: 'تماس با ما', url: '/contact' },
+
             ]
         },
         {
@@ -17,7 +19,6 @@ const Footer = () => {
                 { name: 'سوالات متداول', url: '/faq' },
                 { name: 'شرایط و مقررات', url: '/terms' },
                 { name: 'حریم خصوصی', url: '/privacy' },
-                { name: 'ارسال و مرجوعی', url: '/shipping' }
             ]
         },
         {
