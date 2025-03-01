@@ -1,8 +1,8 @@
 function NotFound() {
     return (
-        <div className='custom flex justify-between'>
+        <div className='text-center font-primaryBold'>
             <p className="text-red-500">
-                404 not found
+                صفحه مورد نظر پیدا نشد.
             </p>
         </div>
 
