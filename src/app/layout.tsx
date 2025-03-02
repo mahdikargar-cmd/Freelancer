@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en">
       
       <body
-        className={'antialiasing'} dir="rtl"
+        className="bg-black" dir="rtl"
       >
         <Header />
         {children}
