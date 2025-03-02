@@ -1,10 +1,8 @@
 package com.manage.freelancer.infrastructure.persistence.repository;
 
-import com.manage.freelancer.domain.entity.FooterLink;
 import com.manage.freelancer.domain.entity.FooterLinkCategory;
 import com.manage.freelancer.domain.repository.FooterLinkCategoryRepository;
 import com.manage.freelancer.infrastructure.persistence.entity.FooterLinkCategoryEntity;
-import com.manage.freelancer.infrastructure.persistence.entity.FooterLinkEntity;
 import com.manage.freelancer.infrastructure.persistence.mapper.FooterMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
