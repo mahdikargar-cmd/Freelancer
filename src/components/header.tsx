@@ -32,7 +32,7 @@ const Header = async () => {
                             <li key={item.id}>
                                 <Link
                                     href="#"
-                                    className={`inline-block py-4 px-2 text-sm text-color2 hover:text-color4`}
+                                    className={`inline-block py-4 px-2 text-sm text-color2 hover:text-color4 hover:bg-color5`}
                                 >
                                     {item.title}
                                 </Link>
