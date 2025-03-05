@@ -9,7 +9,7 @@ const SignHead = () => {
         {
             "title": "ورود",
             "id": 2,
-            "link":"/signIn"
+            "link":"/login"
         }
     ];
     return (
