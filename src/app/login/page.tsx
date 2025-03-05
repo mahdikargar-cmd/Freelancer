@@ -1,9 +1,13 @@
-import bg from '../../img/bg.png';
+'use client'
+
 import Image from 'next/image';
 import r_c from '../../img/right-corner.png';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'
 
 const Login = () => {
+    const route = useRouter();
+
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4"> 
@@ -38,7 +42,7 @@ const Login = () => {
                         </div>
                     </div>
                 </div>
-                <Link href='/' className="text-color3 font-primaryMedium underline decoration-color3 mt-4">
+                <Link href='/forgetPassword' className="text-color3 font-primaryMedium underline decoration-color3 mt-4">
                     رمز عبور خود را فراموش کرده اید ؟
                 </Link>
                 <div className="flex justify-center">
@@ -46,7 +50,7 @@ const Login = () => {
                         <button className="bg-color4 rounded-full text-color1 font-primaryMedium p-4 w-full">
                             ورود به سیستم
                         </button>
-                        <button className="bg-color1 rounded-3xl border border-color5 text-center text-color2 font-primaryMedium p-4 w-full">
+                        <button className="bg-color1 rounded-3xl border border-color5 text-center text-color2 font-primaryMedium p-4 w-full" onClick={() => route.push('/signUp')}>
                             ثبت نام کنید
                         </button>
                     </div>
