@@ -20,8 +20,8 @@ public class LoginUserUseCase {
         this.jwtService = jwtService;
     }
 
-    public String login(String name, String password) {
-        Optional<User> userOpt = userRepository.findByName(name);
+    public String login(String email, String password) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
             User user = userOpt.get();

@@ -32,7 +32,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         try {
-            registerUserUseCase.register(request.getName(), request.getPassword());
+            registerUserUseCase.register(request.getEmail(), request.getPassword());
             return ResponseEntity.ok(new AuthResponse("User registered successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -42,7 +42,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        String token = loginUserUseCase.login(request.getName(), request.getPassword());
+        String token = loginUserUseCase.login(request.getEmail(), request.getPassword());
         if (token != null) {
             return ResponseEntity.ok(new AuthResponse("Login successful", token));
         } else {

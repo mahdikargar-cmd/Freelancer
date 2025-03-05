@@ -19,17 +19,17 @@ public class UserRepositoryImpl implements UserRepository {
     public void save(User user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(user.getId());
-        userEntity.setName(user.getName());
+        userEntity.setEmail(user.getEmail());
         userEntity.setPassword(user.getPassword());
         jpaUserRepository.save(userEntity);
     }
 
     @Override
-    public Optional<User> findByName(String name) {
-        return jpaUserRepository.findByName(name)
+    public Optional<User> findByEmail(String email) {
+        return jpaUserRepository.findByEmail(email)
                 .map(userEntity -> new User(
                         userEntity.getId(),
-                        userEntity.getName(),
+                        userEntity.getEmail(),
                         userEntity.getPassword()
                 ));
     }

@@ -15,13 +15,13 @@ public class RegisterUserUseCase {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void register(String name, String password) {
-        if (userRepository.findByName(name).isPresent()) {
+    public void register(String email, String password) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
 
         String hashedPassword = passwordEncoder.encode(password);
-        User user = new User(null, name, hashedPassword);
+        User user = new User(null, email, hashedPassword);
         userRepository.save(user);
     }
 }
