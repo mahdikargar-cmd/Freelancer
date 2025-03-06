@@ -1,6 +1,7 @@
 import MainFooter from "./mainFooter";
 import SocialLinks from "./sociallink";
-
+import Image from "next/image";
+import enamad from '../img/enamad_icon_text_color_blue_1024.png'
 const Footer = () => {
     const newsLetterForm = () => {
         return (
@@ -41,8 +42,7 @@ const Footer = () => {
                             © ۱۴۰۴ تمامی حقوق این سایت محفوظ است.
                         </p>
                         <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                            <img src="/images/enamad.png" alt="نماد اعتماد الکترونیکی" className="h-16 w-auto" />
-                            <img src="/images/samandehi.png" alt="نشان ساماندهی" className="h-16 w-auto" />
+                            <Image src={enamad} alt="نماد اعتماد الکترونیکی" className="h-16 w-auto" width={100} height={100}/>
                         </div>
                     </div>
                 </div>

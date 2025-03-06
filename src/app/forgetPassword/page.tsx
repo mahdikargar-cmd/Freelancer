@@ -34,7 +34,6 @@ const ForPass = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     )
