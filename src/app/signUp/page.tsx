@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import r_c from '../../img/right-corner.png';
-import API from '@/components/api';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import Success from '@/components/Toast/success';
+import Failed from '@/components/Toast/failed';
 
 const SignUp = () => {
     const route = useRouter();
@@ -11,38 +12,63 @@ const SignUp = () => {
         email: "",
         password: ""
     });
+    const [warning, setWarning] = useState("");
+    const [showToast, setShowToast] = useState({
+        Success: false,
+        Failed: false
+    });
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
     const handleSubmit = async () => {
+        if (!emailRegex.test(Info.email)) {
+            setWarning("ایمیل نامعتبر است!");
+            setShowToast({ Success: false, Failed: true });
+            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
+            return;
+        }
+
+        if (!passwordRegex.test(Info.password)) {
+            setWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
+            setShowToast({ Success: false, Failed: true });
+            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
+            return;
+        }
+
         try {
             const response = await fetch("/api/auth/register", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(Info)
             });
-            console.log(JSON.stringify(Info))
 
             if (!response.ok) {
-                throw new Error("مشکلی در ثبت نام رخ داد.");
+                throw new Error("شما قبلا ثبت نام کرده اید.");
             }
 
-            const data = await response.json();
-            console.log("ثبت نام موفقیت آمیز بود:", data);
-            alert("ثبت نام انجام شد!");
-            route.push('/panel');
+            setWarning("");
+            setShowToast({ Success: true, Failed: false });
 
-        } catch (error) {
-            console.error("خطا در ثبت نام:", error);
-            alert("خطایی رخ داد، لطفا دوباره امتحان کنید.");
+            setTimeout(() => {
+                setShowToast({ Success: false, Failed: false });
+                route.push('/panel');
+            }, 3000);
+
+        } catch (error: any) {
+            setWarning(error.message);
+            setShowToast({ Success: false, Failed: true });
+            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4"> 
+        <div className="flex items-center justify-center min-h-screen relative">
+            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
+                {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} />}
+                {showToast.Failed && <Failed showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 <Image
-                    className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px]"
+                    className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px] pointer-events-none"
                     src={r_c}
                     alt="corner"
                     width={200}
@@ -57,7 +83,7 @@ const SignUp = () => {
                         <div className="w-full">
                             <input
                                 type="email"
-                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:ring-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
+                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:outline-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
                                 placeholder="ایمیل خود را وارد کنید."
                                 required
                                 value={Info.email}
@@ -66,18 +92,18 @@ const SignUp = () => {
                         </div>
                         <div className="w-full">
                             <input
-                                type="text"
-                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:ring-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
+                                type="password"
+                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:outline-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
                                 placeholder="رمز خود را وارد کنید."
                                 required
                                 value={Info.password}
-                                onChange={(e) => SetInfo({ ...Info, password : e.target.value })}
+                                onChange={(e) => SetInfo({ ...Info, password: e.target.value })}
                             />
                         </div>
                     </div>
                 </div>
                 <div className="flex justify-center">
-                    <div className="grid gap-4 my-6 w-full md:w-1/2 px-4 place-items-center py-4">
+                    <div className="grid gap-4 my-4 w-full md:w-1/2 px-4 place-items-center py-4">
                         <button
                             className="bg-color4 rounded-full text-color1 font-primaryMedium p-4 w-full"
                             onClick={handleSubmit}
