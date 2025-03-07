@@ -46,8 +46,8 @@ const SignUp = () => {
             if (!response.ok) {
                 throw new Error("شما قبلا ثبت نام کرده اید.");
             }
-
-            setWarning("");
+            const data = await response.json();
+            setWarning("ثبت نام شما با موفقیت انجام شد .");
             setShowToast({ Success: true, Failed: false });
 
             setTimeout(() => {
@@ -65,7 +65,7 @@ const SignUp = () => {
     return (
         <div className="flex items-center justify-center min-h-screen relative">
             <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
-                {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} />}
+                {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 {showToast.Failed && <Failed showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 <Image
                     className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px] pointer-events-none"

@@ -5,6 +5,8 @@ import r_c from '../../img/right-corner.png';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
 import { useState } from 'react';
+import Success from '@/components/Toast/success';
+import Failed from '@/components/Toast/failed';
 
 const Login = () => {
     const route = useRouter();
@@ -12,8 +14,29 @@ const Login = () => {
         email: "",
         password: ""
     });
+    const [warning, setWarning] = useState("");
+    const [showToast, setShowToast] = useState({
+        Success: false,
+        Failed: false
+    });
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
     const handleSubmit = async () => {
+        if (!emailRegex.test(Info.email)) {
+            setWarning("ایمیل نامعتبر است!");
+            setShowToast({ Success: false, Failed: true });
+            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
+            return;
+        }
+
+        if (!passwordRegex.test(Info.password)) {
+            setWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
+            setShowToast({ Success: false, Failed: true });
+            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
+            return;
+        }
         try {
             const response = await fetch("/api/auth/login", {
                 method: "POST",
@@ -25,24 +48,31 @@ const Login = () => {
             console.log(JSON.stringify(Info))
 
             if (!response.ok) {
-                throw new Error("مشکلی در ورود رخ داد.");
+                throw new Error("رمز عبور یا ایمیل اشتباه است .");
             }
 
             const data = await response.json();
-            console.log("ورود موفقیت آمیز بود:", data);
-            alert("ورود انجام شد!");
-            route.push('/panel');
+            setWarning("خوش آمدید .");
+            setShowToast({ Success: true, Failed: false });
 
-        } catch (error) {
-            console.error("خطا در  ورود:", error);
-            alert("خطایی رخ داد، لطفا دوباره امتحان کنید.");
+            setTimeout(() => {
+                setShowToast({ Success: false, Failed: false });
+                route.push('/panel');
+            }, 3000);
+
+        } catch (error: any) {
+            setWarning(error.message);
+            setShowToast({ Success: false, Failed: true });
+            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
         }
     };
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
+                {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
+                {showToast.Failed && <Failed showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 <Image
-                    className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px]"
+                    className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px] pointer-events-none"
                     src={r_c}
                     alt="corner"
                     width={200}
