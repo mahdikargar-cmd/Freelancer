@@ -67,8 +67,6 @@ const Panel = () => {
                     <Work />
                 </div>
                 <Rules />
-
-                {/* دکمه ادامه */}
                 <button
                     className={`w-full py-3 mt-4 rounded-full font-primaryMedium text-lg transition-all duration-300 
                     ${isValid ? 'bg-color4 text-black hover:bg-green-500' : 'bg-gray-600 text-gray-300 cursor-not-allowed'}`}

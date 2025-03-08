@@ -4,7 +4,6 @@ import Image from 'next/image';
 import r_c from '../../img/right-corner.png';
 import { useRouter } from 'next/navigation';
 import Success from '@/components/Toast/success';
-import Failed from '@/components/Toast/failed';
 
 const SignUp = () => {
     const route = useRouter();
@@ -12,29 +11,36 @@ const SignUp = () => {
         email: "",
         password: ""
     });
-    const [warning, setWarning] = useState("");
-    const [showToast, setShowToast] = useState({
-        Success: false,
-        Failed: false
-    });
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const [correct, setCorrect] = useState('');
+    const [showToast, setShowToast] = useState(false);
+    const [emailWarning, setEmailWarning] = useState("");
+    const [passwordWarning, setPasswordWarning] = useState("");
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
-    const handleSubmit = async () => {
-        if (!emailRegex.test(Info.email)) {
-            setWarning("ایمیل نامعتبر است!");
-            setShowToast({ Success: false, Failed: true });
-            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
-            return;
+    const validateEmail = (email: string) => {
+        if (email.length === 0) {
+            setEmailWarning("");
+        } else if (!emailRegex.test(email)) {
+            setEmailWarning("ایمیل نامعتبر است!");
+        } else {
+            setEmailWarning("");
         }
+    };
 
-        if (!passwordRegex.test(Info.password)) {
-            setWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
-            setShowToast({ Success: false, Failed: true });
-            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
-            return;
+    const validatePassword = (password: string) => {
+        if (password.length === 0) {
+            setPasswordWarning("");
+        } else if (!passwordRegex.test(password)) {
+            setPasswordWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
+        } else {
+            setPasswordWarning("");
         }
+    };
+
+    const handleSubmit = async () => {
+        if (emailWarning || passwordWarning || !Info.email || !Info.password) return;
 
         try {
             const response = await fetch("/api/auth/register", {
@@ -44,29 +50,24 @@ const SignUp = () => {
             });
 
             if (!response.ok) {
-                throw new Error("شما قبلا ثبت نام کرده اید.");
+                throw new Error("شما قبلا ثبت نام کرده‌اید.");
             }
-            const data = await response.json();
-            setWarning("ثبت نام شما با موفقیت انجام شد .");
-            setShowToast({ Success: true, Failed: false });
 
+            setCorrect("ثبت نام شما با موفقیت انجام شد .");
+            setShowToast(true);
+            
             setTimeout(() => {
-                setShowToast({ Success: false, Failed: false });
                 route.push('/panel');
             }, 3000);
-
         } catch (error: any) {
-            setWarning(error.message);
-            setShowToast({ Success: false, Failed: true });
-            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
+            setEmailWarning(error.message);
         }
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen relative">
             <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
-                {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
-                {showToast.Failed && <Failed showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
+                {showToast && <Success showToast={() => setShowToast(true)} text={correct} />}
                 <Image
                     className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px] pointer-events-none"
                     src={r_c}
@@ -83,33 +84,48 @@ const SignUp = () => {
                         <div className="w-full">
                             <input
                                 type="email"
-                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:outline-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
+                                className={`bg-color6 border text-color3 text-sm rounded-full block w-full p-4 font-primaryRegular 
+                                ${emailWarning ? 'border-red-500 focus:ring-2 focus:ring-red-500'
+                                        : Info.email ? 'border-green-500 focus:ring-2 focus:ring-green-500'
+                                            : 'border-white focus:ring-2 focus:ring-gray-300'}`}
                                 placeholder="ایمیل خود را وارد کنید."
-                                required
                                 value={Info.email}
-                                onChange={(e) => SetInfo({ ...Info, email: e.target.value })}
+                                onChange={(e) => {
+                                    SetInfo({ ...Info, email: e.target.value });
+                                    validateEmail(e.target.value);
+                                }}
                             />
+                            {emailWarning && <p className="text-red-500 font-primaryMedium mt-2">{emailWarning}</p>}
                         </div>
                         <div className="w-full">
                             <input
                                 type="password"
-                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:outline-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
+                                className={`bg-color6 border text-color3 text-sm rounded-full block w-full p-4 font-primaryRegular 
+                                ${passwordWarning ? 'border-red-500 focus:ring-2 focus:ring-red-500'
+                                        : Info.password ? 'border-green-500 focus:ring-2 focus:ring-green-500'
+                                            : 'border-white focus:ring-2 focus:ring-gray-300'}`}
                                 placeholder="رمز خود را وارد کنید."
-                                required
                                 value={Info.password}
-                                onChange={(e) => SetInfo({ ...Info, password: e.target.value })}
+                                onChange={(e) => {
+                                    SetInfo({ ...Info, password: e.target.value });
+                                    validatePassword(e.target.value);
+                                }}
                             />
+                            {passwordWarning && <p className="text-red-500 font-primaryMedium mt-2">{passwordWarning}</p>}
                         </div>
                     </div>
                 </div>
                 <div className="flex justify-center">
                     <div className="grid gap-4 my-4 w-full md:w-1/2 px-4 place-items-center py-4">
                         <button
-                            className="bg-color4 rounded-full text-color1 font-primaryMedium p-4 w-full"
+                            className={`rounded-full text-color1 font-primaryMedium p-4 w-full 
+                            ${!!emailWarning || !!passwordWarning || !Info.email || !Info.password ? 'bg-gray-500 cursor-not-allowed' : 'bg-color4'}`}
                             onClick={handleSubmit}
+                            disabled={!!emailWarning || !!passwordWarning || !Info.email || !Info.password}
                         >
                             ثبت نام کنید
                         </button>
+
                     </div>
                 </div>
             </div>
