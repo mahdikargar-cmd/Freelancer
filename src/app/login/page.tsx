@@ -111,10 +111,18 @@ const Login = () => {
                 </Link>
                 <div className="flex justify-center">
                     <div className="grid gap-4 my-6 w-full md:w-1/2 px-4 place-items-center py-4">
-                        <button className="bg-color4 rounded-full text-color1 font-primaryMedium p-4 w-full" onClick={handleSubmit}>
+                        <button
+                            className={`rounded-full text-color1 font-primaryMedium p-4 w-full
+                            ${!Info.email || !Info.password ? 'bg-gray-500 cursor-not-allowed' : 'bg-color4'}`}
+                            onClick={handleSubmit}
+                            disabled={!Info.email || !Info.password} // ✅ حالا دکمه فقط وقتی خالیه غیرفعاله
+                        >
                             ورود به سیستم
                         </button>
-                        <button className="bg-color1 rounded-3xl border border-color5 text-center text-color2 font-primaryMedium p-4 w-full" onClick={() => route.push('/signUp')}>
+
+                        <button
+                            className="bg-color1 rounded-3xl border border-color5 text-center text-color2 font-primaryMedium p-4 w-full" onClick={() => route.push('/signUp')}
+                        >
                             ثبت نام کنید
                         </button>
                     </div>
