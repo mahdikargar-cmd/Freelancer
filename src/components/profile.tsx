@@ -1,23 +1,35 @@
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaUniversity } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaUniversity, FaCheckCircle, FaLightbulb, FaShareAlt } from "react-icons/fa";
 
 const Profile = () => {
+    const Notif = [
+        {
+            title: "تکمیل نام کاربری",
+            text: "اگر هنوز اطلاعات کاربری خود را تکمیل نکرده اید لطفا هر چه زودتر اقدام فرمایید",
+            confirm: "تکمیل اطلاعات",
+            id: 1,
+            icon: <FaCheckCircle className="text-color4 text-xl" />
+        },
+        {
+            title: "مهارت ها",
+            text: "در مورد علایق و مهارت های خودت به ما بگو",
+            confirm: "تکمیل اطلاعات",
+            id: 2,
+            icon: <FaLightbulb className="text-yellow-400 text-xl" />
+        },
+        {
+            title: "اشتراک گذاری",
+            text: "پروفایل خود را با بقیه دوستانتان به اشتراک بگذارید",
+            confirm: "تکمیل اطلاعات",
+            id: 3,
+            icon: <FaShareAlt className="text-blue-400 text-xl" />
+        },
+    ];
+
     return (
         <div className="text-white max-w-screen-xl mx-auto my-8">
-            {/* نوار ناوبری (Navbar) */}
-            <div className="col-span-full mt-2 border border-color5 rounded-full shadow-md mx-auto">
-                <div className="bg-color1 text-color2 p-4 rounded-full shadow-lg ">
-                    <h2 className="text-xl font-primaryBold mb-4">پیشرفت تکمیل پروفایل</h2>
-                    <div className="w-full bg-gray-700 rounded-full h-2.5">
-                        <div className="bg-color4 h-2.5 rounded-full" style={{ width: "60%" }}></div>
-                    </div>
-                    <p className="mt-2 text-sm font-primaryRegular">۶۰% تکمیل شده</p>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4 ">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
                 <div className="bg-color1 text-color2 p-8 rounded-2xl shadow-xl border border-color5 transition-all hover:shadow-2xl mx-auto self-start">
                     <div className="grid grid-cols-1 items-center font-primaryMedium">
-
-                        {/* بخش تصویر پروفایل */}
                         <div className="flex flex-col justify-center items-center border-b-2 border-color3 mb-4 pb-4">
                             <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xl shadow-md">
                                 عکس پروفایل
@@ -36,8 +48,6 @@ const Profile = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* اطلاعات پروفایل */}
                         <div className="flex flex-col justify-center space-y-3">
                             <h2 className="text-2xl font-primaryBold mb-3 text-color4">اطلاعات پروفایل</h2>
 
@@ -73,27 +83,29 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-2">
-                    <div className="bg-color1 text-color2 p-6 rounded-2xl mt-6 shadow-lg ">
-                        <h2 className="text-xl font-primaryBold mb-4">تکمیل اطلاعات پروفایل</h2>
-                        <p className="mb-4 font-primaryMedium">لطفاً اطلاعات زیر را تکمیل کنید:</p>
-                        <ul className="space-y-2 font-primaryMedium">
-                            <li className="flex items-center gap-2">
-                                <span className="w-4 h-4 bg-color4 rounded-full flex items-center justify-center text-xs">1</span>
-                                <span>آدرس محل سکونت</span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="w-4 h-4 bg-color4 rounded-full flex items-center justify-center text-xs">2</span>
-                                <span>شماره تماس</span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="w-4 h-4 bg-color4 rounded-full flex items-center justify-center text-xs">3</span>
-                                <span>محل تحصیل</span>
-                            </li>
-                        </ul>
-                        <button className="mt-4 bg-color4 text-white px-6 py-2 rounded-md text-sm hover:bg-opacity-80 transition-all">
-                            تکمیل اطلاعات
-                        </button>
+                <div className="col-span-2 border border-color5 shadow-md p-4 rounded-xl">
+                    <div className="col-span-full mt-2 border border-color5 rounded-full shadow-md mx-auto">
+                        <div className="bg-color1 text-color2 p-4 rounded-full shadow-lg">
+                            <h2 className="text-xl font-primaryBold mb-4">پیشرفت تکمیل پروفایل</h2>
+                            <div className="w-full bg-gray-700 rounded-full h-2.5">
+                                <div className="bg-color4 h-2.5 rounded-full" style={{ width: "60%" }}></div>
+                            </div>
+                            <p className="mt-2 text-sm font-primaryRegular">۶۰% تکمیل شده</p>
+                        </div>
+                    </div>
+                    <div className="bg-color1 text-color2 p-6 rounded-2xl mt-6 shadow-lg border border-color5">
+                        {Notif.map((items) => (
+                            <div key={items.id} className="flex items-center gap-4 mb-4 p-4 border border-color5 rounded-xl shadow-md">
+                                {items.icon}
+                                <div>
+                                    <h1 className="text-lg font-primaryDemibold">{items.title}</h1>
+                                    <p className="text-sm text-gray-300 my-2 font-primaryMedium">{items.text}</p>
+                                    <button className="bg-color4 text-black px-4 py-2 rounded-lg text-sm font-primaryDemibold transition-all hover:bg-opacity-80">
+                                        {items.confirm}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

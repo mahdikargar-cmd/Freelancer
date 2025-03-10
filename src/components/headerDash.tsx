@@ -1,40 +1,38 @@
-'use client'
+'use client';
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { useState } from "react";
 
-const NavPro = () => {
-    const pathname = usePathname();
+interface NavProProps {
+    onSelect: (id: number) => void;
+}
 
-    interface Info {
-        title: string;
-        link: string;
-        id: number;
-    }
+const NavPro = ({ onSelect }: NavProProps) => {
+    const [activeTab, setActiveTab] = useState(1);
 
-    const info: Info[] = [
-        {
-            title: "اتاق کار",
-            link: "/panel/dashboard/myRoom",
-            id: 1
-        },
-        {
-            title: "پروفایل",
-            link: "/panel/dashboard/profile",
-            id: 2
-        }
+    const info = [
+        { title: "اتاق کار", id: 1 },
+        { title: "پروفایل", id: 2 }
     ];
 
     return (
         <nav className="w-full md:max-w-screen-xl mx-auto bg-color1 border border-color5 text-white font-primaryMedium text-xl shadow-md py-4 mt-6 rounded-full">
-            <ul className="flex justify-center space-x-8">
+            <ul className="flex justify-evenly">
                 {info.map((item) => (
                     <li key={item.id}>
-                        <Link href={item.link}>
-                            <span className={`inline-block py-2 px-4 text-sm text-color2 hover:text-color4 hover:bg-color5 rounded-full ${pathname === item.link ? "bg-color4 text-color6" : ""}`}>
-                                {item.title}
-                            </span>
-                        </Link>
+                        <button
+                            onClick={() => {
+                                setActiveTab(item.id);
+                                onSelect(item.id);
+                            }}
+                            className={`inline-block py-2 px-4 text-sm rounded-full transition-all duration-300
+                                ${
+                                    activeTab === item.id
+                                        ? "bg-color4 text-color6 shadow-lg scale-105"
+                                        : "text-color2 hover:text-color4 hover:bg-color5"
+                                }`}
+                        >
+                            {item.title}
+                        </button>
                     </li>
                 ))}
             </ul>
