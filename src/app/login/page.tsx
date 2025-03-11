@@ -57,7 +57,7 @@ const Login = () => {
 
             setTimeout(() => {
                 setShowToast({ Success: false, Failed: false });
-                route.push('/panel');
+                route.push('/dashboard');
             }, 3000);
 
         } catch (error: any) {

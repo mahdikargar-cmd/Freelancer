@@ -57,7 +57,7 @@ const SignUp = () => {
             setShowToast(true);
             
             setTimeout(() => {
-                route.push('/panel');
+                route.push('/dashboard');
             }, 3000);
         } catch (error: any) {
             setEmailWarning(error.message);

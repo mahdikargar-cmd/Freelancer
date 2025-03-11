@@ -21,7 +21,7 @@ const Header = async () => {
 
     return (
         <nav className="w-full z-20 top-0 start-0 mt-6 bg-color6">
-            <div className="max-w-screen-xl flex flex-wrap items-center justify-between md:justify-around mx-auto p-4 bg-color1 rounded-full border border-color5">
+            <div className="max-w-screen-xl flex flex-wrap items-center justify-between md:justify-around mx-2 md:mx-auto p-4 bg-color1 rounded-full border border-color5">
                 <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
                     <Image src={img} className="h-8 w-32" alt="Flowbite Logo" width={100} height={128} />
                 </Link>
@@ -33,7 +33,7 @@ const Header = async () => {
                             <li key={item.id}>
                                 <Link
                                     href="#"
-                                    className={`inline-block py-2 px-4 text-sm text-color2 hover:text-color4 hover:bg-color5 rounded-full `}
+                                    className={`inline-block py-2 px-4 text-sm text-color2 hover:text-color4 hover:bg-color5 rounded-full transition-all duration-300`}
                                 >
                                     {item.title}
                                 </Link>
