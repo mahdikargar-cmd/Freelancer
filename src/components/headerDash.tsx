@@ -10,8 +10,8 @@ const NavPro = ({ onSelect }: NavProProps) => {
     const [activeTab, setActiveTab] = useState(1);
 
     const info = [
-        { title: "اتاق کار", id: 1 },
-        { title: "پروفایل", id: 2 }
+        { title: "پروفایل", id: 1 },
+        { title: "اتاق کار", id: 2 }
     ];
 
     return (

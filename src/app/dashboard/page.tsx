@@ -13,7 +13,7 @@ const DashBoard = () => {
             <NavPro onSelect={setSelectedTab} />
 
             <div className="mt-6">
-                {selectedTab === 1 ? <Room /> : <Profile />}
+                {selectedTab === 1 ? <Profile /> : <Room />}
             </div>
         </div>
     );

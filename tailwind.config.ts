@@ -15,7 +15,9 @@ export default {
         'color4':'#CAFF33',
         'color5':'#262626',
         'color6':'#1A1A1A',
-        'color7':'#BFBFBF'
+        'color7':'#BFBFBF',
+        'color8':'#A4E600',
+        'color9':'#8FD400'
       },
     },
     fontFamily: {
