@@ -1,7 +1,7 @@
 package com.manage.freelancer.infrastructure.persistence.mapper.mainpage;
 
 import com.manage.freelancer.domain.entity.mainpage.SocialLink;
-import com.manage.freelancer.infrastructure.persistence.entity.mainpage.SocialLinkEntity;
+import com.manage.freelancer.infrastructure.persistence.entityDTO.mainpage.SocialLinkEntity;
 import org.springframework.stereotype.Component;
 
 @Component

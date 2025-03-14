@@ -1,7 +1,7 @@
 package com.manage.freelancer.infrastructure.persistence.mapper.mainpage;
 
 import com.manage.freelancer.domain.entity.mainpage.NotFound;
-import com.manage.freelancer.infrastructure.persistence.entity.mainpage.NotFoundEntity;
+import com.manage.freelancer.infrastructure.persistence.entityDTO.mainpage.NotFoundEntity;
 import org.springframework.stereotype.Component;
 
 @Component

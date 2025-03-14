@@ -1,14 +1,14 @@
 package com.manage.freelancer.AAA.application.usecase;
 
 import com.manage.freelancer.AAA.domain.model.User;
-import com.manage.freelancer.AAA.domain.repository.UserRepository;
+import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RegisterUserUseCase {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;  // این از Spring Security است
+    private final PasswordEncoder passwordEncoder;
 
     public RegisterUserUseCase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;

@@ -2,8 +2,8 @@ package com.manage.freelancer.infrastructure.persistence.mapper.mainpage;
 
 import com.manage.freelancer.domain.entity.mainpage.FooterLink;
 import com.manage.freelancer.domain.entity.mainpage.FooterLinkCategory;
-import com.manage.freelancer.infrastructure.persistence.entity.mainpage.FooterLinkCategoryEntity;
-import com.manage.freelancer.infrastructure.persistence.entity.mainpage.FooterLinkEntity;
+import com.manage.freelancer.infrastructure.persistence.entityDTO.mainpage.FooterLinkCategoryEntity;
+import com.manage.freelancer.infrastructure.persistence.entityDTO.mainpage.FooterLinkEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

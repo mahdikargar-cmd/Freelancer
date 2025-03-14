@@ -2,7 +2,7 @@ package com.manage.freelancer.AAA.application.usecase;
 
 import com.manage.freelancer.AAA.config.JwtService;
 import com.manage.freelancer.AAA.domain.model.User;
-import com.manage.freelancer.AAA.domain.repository.UserRepository;
+import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +14,7 @@ public class LoginUserUseCase {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    //متد سازنده
     public LoginUserUseCase(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

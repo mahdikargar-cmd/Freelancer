@@ -3,9 +3,9 @@ package com.manage.freelancer.presentation.controller.mainpage;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.manage.freelancer.application.service.mainpage.NotFoundService;
+import com.manage.freelancer.application.usecase.mainpage.NotFoundUseCase;
 import com.manage.freelancer.domain.entity.mainpage.NotFound;
-import com.manage.freelancer.presentation.dto.mainpage.NotFoundDataResponse;
+import com.manage.freelancer.presentation.response.mainpage.NotFoundDataResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,16 +21,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class NotFoundController {
 
-    private final NotFoundService notFoundService;
+    private final NotFoundUseCase notFoundUseCase;
 
     @GetMapping("/notfound")
     public ResponseEntity<NotFoundDataResponse> getNotFound() {
-        List<NotFound> links = notFoundService.getAllNotFounds();
+        List<NotFound> links = notFoundUseCase.getAllNotFounds();
         return ResponseEntity.ok(new NotFoundDataResponse(links));
     }
 
     @PostMapping("/notfound/create")
     public ResponseEntity<NotFound> createEntity(@RequestBody NotFound notFound) {
-        return ResponseEntity.ok(notFoundService.create(notFound));
+        return ResponseEntity.ok(notFoundUseCase.create(notFound));
     }
 }

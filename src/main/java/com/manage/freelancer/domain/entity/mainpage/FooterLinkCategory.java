@@ -9,13 +9,11 @@ import lombok.Builder;
 import java.util.List;
 
 
+// domain/entity/mainpage/FooterLinkCategory.java (بدون وابستگی به JPA)
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class FooterLinkCategory {
     private Long id;
     private String title;
     private List<FooterLink> links;
-
 }

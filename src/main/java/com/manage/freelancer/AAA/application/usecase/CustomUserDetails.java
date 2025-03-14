@@ -15,7 +15,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList(); // فعلاً نقش‌ها را خالی می‌گذاریم
+        return Collections.emptyList();
     }
 
     @Override

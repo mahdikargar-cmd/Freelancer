@@ -16,12 +16,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // غیرفعال کردن CSRF
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/footer/**").permitAll()
-                                .requestMatchers("/api/**").permitAll() // آزاد کردن مسیر API فوتر
-// آزاد کردن مسیر API فوتر
-                                .anyRequest().permitAll() // غیرفعال کردن امنیت برای همه APIها
+                                .requestMatchers("/api/**").permitAll()
+                                .anyRequest().permitAll()
                 )
-                .formLogin(form -> form.disable()) // غیرفعال کردن فرم لاگین
-                .httpBasic(basic -> basic.disable()); // غیرفعال کردن احراز هویت Basic
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }

@@ -1,7 +1,7 @@
 package com.manage.freelancer.infrastructure.persistence.mapper.mainpage;
 
 import com.manage.freelancer.domain.entity.mainpage.HeaderLink;
-import com.manage.freelancer.infrastructure.persistence.entity.mainpage.HeaderLinkEntity;
+import com.manage.freelancer.infrastructure.persistence.entityDTO.mainpage.HeaderLinkEntity;
 import org.springframework.stereotype.Component;
 
 @Component
