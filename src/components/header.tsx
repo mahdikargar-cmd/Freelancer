@@ -20,8 +20,8 @@ const Header = async () => {
     const posts: HeaderData = await res.json();
 
     return (
-        <nav className="w-full z-20 top-0 start-0 mt-6 bg-color6 ">
-            <div className="max-w-screen-xl  xl:w-[1000px] flex flex-wrap  items-center justify-between md:justify-around mx-2 md:mx-auto p-3 bg-color1 rounded-full border border-color5">
+        <nav className="w-full z-20 top-0 start-0 mt-6 bg-color6 sticky">
+            <div className="max-w-screen-xl  xl:w-[1000px] flex flex-wrap items-center justify-between md:justify-around mx-2 md:mx-auto p-3 bg-color1 rounded-full border border-color5">
                 <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
                     <Image src={img} className="h-8 w-32" alt="Flowbite Logo" width={100} height={128} />
                 </Link>
