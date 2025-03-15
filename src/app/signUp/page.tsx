@@ -52,12 +52,13 @@ const SignUp = () => {
             if (!response.ok) {
                 throw new Error("شما قبلا ثبت نام کرده‌اید.");
             }
+            const data = await response.json();
 
             setCorrect("ثبت نام شما با موفقیت انجام شد .");
             setShowToast(true);
             
             setTimeout(() => {
-                route.push('/dashboard');
+                route.push('/login');
             }, 3000);
         } catch (error: any) {
             setEmailWarning(error.message);

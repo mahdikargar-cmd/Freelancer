@@ -9,25 +9,17 @@ const ProjectId = ({ params }: { params: { projectId: string } }) => {
     return (
         <div className="max-w-screen-lg mx-2 md:mx-auto p-6 bg-color1 rounded-2xl shadow-lg text-color2 my-4 border border-color5 relative">
             <div className="absolute top-0 right-0 left-0 h-2 bg-color4 rounded-t-2xl"></div>
-
-            {/* وضعیت پروژه */}
             <span className="border-2 border-green-900 bg-green-300 text-green-900 px-3 py-1 rounded-full mt-2 font-primaryLight flex items-center gap-2 text-md w-fit">
                 <MdOutlineMoreTime /> باز
             </span>
-
-            {/* عنوان پروژه */}
             <h1 className="text-3xl font-primaryDemibold text-color4 mt-4">
                 طراحی سایت و اپلیکیشن
             </h1>
-
-            {/* مشخصات پروژه */}
             <ul className="font-primaryMedium text-color7 space-y-3 mt-4">
                 <li className="flex items-center gap-2"><FaClock className="text-color4" /> 12 روز و 12 ساعت</li>
                 <li className="flex items-center gap-2"><FaRegCommentDots className="text-color4" /> 2 پیشنهاد</li>
                 <li className="flex items-center gap-2"><FaDollarSign className="text-color4" /> از پنج میلیون تا هفت میلیون</li>
             </ul>
-
-            {/* توضیحات پروژه */}
             <div className="mt-6 text-justify text-color3 leading-relaxed font-primaryMedium">
                 <p>
                     نیاز به یک اپلیکیشن فروشگاهی اندرویدی دارم که قابلیت‌های **کامنت گذاشتن، پنل ادمین، پنل کاربری، ثبت سفارش آنلاین و درگاه پرداخت** داشته باشد.
@@ -53,17 +45,12 @@ const ProjectId = ({ params }: { params: { projectId: string } }) => {
                     </div>
                 )}
             </div>
-
-            {/* دکمه نمایش بیشتر */}
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="mt-4 py-2 px-4 bg-color4 text-color5 font-primaryMedium text-md rounded-lg hover:bg-color8 transition"
             >
                 {expanded ? "نمایش کمتر" : "مشاهده بیشتر"}
             </button>
-
-            {/* مهارت‌های موردنیاز */}
-
         </div>
     );
 };

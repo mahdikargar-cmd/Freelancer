@@ -52,6 +52,7 @@ const Login = () => {
             }
 
             const data = await response.json();
+            localStorage.setItem("token", data.token);
             setWarning("خوش آمدید .");
             setShowToast({ Success: true, Failed: false });
 
@@ -96,7 +97,7 @@ const Login = () => {
                         </div>
                         <div className="w-full">
                             <input
-                                type="text"
+                                type="password"
                                 className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:ring-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
                                 placeholder="رمز خود را وارد کنید."
                                 required
