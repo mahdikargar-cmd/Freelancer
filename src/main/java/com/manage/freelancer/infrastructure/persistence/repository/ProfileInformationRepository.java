@@ -4,12 +4,15 @@ import com.manage.freelancer.domain.entity.ProfileInformation;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProfileInformationRepository {
-     List<ProfileInformation> findAll();
+    List<ProfileInformation> findAll();
 
     ProfileInformation findOne(Long id);
+
+    Optional<ProfileInformation> findById(Long id);
 
     ProfileInformation save(ProfileInformation profileInformation);
 
@@ -21,7 +24,7 @@ public interface ProfileInformationRepository {
 
     ProfileInformation findByUsername(String username);
 
-    ProfileInformation findByEmail(String email);
+    Optional<ProfileInformation> findByEmail(String email);
 
-    ProfileInformation findById(Long id);
+    Optional<ProfileInformation> findByPhoneNumber(String phoneNumber);
 }

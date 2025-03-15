@@ -1,4 +1,5 @@
 package com.manage.freelancer.infrastructure.persistence.entityDTO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manage.freelancer.AAA.infrastructure.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class ProfileInformationDTO {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserEntity user;
 
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProfileInformationUseCaseImpl implements ProfileInformationUseCase {
@@ -22,7 +23,6 @@ public class ProfileInformationUseCaseImpl implements ProfileInformationUseCase 
         return profileInformationRepository.save(profileInformation);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public List<ProfileInformation> getAllProfileInformation() {
@@ -30,23 +30,42 @@ public class ProfileInformationUseCaseImpl implements ProfileInformationUseCase 
     }
 
     @Override
-    public ProfileInformation getProfileInformationById(long id) {
-        return null;
+    @Transactional(readOnly = true)
+    public Optional<ProfileInformation> getProfileInformationById(long id) {
+        return profileInformationRepository.findById(id);
     }
 
     @Override
-    public ProfileInformation updateProfileInformation(Long id,ProfileInformation profileInformation) {
-        return null;
+    @Transactional
+    public ProfileInformation updateProfileInformation(Long id, ProfileInformation profileInformation) {
+        Optional<ProfileInformation> existingProfileOpt = profileInformationRepository.findById(id);
+
+        if (existingProfileOpt.isEmpty()) {
+            return null;
+        }
+
+        ProfileInformation existingProfile = existingProfileOpt.get();
+        profileInformation.setId(id);
+
+        if (profileInformation.getUser() == null) {
+            profileInformation.setUser(existingProfile.getUser());
+        }
+
+        return profileInformationRepository.update(profileInformation);
     }
 
-
     @Override
+    @Transactional
     public void deleteProfileInformation(long id) {
-
+        if (profileInformationRepository.findById(id).isPresent()) {
+            profileInformationRepository.delete(id);
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProfileInformation getInformationByPhoneNumber(String phoneNumber) {
-        return null;
+        Optional<ProfileInformation> profileOpt = profileInformationRepository.findByPhoneNumber(phoneNumber);
+        return profileOpt.orElse(null);
     }
 }
