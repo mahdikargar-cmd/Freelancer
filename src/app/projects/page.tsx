@@ -1,7 +1,7 @@
 'use client'
 import { FaClock, FaRegCommentDots, FaDollarSign } from "react-icons/fa";
 import { useState } from "react";
-
+import Link from "next/link";
 const Project = () => {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
@@ -79,8 +79,10 @@ const Project = () => {
                             <li className="flex items-center gap-2"><FaRegCommentDots className="text-color4" /> 2 پیشنهاد</li>
                             <li className="flex items-center gap-2"><FaDollarSign className="text-color4" /> از پنج میلیون تا هفت میلیون</li>
                         </ul>
-                        <button className="w-1/2 mt-4 py-2 rounded-lg bg-color4 text-color5 font-primaryMedium text-md md:text-lg hover:bg-color8 transition">
-                            مشاهده پروژه
+                        <button  className="w-1/2 mt-4 py-2 rounded-lg bg-color4 text-color5 font-primaryMedium text-md md:text-lg hover:bg-color8 transition">
+                            <Link href={`/projects/${index}`}>
+                                مشاهده پروژه
+                            </Link>
                         </button>
                     </div>
                 </div>
