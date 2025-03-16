@@ -3,6 +3,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import "./globals.css";
 import React from "react";
+import { AuthProvider } from "@/components/AuthContext";
 
 export const metadata: Metadata = {
   title: "Freelancer",
@@ -20,9 +21,11 @@ export default function RootLayout({
       <body
         className="bg-color6" dir="rtl"
       >
+        <AuthProvider>
           <Header />
           {children}
           <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

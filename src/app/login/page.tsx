@@ -7,8 +7,10 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react';
 import Success from '@/components/Toast/success';
 import Failed from '@/components/Toast/failed';
+import { useAuth } from '@/components/AuthContext';
 
 const Login = () => {
+    const { login } = useAuth();
     const route = useRouter();
     const [Info, SetInfo] = useState({
         email: "",
@@ -52,16 +54,19 @@ const Login = () => {
             }
 
             const data = await response.json();
-            if(data.success) document.cookie = `token=${data.token}; path=/; max-age=3600`;
+            if (data.token) {
+                document.cookie = `token=${data.token}; path=/; max-age=3600`;
+                login(data.token);
+                setWarning("خوش آمدید .");
+                setShowToast({ Success: true, Failed: false });
 
-            setWarning("خوش آمدید .");
-            setShowToast({ Success: true, Failed: false });
+                setTimeout(() => {
+                    setShowToast({ Success: false, Failed: false });
+                    setWarning("");
+                    route.push('/dashboard');
+                }, 3000);
+            }
 
-            setTimeout(() => {
-                setShowToast({ Success: false, Failed: false });
-                setWarning("");
-                route.push('/dashboard');
-            }, 3000);
 
         } catch (error: any) {
             setWarning(error.message);
