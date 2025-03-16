@@ -38,26 +38,28 @@ const Login = () => {
             return;
         }
         try {
-            const response = await fetch("/api/auth/login", {
+            const response: any = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(Info)
+                body: JSON.stringify(Info),
+                credentials: 'include'
             });
-            console.log(JSON.stringify(Info))
 
             if (!response.ok) {
                 throw new Error("رمز عبور یا ایمیل اشتباه است .");
             }
 
             const data = await response.json();
-            localStorage.setItem("token", data.token);
+            if(data.success) document.cookie = `token=${data.token}; path=/; max-age=3600`;
+
             setWarning("خوش آمدید .");
             setShowToast({ Success: true, Failed: false });
 
             setTimeout(() => {
                 setShowToast({ Success: false, Failed: false });
+                setWarning("");
                 route.push('/dashboard');
             }, 3000);
 
@@ -67,6 +69,7 @@ const Login = () => {
             setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
         }
     };
+
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
