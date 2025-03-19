@@ -5,7 +5,6 @@ import com.manage.freelancer.domain.entity.ProfileInformation;
 import com.manage.freelancer.infrastructure.persistence.repository.ProfileInformationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +21,13 @@ public class ProfileInformationUseCaseImpl implements ProfileInformationUseCase 
     public ProfileInformation createProfileInformation(ProfileInformation profileInformation) {
         return profileInformationRepository.save(profileInformation);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ProfileInformation> getProfileInformationByUserId(Long userId) {
+        return profileInformationRepository.findByUserId(userId);
+    }
+
 
     @Override
     @Transactional(readOnly = true)

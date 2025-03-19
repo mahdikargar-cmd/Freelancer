@@ -9,8 +9,7 @@ import java.util.Optional;
 @Repository
 public interface ProfileInformationRepository {
     List<ProfileInformation> findAll();
-
-    ProfileInformation findOne(Long id);
+    Optional<ProfileInformation> findByUserId(Long userId);
 
     Optional<ProfileInformation> findById(Long id);
 
@@ -18,13 +17,7 @@ public interface ProfileInformationRepository {
 
     void delete(Long id);
 
-    void delete(ProfileInformation profileInformation);
-
     ProfileInformation update(ProfileInformation profileInformation);
-
-    ProfileInformation findByUsername(String username);
-
-    Optional<ProfileInformation> findByEmail(String email);
 
     Optional<ProfileInformation> findByPhoneNumber(String phoneNumber);
 }

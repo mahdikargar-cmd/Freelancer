@@ -1,7 +1,6 @@
 package com.manage.freelancer.AAA.infrastructure.repository;
 
-import com.manage.freelancer.AAA.domain.model.User;
-import com.manage.freelancer.AAA.infrastructure.entity.UserEntity;
+import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -15,21 +14,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void save(User user) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(user.getId());
-        userEntity.setEmail(user.getEmail());
-        userEntity.setPassword(user.getPassword());
-        jpaUserRepository.save(userEntity);
+    public void save(UserDTO user) {
+        jpaUserRepository.save(user);
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return jpaUserRepository.findByEmail(email)
-                .map(userEntity -> new User(
-                        userEntity.getId(),
-                        userEntity.getEmail(),
-                        userEntity.getPassword()
-                ));
+    public Optional<UserDTO> findByEmail(String email) {
+        return jpaUserRepository.findByEmail(email);
     }
 }

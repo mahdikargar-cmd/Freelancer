@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public interface ProfileInformationUseCase {
 
-
     List<ProfileInformation> getAllProfileInformation();
+    Optional<ProfileInformation> getProfileInformationByUserId(Long userId);
 
     Optional<ProfileInformation> getProfileInformationById(long id);
 

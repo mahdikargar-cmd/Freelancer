@@ -6,7 +6,6 @@ import com.manage.freelancer.infrastructure.persistence.jparepository.ProfileInf
 import com.manage.freelancer.infrastructure.persistence.mapper.ProfileInformationMapper;
 import com.manage.freelancer.infrastructure.persistence.repository.ProfileInformationRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,10 +28,11 @@ public class ProfileInformationRepositoryImpl implements ProfileInformationRepos
     }
 
     @Override
-    public ProfileInformation findOne(Long id) {
-        Optional<ProfileInformation> profileOpt = findById(id);
-        return profileOpt.orElse(null);
+    public Optional<ProfileInformation> findByUserId(Long userId) {
+        return profileInformationJpaRepository.findByUserId(userId)
+                .map(profileInformationMapper::toDomain);
     }
+
 
     @Override
     public ProfileInformation save(ProfileInformation profileInformation) {
@@ -47,11 +47,6 @@ public class ProfileInformationRepositoryImpl implements ProfileInformationRepos
     }
 
     @Override
-    public void delete(ProfileInformation profileInformation) {
-        profileInformationJpaRepository.deleteById(profileInformation.getId());
-    }
-
-    @Override
     public ProfileInformation update(ProfileInformation profileInformation) {
         // Check if entity exists
         if (!profileInformationJpaRepository.existsById(profileInformation.getId())) {
@@ -62,18 +57,6 @@ public class ProfileInformationRepositoryImpl implements ProfileInformationRepos
         ProfileInformationDTO profileInformationDTO = profileInformationMapper.toDTO(profileInformation);
         ProfileInformationDTO updatedEntity = profileInformationJpaRepository.save(profileInformationDTO);
         return profileInformationMapper.toDomain(updatedEntity);
-    }
-
-    @Override
-    public ProfileInformation findByUsername(String username) {
-        // Implementation pending
-        return null;
-    }
-
-    @Override
-    public Optional<ProfileInformation> findByEmail(String email) {
-        // Implementation pending
-        return Optional.empty();
     }
 
     @Override

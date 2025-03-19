@@ -1,7 +1,7 @@
 package com.manage.freelancer.AAA.application.usecase;
 
 import com.manage.freelancer.AAA.config.JwtService;
-import com.manage.freelancer.AAA.domain.model.User;
+import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,10 +22,10 @@ public class LoginUserUseCase {
     }
 
     public String login(String email, String password) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
+        Optional<UserDTO> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
-            User user = userOpt.get();
+            UserDTO user = userOpt.get();
             CustomUserDetails userDetails = new CustomUserDetails(user); // تبدیل `User` به `UserDetails`
             return jwtService.generateToken(userDetails); // تولید و بازگشت JWT
         }

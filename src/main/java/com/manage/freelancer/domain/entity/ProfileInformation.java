@@ -1,5 +1,5 @@
 package com.manage.freelancer.domain.entity;
-import com.manage.freelancer.AAA.infrastructure.entity.UserEntity;
+import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +17,5 @@ public class ProfileInformation {
     private String profileImageUrl;
     private String address;
     private String placeOfStudy;
-    private UserEntity user;
+    private UserDTO user;
 }

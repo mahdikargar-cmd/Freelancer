@@ -1,6 +1,7 @@
 package com.manage.freelancer.AAA.application.usecase;
 
 import com.manage.freelancer.AAA.domain.model.User;
+import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class RegisterUserUseCase {
         }
 
         String hashedPassword = passwordEncoder.encode(password);
-        User user = new User(null, email, hashedPassword);
+        UserDTO user = new UserDTO(null, email, hashedPassword);
         userRepository.save(user);
     }
 }
