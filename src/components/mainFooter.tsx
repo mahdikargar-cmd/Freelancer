@@ -1,4 +1,4 @@
-import API from "./api";
+import API from "./utils/api";
 import Link from "next/link";
 
 interface FooterLink {

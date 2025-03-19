@@ -1,4 +1,4 @@
-import API from "./api";
+import API from "./utils/api";
 
 interface SocialLink {
     id:number,

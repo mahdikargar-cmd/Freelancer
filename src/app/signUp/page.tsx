@@ -29,15 +29,7 @@ const SignUp = () => {
         }
     };
 
-    const validatePassword = (password: string) => {
-        if (password.length === 0) {
-            setPasswordWarning("");
-        } else if (!passwordRegex.test(password)) {
-            setPasswordWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
-        } else {
-            setPasswordWarning("");
-        }
-    };
+
 
     const handleSubmit = async () => {
         if (emailWarning || passwordWarning || !Info.email || !Info.password) return;
@@ -109,7 +101,7 @@ const SignUp = () => {
                                 value={Info.password}
                                 onChange={(e) => {
                                     SetInfo({ ...Info, password: e.target.value });
-                                    validatePassword(e.target.value);
+
                                 }}
                             />
                             {passwordWarning && <p className="text-red-500 font-primaryMedium mt-2">{passwordWarning}</p>}

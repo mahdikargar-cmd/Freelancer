@@ -1,4 +1,4 @@
-import API from "@/components/api";
+import API from "@/components/utils/api";
 
 interface Link {
   id: number,

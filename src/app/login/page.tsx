@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react';
 import Success from '@/components/Toast/success';
 import Failed from '@/components/Toast/failed';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/components/context/AuthContext';
 
 const Login = () => {
     const { login } = useAuth();
@@ -33,12 +33,7 @@ const Login = () => {
             return;
         }
 
-        if (!passwordRegex.test(Info.password)) {
-            setWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
-            setShowToast({ Success: false, Failed: true });
-            setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
-            return;
-        }
+
         try {
             const response: any = await fetch("/api/auth/login", {
                 method: "POST",

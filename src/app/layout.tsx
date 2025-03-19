@@ -3,7 +3,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import "./globals.css";
 import React from "react";
-import { AuthProvider } from "@/components/AuthContext";
+import { AuthProvider } from "@/components/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "Freelancer",

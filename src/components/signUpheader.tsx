@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from "./AuthContext";
+import { useAuth } from "@/components/context/AuthContext";
 import { FaUser } from "react-icons/fa";
 import Link from "next/link";
 import { useState,useEffect } from "react";
@@ -38,6 +38,7 @@ const SignHead = () => {
                             >
                                 خروج
                             </button>
+
                         </div>
                     )}
                 </div>
