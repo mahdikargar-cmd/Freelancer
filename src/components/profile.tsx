@@ -5,10 +5,10 @@ import {
     FaUniversity,
     FaCheckCircle,
 } from "react-icons/fa";
-import {useAuth} from "@/components/context/AuthContext";
-import React, {useEffect, useState} from "react";
+import { useAuth } from "@/components/context/AuthContext";
+import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import axios, {AxiosResponse} from "axios";
+import axios, { AxiosResponse } from "axios";
 
 interface ProfileData {
     id: number | null;
@@ -21,10 +21,19 @@ interface ProfileData {
     user: {
         id: string | null;
     };
+    status?: string; // اضافه کردن status به عنوان فیلد اختیاری
+    message?: string; // اضافه کردن message به عنوان فیلد اختیاری
 }
 
+// یا تعریف نوع جدید:
+type ProfileResponse = ProfileData & {
+    error?: string;
+    status?: string;
+    message?: string;
+};
+
 const Profile = () => {
-    const {isLoggedIn, userId} = useAuth();
+    const { isLoggedIn, userId } = useAuth();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [profileExists, setProfileExists] = useState<boolean>(false);
@@ -64,14 +73,10 @@ const Profile = () => {
                     return;
                 }
 
-                const response: AxiosResponse<ProfileData & {
-                    error?: string
-                }> = await api.get("http://localhost:8080/api/getProfileInformation");
-                console.log("GET Response:", response.data);
-
+                // در کد خود:
+                const response: AxiosResponse<ProfileResponse> = await api.get("http://localhost:8080/api/getProfileInformation");
 
                 if (response.data && response.data.status === "new_user") {
-                    // Handle new user scenario
                     console.log(response.data.message);
                     setProfileExists(false);
                     setProfileData((prev) => ({
@@ -80,7 +85,7 @@ const Profile = () => {
                             id: userId,
                         },
                     }));
-                }else if (response.data && !response.data.error) {
+                } else if (response.data && !response.data.error) {
                     const profile = response.data;
                     setProfileData({
                         id: profile.id,
@@ -272,7 +277,7 @@ const Profile = () => {
                                     className="mt-3 bg-color4 text-black px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-opacity-80 cursor-pointer">
                                     تغییر عکس
                                     <input type="file" accept="image/jpeg,image/png" onChange={handleUploadImage}
-                                           className="hidden"/>
+                                        className="hidden" />
                                 </label>
                             ) : (
                                 <p className="text-sm text-gray-300 mt-2">ابتدا پروفایل خود را ایجاد کنید</p>
@@ -284,56 +289,56 @@ const Profile = () => {
                             </h2>
                             {/* فیلدهای قابل ویرایش */}
                             <div className="relative">
-                                <FaUser className="absolute right-2 top-3 text-color4"/>
+                                <FaUser className="absolute right-2 top-3 text-color4" />
                                 <input
                                     type="text"
                                     placeholder="نام"
                                     value={profileData.firstName}
-                                    onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
+                                    onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
                                     className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
                                 />
                             </div>
 
                             <div className="relative">
-                                <FaUser className="absolute right-2 top-3 text-color4"/>
+                                <FaUser className="absolute right-2 top-3 text-color4" />
                                 <input
                                     type="text"
                                     placeholder="نام خانوادگی"
                                     value={profileData.lastName}
-                                    onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
+                                    onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
                                     className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
                                 />
                             </div>
 
                             <div className="relative">
-                                <FaPhone className="absolute right-2 top-3 text-color4"/>
+                                <FaPhone className="absolute right-2 top-3 text-color4" />
                                 <input
                                     type="text"
                                     placeholder="شماره تلفن"
                                     value={profileData.phoneNumber}
-                                    onChange={(e) => setProfileData({...profileData, phoneNumber: e.target.value})}
+                                    onChange={(e) => setProfileData({ ...profileData, phoneNumber: e.target.value })}
                                     className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
                                 />
                             </div>
 
                             <div className="relative">
-                                <FaMapMarkerAlt className="absolute right-2 top-3 text-color4"/>
+                                <FaMapMarkerAlt className="absolute right-2 top-3 text-color4" />
                                 <input
                                     type="text"
                                     placeholder="آدرس"
                                     value={profileData.address}
-                                    onChange={(e) => setProfileData({...profileData, address: e.target.value})}
+                                    onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
                                     className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
                                 />
                             </div>
 
                             <div className="relative">
-                                <FaUniversity className="absolute right-2 top-3 text-color4"/>
+                                <FaUniversity className="absolute right-2 top-3 text-color4" />
                                 <input
                                     type="text"
                                     placeholder="محل تحصیل"
                                     value={profileData.placeOfStudy}
-                                    onChange={(e) => setProfileData({...profileData, placeOfStudy: e.target.value})}
+                                    onChange={(e) => setProfileData({ ...profileData, placeOfStudy: e.target.value })}
                                     className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
                                 />
                             </div>
@@ -351,7 +356,7 @@ const Profile = () => {
                 <div className="col-span-2 border border-color5 shadow-md p-4 rounded-xl">
                     <div className="bg-color1 text-color2 p-6 rounded-2xl shadow-lg border border-color5">
                         <div className="flex items-center gap-4 mb-4 p-4 border border-color5 rounded-xl shadow-md">
-                            <FaCheckCircle className="text-color4 text-xl"/>
+                            <FaCheckCircle className="text-color4 text-xl" />
                             <div>
                                 <h1 className="text-lg font-primaryDemibold">
                                     {profileExists ? "تکمیل اطلاعات پروفایل" : "ایجاد پروفایل"}

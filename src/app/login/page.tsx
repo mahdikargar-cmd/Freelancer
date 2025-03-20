@@ -51,7 +51,7 @@ const Login = () => {
             const data = await response.json();
             if (data.token) {
                 document.cookie = `token=${data.token}; path=/; max-age=3600`;
-                login(data.token);
+                login(data.token , data.id);
                 setWarning("خوش آمدید .");
                 setShowToast({ Success: true, Failed: false });
 
