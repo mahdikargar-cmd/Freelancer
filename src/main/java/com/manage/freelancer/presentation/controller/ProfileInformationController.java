@@ -58,7 +58,7 @@ public class ProfileInformationController {
                 Map<String, Object> responseMap = new HashMap<>();
                 responseMap.put("status", "new_user");
                 responseMap.put("message", "پروفایل یافت نشد - می‌توانید پروفایل جدید ایجاد کنید");
-                return ResponseEntity.ok(responseMap);  // Return 200 OK instead of 404
+                return ResponseEntity.ok(responseMap);
             }
         } catch (Exception e) {
             logger.error("❌ خطا در دریافت پروفایل: {}", e.getMessage());
