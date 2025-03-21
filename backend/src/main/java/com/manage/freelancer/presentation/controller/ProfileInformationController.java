@@ -273,7 +273,7 @@ public class ProfileInformationController {
         logger.info("نام فایل  دریافت شده: {}", file.getOriginalFilename());
 
         if (file.isEmpty()) {
-            logger.error("فایل دریافت  نشد!!!");
+            logger.error("فایل دریافت  نشد!");
             return ResponseEntity.badRequest().body(createErrorResponse("فایل ارسال نشده است!"));
         }
 
@@ -285,6 +285,7 @@ public class ProfileInformationController {
 
             ProfileInformation profileInformation = profileInformationOpt.get();
 
+            // Only allow jpg and png files
             if (!isValidImageFile(file)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createErrorResponse("Invalid file type"));
             }
