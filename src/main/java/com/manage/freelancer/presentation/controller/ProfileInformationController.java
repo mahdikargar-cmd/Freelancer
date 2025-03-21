@@ -285,7 +285,6 @@ public class ProfileInformationController {
 
             ProfileInformation profileInformation = profileInformationOpt.get();
 
-            // Only allow jpg and png files
             if (!isValidImageFile(file)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createErrorResponse("Invalid file type"));
             }
