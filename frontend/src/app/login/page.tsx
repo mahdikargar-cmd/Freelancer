@@ -25,50 +25,55 @@ const Login = () => {
 
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         if (!emailRegex.test(Info.email)) {
             setWarning("ایمیل نامعتبر است!");
             setShowToast({ Success: false, Failed: true });
             setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
             return;
         }
-
-
-        try {
-            const response: any = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(Info),
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error("رمز عبور یا ایمیل اشتباه است .");
-            }
-
-            const data = await response.json();
-            if (data.token) {
-                document.cookie = `token=${data.token}; path=/; max-age=3600`;
-                login(data.token , data.id);
-                setWarning("خوش آمدید .");
-                setShowToast({ Success: true, Failed: false });
-
-                setTimeout(() => {
-                    setShowToast({ Success: false, Failed: false });
-                    setWarning("");
-                    route.push('/dashboard');
-                }, 3000);
-            }
-
-
-        } catch (error: any) {
-            setWarning(error.message);
+        if (!passwordRegex.test(Info.password)) {
+            setWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
             setShowToast({ Success: false, Failed: true });
             setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
+            return;
         }
+
+        fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(Info),
+            credentials: 'include'
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("رمز عبور یا ایمیل اشتباه است.");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.token) {
+                    document.cookie = `token=${data.token}; path=/; max-age=3600`;
+                    login(data.token, data.id);
+                    setWarning("خوش آمدید.");
+                    setShowToast({ Success: true, Failed: false });
+
+                    setTimeout(() => {
+                        setShowToast({ Success: false, Failed: false });
+                        setWarning("");
+                        route.push('/dashboard');
+                    }, 3000);
+                }
+            })
+            .catch((error) => {
+                setWarning(error.message);
+                setShowToast({ Success: false, Failed: true });
+                setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
+            });
     };
+
 
     return (
         <div className="flex items-center justify-center min-h-screen">

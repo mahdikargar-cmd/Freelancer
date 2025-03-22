@@ -11,6 +11,7 @@ const SignUp = () => {
         email: "",
         password: ""
     });
+
     const [correct, setCorrect] = useState('');
     const [showToast, setShowToast] = useState(false);
     const [emailWarning, setEmailWarning] = useState("");
@@ -29,33 +30,45 @@ const SignUp = () => {
         }
     };
 
-
-
-    const handleSubmit = async () => {
-        if (emailWarning || passwordWarning || !Info.email || !Info.password) return;
-
-        try {
-            const response = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(Info)
-            });
-
-            if (!response.ok) {
-                throw new Error("شما قبلا ثبت نام کرده‌اید.");
-            }
-            const data = await response.json();
-
-            setCorrect("ثبت نام شما با موفقیت انجام شد .");
-            setShowToast(true);
-            
-            setTimeout(() => {
-                route.push('/login');
-            }, 3000);
-        } catch (error: any) {
-            setEmailWarning(error.message);
+    const validatePassword = (password: string) => {
+        if (password.length === 0) {
+            setPasswordWarning("");
+        } else if (!passwordRegex.test(password)) {
+            setPasswordWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
+        } else {
+            setPasswordWarning("");
         }
     };
+
+
+
+    const handleSubmit = () => {
+        if (emailWarning || passwordWarning || !Info.email || !Info.password) return;
+
+        fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(Info)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("شما قبلا ثبت نام کرده‌اید.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                setCorrect("ثبت نام شما با موفقیت انجام شد.");
+                setShowToast(true);
+
+                setTimeout(() => {
+                    route.push('/login');
+                }, 3000);
+            })
+            .catch(error => {
+                setEmailWarning(error.message);
+            });
+    };
+
 
     return (
         <div className="flex items-center justify-center min-h-screen relative">
@@ -101,7 +114,7 @@ const SignUp = () => {
                                 value={Info.password}
                                 onChange={(e) => {
                                     SetInfo({ ...Info, password: e.target.value });
-
+                                    validatePassword(e.target.value);
                                 }}
                             />
                             {passwordWarning && <p className="text-red-500 font-primaryMedium mt-2">{passwordWarning}</p>}
