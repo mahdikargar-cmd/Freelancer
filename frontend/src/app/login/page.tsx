@@ -124,11 +124,10 @@ const Login = () => {
                             className={`rounded-full text-color1 font-primaryMedium p-4 w-full
                             ${!Info.email || !Info.password ? 'bg-gray-500 cursor-not-allowed' : 'bg-color4'}`}
                             onClick={handleSubmit}
-                            disabled={!Info.email || !Info.password} // ✅ حالا دکمه فقط وقتی خالیه غیرفعاله
+                            disabled={!Info.email || !Info.password}
                         >
                             ورود به سیستم
                         </button>
-
                         <button
                             className="bg-color1 rounded-3xl border border-color5 text-center text-color2 font-primaryMedium p-4 w-full" onClick={() => route.push('/signUp')}
                         >
