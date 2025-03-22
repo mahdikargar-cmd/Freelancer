@@ -19,13 +19,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = Cookies.get("token");
+    const token = Cookies.get("token") || null;
+    const storedUserId = Cookies.get("userId") || null;
     if (token) {
-      const storedUserId = Cookies.get("userId");
-      setUserId(storedUserId || null);
-      setIsLoggedIn(true);
+        setUserId(storedUserId);
+        setIsLoggedIn(true);
     }
-  }, []);
+}, []);
+
 
   const login = (token: string, id: string) => {
     Cookies.set("token", token);
