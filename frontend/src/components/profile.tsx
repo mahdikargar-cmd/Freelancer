@@ -6,9 +6,10 @@ import {
     FaCheckCircle,
 } from "react-icons/fa";
 import { useAuth } from "@/components/context/AuthContext";
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
+import { div } from "framer-motion/client";
 
 interface ProfileData {
     id: number | null;
@@ -136,7 +137,7 @@ const Profile = () => {
                 console.log("توکن یافت نشد");
                 return;
             }
-
+            setProfileExists(false);
             const url =
                 profileExists && profileData.id
                     ? `http://localhost:8080/api/ProfileInformation/${profileData.id}`
@@ -251,13 +252,20 @@ const Profile = () => {
             </div>
         );
     }
+    const fields: { icon: JSX.Element; placeholder: string; key: keyof ProfileData }[] = [
+        { icon: <FaUser />, placeholder: "نام", key: "firstName" },
+        { icon: <FaUser />, placeholder: "نام خانوادگی", key: "lastName" },
+        { icon: <FaPhone />, placeholder: "شماره تلفن", key: "phoneNumber" },
+        { icon: <FaMapMarkerAlt />, placeholder: "آدرس", key: "address" },
+        { icon: <FaUniversity />, placeholder: "محل تحصیل", key: "placeOfStudy" }
+    ];
 
     return (
         <div className="text-white max-w-screen-xl mx-auto my-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
                 {/* کادر اطلاعات کاربر */}
                 <div
-                    className="bg-color1 text-color2 p-8 rounded-2xl shadow-xl border border-color5 transition-all hover:shadow-2xl mx-auto self-start">
+                    className="bg-color1 text-color2 p-4 rounded-2xl shadow-xl border border-color5 transition-all hover:shadow-2xl md:mx-2 mx-auto self-start w-full">
                     <div className="grid grid-cols-1 items-center font-primaryMedium">
                         <div className="flex flex-col justify-center items-center border-b-2 border-color3 mb-4 pb-4">
                             <img
@@ -280,74 +288,57 @@ const Profile = () => {
                                         className="hidden" />
                                 </label>
                             ) : (
-                                <p className="text-sm text-gray-300 mt-2">ابتدا پروفایل خود را ایجاد کنید</p>
+                                <p className="text-sm text-gray-300 mt-2">در ابتدا اطلاعات شخصی خود را تکمیل کنید .</p>
                             )}
                         </div>
                         <div className="flex flex-col justify-center space-y-3">
-                            <h2 className="text-2xl font-primaryBold mb-3 text-color4">
-                                {profileExists ? "اطلاعات پروفایل" : "ایجاد پروفایل جدید"}
+                            <h2 className="text-xl font-primaryBold mb-3 text-color4 text-center">
+                                {profileExists ? "اطلاعات پروفایل" : "تکمیل اطلاعات"}
                             </h2>
-                            {/* فیلدهای قابل ویرایش */}
-                            <div className="relative">
-                                <FaUser className="absolute right-2 top-3 text-color4" />
-                                <input
-                                    type="text"
-                                    placeholder="نام"
-                                    value={profileData.firstName}
-                                    onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
-                                    className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
-                                />
-                            </div>
-
-                            <div className="relative">
-                                <FaUser className="absolute right-2 top-3 text-color4" />
-                                <input
-                                    type="text"
-                                    placeholder="نام خانوادگی"
-                                    value={profileData.lastName}
-                                    onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
-                                    className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
-                                />
-                            </div>
-
-                            <div className="relative">
-                                <FaPhone className="absolute right-2 top-3 text-color4" />
-                                <input
-                                    type="text"
-                                    placeholder="شماره تلفن"
-                                    value={profileData.phoneNumber}
-                                    onChange={(e) => setProfileData({ ...profileData, phoneNumber: e.target.value })}
-                                    className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
-                                />
-                            </div>
-
-                            <div className="relative">
-                                <FaMapMarkerAlt className="absolute right-2 top-3 text-color4" />
-                                <input
-                                    type="text"
-                                    placeholder="آدرس"
-                                    value={profileData.address}
-                                    onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
-                                    className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
-                                />
-                            </div>
-
-                            <div className="relative">
-                                <FaUniversity className="absolute right-2 top-3 text-color4" />
-                                <input
-                                    type="text"
-                                    placeholder="محل تحصیل"
-                                    value={profileData.placeOfStudy}
-                                    onChange={(e) => setProfileData({ ...profileData, placeOfStudy: e.target.value })}
-                                    className="border border-color5 shadow-md p-2 pr-8 rounded-full w-full text-black"
-                                />
-                            </div>
-
+                            {
+                                profileExists ? (
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {[
+                                            { icon: <FaUser />, label: profileData.firstName },
+                                            { icon: <FaUser />, label: profileData.lastName },
+                                            { icon: <FaPhone />, label: profileData.phoneNumber },
+                                            { icon: <FaMapMarkerAlt />, label: profileData.address },
+                                            { icon: <FaUniversity />, label: profileData.placeOfStudy }
+                                        ].map((item, index) => (
+                                            <div key={index} className="relative">
+                                                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-color4 text-lg">
+                                                    {item.icon}
+                                                </span>
+                                                <p className="bg-color6 border border-color5 text-color3 text-lg rounded-full block w-full py-3 pl-4 pr-10 font-primaryMedium text-center shadow-md">
+                                                    {item.label}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {fields.map((item, index) => (
+                                            <div key={index} className="relative">
+                                                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-color4 text-lg">
+                                                    {item.icon}
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    placeholder={item.placeholder}
+                                                    value={profileData[item.key] ?? ""}  // بدون ارور
+                                                    onChange={(e) => setProfileData({ ...profileData, [item.key]: e.target.value })}
+                                                    className="border border-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-color4"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )
+                            }
                             <button
                                 onClick={handleSaveProfile}
                                 className="bg-color4 text-black px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-opacity-80 mt-4"
                             >
-                                {profileExists ? "ذخیره تغییرات" : "ایجاد پروفایل"}
+                                {profileExists ? " تغییر اطلاعات" : "ایجاد پروفایل"}
                             </button>
                         </div>
                     </div>
@@ -376,8 +367,8 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
