@@ -22,8 +22,7 @@ const Login = () => {
         Failed: false
     });
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     const handleSubmit = () => {
         if (!emailRegex.test(Info.email)) {
@@ -33,7 +32,7 @@ const Login = () => {
             return;
         }
         if (!passwordRegex.test(Info.password)) {
-            setWarning("رمز عبور باید حداقل ۸ کاراکتر، شامل عدد و حروف انگلیسی باشد!");
+            setWarning("رمز عبور باید حداقل 8 کاراکتر باشد و شامل حداقل یک حرف بزرگ، یک حرف کوچک، یک عدد و یک نماد خاص باشد.");
             setShowToast({ Success: false, Failed: true });
             setTimeout(() => setShowToast({ Success: false, Failed: false }), 3000);
             return;
