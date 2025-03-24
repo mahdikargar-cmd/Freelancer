@@ -9,8 +9,7 @@ import { useAuth } from "@/components/context/AuthContext";
 import React, { JSX, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
-import { div } from "framer-motion/client";
-
+import Success from "./Toast/success";
 interface ProfileData {
     id: number | null;
     firstName: string;
@@ -51,7 +50,16 @@ const Profile = () => {
             id: null,
         },
     });
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
 
+    const handleShowToast = (message: string) => {
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => {
+            setShowToast(false);
+        }, 3000); // مخفی شدن toast بعد از 3 ثانیه
+    };
     const api = axios.create({
         withCredentials: true,
     });
@@ -176,13 +184,11 @@ const Profile = () => {
                 setProfileExists(true);
                 setIsEditing(false); // وقتی ذخیره شد، حالت ویرایش رو غیرفعال کن
 
-                setTimeout(() => {
-                    alert(profileExists ? "پروفایل بروزرسانی شد" : "پروفایل با موفقیت ایجاد شد");
-                }, 100); // تاخیر کوچک برای اینکه UI آپدیت شود
+                handleShowToast(profileExists ? "پروفایل بروزرسانی شد" : "پروفایل با موفقیت ایجاد شد");
             }
         } catch (error: any) {
             console.error("خطا در ذخیره پروفایل:", error);
-            alert(`خطا: ${error.response?.data?.error || error.message}`);
+            handleShowToast(`خطا: ${error.response?.data?.error || error.message}`);
         }
     };
 
@@ -222,7 +228,7 @@ const Profile = () => {
             }
 
             if (response.data) {
-                alert("تصویر پروفایل با موفقیت آپلود شد");
+                handleShowToast("تصویر پروفایل با موفقیت آپلود شد");
 
                 try {
                     const profileResponse: AxiosResponse<ProfileData> = await api.get("http://localhost:8080/api/getProfileInformation");
@@ -242,7 +248,7 @@ const Profile = () => {
             }
         } catch (error: any) {
             console.error("خطا در آپلود:", error);
-            alert(`خطا در آپلود تصویر: ${error.response?.data?.error || error.message}`);
+            handleShowToast(`خطا در آپلود تصویر: ${error.response?.data?.error || error.message}`);
         }
     };
     if (loading) {
@@ -269,7 +275,8 @@ const Profile = () => {
     ];
 
     return (
-        <div className="text-white max-w-screen-xl mx-auto my-8">
+        <div className="text-white max-w-screen-xl mx-auto my-8 relative">
+            {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
                 {/* کادر اطلاعات کاربر */}
                 <div
