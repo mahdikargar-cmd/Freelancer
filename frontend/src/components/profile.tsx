@@ -38,7 +38,7 @@ const Profile = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [profileExists, setProfileExists] = useState<boolean>(false);
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState<boolean>(false);
     const [profileData, setProfileData] = useState<ProfileData>({
         id: null,
         firstName: "",
@@ -51,8 +51,8 @@ const Profile = () => {
             id: null,
         },
     });
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState("");
+    const [showToast, setShowToast] = useState<boolean>(false);
+    const [toastMessage, setToastMessage] = useState<string>("");
 
     const handleShowToast = (message: string) => {
         setToastMessage(message);

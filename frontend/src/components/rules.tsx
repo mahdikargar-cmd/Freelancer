@@ -1,5 +1,3 @@
-import { text } from "stream/consumers";
-
 const Rules = () => {
     type InfoItem = {
         text: string;

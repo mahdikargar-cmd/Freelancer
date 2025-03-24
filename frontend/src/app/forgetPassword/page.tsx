@@ -1,4 +1,3 @@
-import Link from "next/link";
 import r_c from '../../img/right-corner.png';
 import Image from "next/image";
 

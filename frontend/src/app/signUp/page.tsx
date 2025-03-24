@@ -7,15 +7,17 @@ import Success from '@/components/Toast/success';
 
 const SignUp = () => {
     const route = useRouter();
-    const [Info, SetInfo] = useState({
+    const [Info, SetInfo] = useState<{ email: string; password: string }>({
         email: "",
         password: ""
     });
 
-    const [correct, setCorrect] = useState('');
-    const [showToast, setShowToast] = useState(false);
-    const [emailWarning, setEmailWarning] = useState("");
-    const [passwordWarning, setPasswordWarning] = useState("");
+
+    const [showToast, setShowToast] = useState<boolean>(false);
+    const [correct, setCorrect] = useState<string>("");
+    const [emailWarning, setEmailWarning] = useState<string>("");
+    const [passwordWarning, setPasswordWarning] = useState<string>("");
+
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -131,7 +133,6 @@ const SignUp = () => {
                         >
                             ثبت نام کنید
                         </button>
-
                     </div>
                 </div>
             </div>
