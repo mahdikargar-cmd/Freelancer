@@ -274,6 +274,21 @@ const Profile = () => {
         { icon: <FaUniversity />, placeholder: "محل تحصیل", key: "placeOfStudy" }
     ];
 
+    const calculateProfileCompletion = () => {
+        const requiredFields: (keyof ProfileData)[] = ["firstName", "lastName", "phoneNumber", "address", "placeOfStudy"];
+        let filledFields = requiredFields.filter(field => profileData[field]?.trim()).length;
+
+        // در صورتی که تصویر پروفایل موجود باشد، یک امتیاز اضافه می‌شود.
+        if (profileData.profileImageUrl) {
+            filledFields += 1;
+        }
+
+        // محاسبه درصد تکمیل
+        return Math.round((filledFields / (requiredFields.length + 1)) * 100);
+    };
+
+    const profileCompletion = calculateProfileCompletion();
+
     return (
         <div className="text-white max-w-screen-xl mx-auto my-8 relative">
             {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
@@ -371,6 +386,13 @@ const Profile = () => {
                 </div>
                 {/* کادر اعلانات */}
                 <div className="col-span-2 border border-color5 shadow-md p-4 rounded-xl">
+                    <div className="bg-color1 text-color2 p-4 rounded-xl shadow-lg mb-4 border border-color5">
+                        <h2 className="text-xl font-primaryBold mb-4">پیشرفت تکمیل پروفایل</h2>
+                        <div className="w-full bg-gray-700 rounded-full h-2.5">
+                            <div className="bg-color4 h-2.5 rounded-full transition-all duration-300" style={{ width: `${profileCompletion}%` }}></div>
+                        </div>
+                        <p className="mt-2 text-sm font-primaryRegular">{profileCompletion}% تکمیل شده</p>
+                    </div>
                     <div className="bg-color1 text-color2 p-6 rounded-2xl shadow-lg border border-color5">
                         <div className="flex items-center gap-4 mb-4 p-4 border border-color5 rounded-xl shadow-md">
                             <FaCheckCircle className="text-color4 text-xl" />
