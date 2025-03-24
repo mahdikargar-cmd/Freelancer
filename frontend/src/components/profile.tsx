@@ -38,6 +38,7 @@ const Profile = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [profileExists, setProfileExists] = useState<boolean>(false);
+    const [isEditing, setIsEditing] = useState(false);
     const [profileData, setProfileData] = useState<ProfileData>({
         id: null,
         firstName: "",
@@ -137,7 +138,7 @@ const Profile = () => {
                 console.log("توکن یافت نشد");
                 return;
             }
-            setProfileExists(false);
+
             const url =
                 profileExists && profileData.id
                     ? `http://localhost:8080/api/ProfileInformation/${profileData.id}`
@@ -152,12 +153,12 @@ const Profile = () => {
                 address: profileData.address,
                 placeOfStudy: profileData.placeOfStudy,
             };
-            const response: AxiosResponse<ProfileData> = await api[method](url, requestData);
-            if (response.data) {
-                alert(profileExists ? "پروفایل بروزرسانی شد" : "پروفایل با موفقیت ایجاد شد");
-                setProfileExists(true);
 
+            const response: AxiosResponse<ProfileData> = await api[method](url, requestData);
+
+            if (response.data) {
                 const responseData = response.data;
+
                 setProfileData((prev) => ({
                     ...prev,
                     id: responseData.id,
@@ -171,6 +172,13 @@ const Profile = () => {
                         id: responseData.user?.id || prev.user.id,
                     },
                 }));
+
+                setProfileExists(true);
+                setIsEditing(false); // وقتی ذخیره شد، حالت ویرایش رو غیرفعال کن
+
+                setTimeout(() => {
+                    alert(profileExists ? "پروفایل بروزرسانی شد" : "پروفایل با موفقیت ایجاد شد");
+                }, 100); // تاخیر کوچک برای اینکه UI آپدیت شود
             }
         } catch (error: any) {
             console.error("خطا در ذخیره پروفایل:", error);
@@ -296,26 +304,7 @@ const Profile = () => {
                                 {profileExists ? "اطلاعات پروفایل" : "تکمیل اطلاعات"}
                             </h2>
                             {
-                                profileExists ? (
-                                    <div className="grid grid-cols-1 gap-4">
-                                        {[
-                                            { icon: <FaUser />, label: profileData.firstName },
-                                            { icon: <FaUser />, label: profileData.lastName },
-                                            { icon: <FaPhone />, label: profileData.phoneNumber },
-                                            { icon: <FaMapMarkerAlt />, label: profileData.address },
-                                            { icon: <FaUniversity />, label: profileData.placeOfStudy }
-                                        ].map((item, index) => (
-                                            <div key={index} className="relative">
-                                                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-color4 text-lg">
-                                                    {item.icon}
-                                                </span>
-                                                <p className="bg-color6 border border-color5 text-color3 text-lg rounded-full block w-full py-3 pl-4 pr-10 font-primaryMedium text-center shadow-md">
-                                                    {item.label}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
+                                isEditing ? (
                                     <div className="grid grid-cols-1 gap-4">
                                         {fields.map((item, index) => (
                                             <div key={index} className="relative">
@@ -332,14 +321,44 @@ const Profile = () => {
                                             </div>
                                         ))}
                                     </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {[
+                                            { icon: <FaUser />, label: profileData.firstName },
+                                            { icon: <FaUser />, label: profileData.lastName },
+                                            { icon: <FaPhone />, label: profileData.phoneNumber },
+                                            { icon: <FaMapMarkerAlt />, label: profileData.address },
+                                            { icon: <FaUniversity />, label: profileData.placeOfStudy }
+                                        ].map((item, index) => (
+                                            <div key={index} className="cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex items-center gap-2 shadow-md">
+                                                <span className="text-color4 text-lg">
+                                                    {item.icon}
+                                                </span>
+                                                <p className="bg-color6 border border-color5 text-color3 text-lg rounded-full block w-full py-3 pl-4 pr-10 font-primaryMedium text-center min-h-[44px]">
+                                                    {item.label}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )
                             }
                             <button
-                                onClick={handleSaveProfile}
-                                className="bg-color4 text-black px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-opacity-80 mt-4"
+                                onClick={() => setIsEditing(true)}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200"
                             >
-                                {profileExists ? " تغییر اطلاعات" : "ایجاد پروفایل"}
+                                ویرایش
                             </button>
+
+                            <button
+                                disabled={!isEditing}
+                                onClick={handleSaveProfile}
+                                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200
+                                ${isEditing ? "bg-green-500 hover:bg-green-600 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+                                `}
+                            >
+                                ذخیره
+                            </button>
+
                         </div>
                     </div>
                 </div>
