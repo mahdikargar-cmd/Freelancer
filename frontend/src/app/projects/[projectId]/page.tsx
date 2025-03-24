@@ -3,7 +3,7 @@ import { useState } from "react";
 import { MdOutlineMoreTime } from "react-icons/md";
 import { FaClock, FaRegCommentDots, FaDollarSign } from "react-icons/fa";
 
-const ProjectId = ({ params }: { params: { projectId: string } }) => {
+const ProjectId = () => {
     const [expanded, setExpanded] = useState(false);
 
     return (
