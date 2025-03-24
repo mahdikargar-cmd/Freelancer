@@ -10,6 +10,7 @@ import React, { JSX, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import Success from "./Toast/success";
+import ProfileLoadingSkeleton from "./loading/lsF-P";
 interface ProfileData {
     id: number | null;
     firstName: string;
@@ -251,13 +252,7 @@ const Profile = () => {
             handleShowToast(`خطا در آپلود تصویر: ${error.response?.data?.error || error.message}`);
         }
     };
-    if (loading) {
-        return (
-            <div className="text-white max-w-screen-xl mx-auto my-8 text-center">
-                <p>در حال بارگذاری اطلاعات پروفایل...</p>
-            </div>
-        );
-    }
+    if(loading) return <ProfileLoadingSkeleton />
 
     if (error) {
         return (
