@@ -59,7 +59,7 @@ const Profile = () => {
         setShowToast(true);
         setTimeout(() => {
             setShowToast(false);
-        }, 3000); // مخفی شدن toast بعد از 3 ثانیه
+        }, 3000);
     };
     const api = axios.create({
         withCredentials: true,
@@ -252,7 +252,7 @@ const Profile = () => {
             handleShowToast(`خطا در آپلود تصویر: ${error.response?.data?.error || error.message}`);
         }
     };
-    if(loading) return <ProfileLoadingSkeleton />
+    if (loading) return <ProfileLoadingSkeleton />
 
     if (error) {
         return (
@@ -271,24 +271,22 @@ const Profile = () => {
 
     const calculateProfileCompletion = () => {
         const requiredFields: (keyof ProfileData)[] = ["firstName", "lastName", "phoneNumber", "address", "placeOfStudy"];
-        let filledFields = requiredFields.filter(field => profileData[field]?.trim()).length;
-
-        // در صورتی که تصویر پروفایل موجود باشد، یک امتیاز اضافه می‌شود.
+        let filledFields = requiredFields.filter(field =>typeof profileData[field] === "string" && profileData[field].trim()).length;
         if (profileData.profileImageUrl) {
             filledFields += 1;
         }
-
-        // محاسبه درصد تکمیل
         return Math.round((filledFields / (requiredFields.length + 1)) * 100);
     };
 
     const profileCompletion = calculateProfileCompletion();
+    const incompleteFields = fields
+        .filter(({ key }) => typeof profileData[key] === "string" && profileData[key]?.trim() === "")
+        .map(({ placeholder }) => placeholder);
 
     return (
         <div className="text-white max-w-screen-xl mx-auto my-8 relative">
             {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
-                {/* کادر اطلاعات کاربر */}
                 <div
                     className="bg-color1 text-color2 p-4 rounded-2xl shadow-xl border border-color5 transition-all hover:shadow-2xl md:mx-2 mx-auto self-start w-full">
                     <div className="grid grid-cols-1 items-center font-primaryMedium">
@@ -331,7 +329,7 @@ const Profile = () => {
                                                 <input
                                                     type="text"
                                                     placeholder={item.placeholder}
-                                                    value={profileData[item.key] ?? ""}  // بدون ارور
+                                                    value={String(profileData[item.key] ?? "")}
                                                     onChange={(e) => setProfileData({ ...profileData, [item.key]: e.target.value })}
                                                     className="border border-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-color4"
                                                 />
@@ -379,7 +377,6 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-                {/* کادر اعلانات */}
                 <div className="col-span-2 border border-color5 shadow-md p-4 rounded-xl">
                     <div className="bg-color1 text-color2 p-4 rounded-xl shadow-lg mb-4 border border-color5">
                         <h2 className="text-xl font-primaryBold mb-4">پیشرفت تکمیل پروفایل</h2>
@@ -388,30 +385,22 @@ const Profile = () => {
                         </div>
                         <p className="mt-2 text-sm font-primaryRegular">{profileCompletion}% تکمیل شده</p>
                     </div>
-                    <div className="bg-color1 text-color2 p-6 rounded-2xl shadow-lg border border-color5">
-                        <div className="flex items-center gap-4 mb-4 p-4 border border-color5 rounded-xl shadow-md">
-                            <FaCheckCircle className="text-color4 text-xl" />
-                            <div>
-                                <h1 className="text-lg font-primaryDemibold">
-                                    {profileExists ? "تکمیل اطلاعات پروفایل" : "ایجاد پروفایل"}
-                                </h1>
-                                <p className="text-sm text-gray-300 my-2">
-                                    {profileExists
-                                        ? "لطفا اطلاعات خود را تکمیل کنید"
-                                        : "برای استفاده از تمامی امکانات سایت، لطفا پروفایل خود را تکمیل کنید"}
-                                </p>
-                                <button
-                                    onClick={handleSaveProfile}
-                                    className="bg-color4 text-black px-4 py-2 rounded-lg text-sm transition-all hover:bg-opacity-80"
-                                >
-                                    {profileExists ? "تکمیل پروفایل" : "ایجاد پروفایل"}
-                                </button>
-                            </div>
+                    {incompleteFields.length > 0 && (
+                        <div className="bg-color1 text-color2 p-6 rounded-2xl shadow-lg border border-color5">
+                            {incompleteFields.map((field, index) => (
+                                <div key={index} className="flex items-center gap-4 mb-4 p-4 border border-color5 rounded-xl shadow-md">
+                                    <FaCheckCircle className="text-color4 text-xl" />
+                                    <div>
+                                        <h1 className="text-lg font-primaryDemibold">تکمیل {field}</h1>
+                                        <p className="text-sm text-gray-300 my-2 font-primaryMedium">لطفا {field} خود را وارد کنید.</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 
