@@ -39,14 +39,14 @@ const ProjectId = () => {
                         </div>
                         <div>
                             <h3 className="font-primaryBold text-color4">کارفرما: علی رضایی</h3>
-                            <p className="text-color3 text-sm">4.8 ⭐ (16 پروژه)</p>
+                            <p className="text-color3 text-sm font-primaryMedium">4.8 ⭐ (16 پروژه)</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-color3 mt-2">
+                    <div className="flex items-center gap-2 text-sm text-color3 mt-2 font-primaryMedium">
                         <MdLocationOn className="text-color4" />
                         <span>تهران، ایران</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-color3 mt-1">
+                    <div className="flex items-center gap-2 text-sm text-color3 mt-1 font-primaryMedium">
                         <MdAccessTime className="text-color4" />
                         <span>عضویت از 1402/06/12</span>
                     </div>
@@ -65,7 +65,7 @@ const ProjectId = () => {
                         <FaClock className="text-color4 text-xl" />
                     </div>
                     <div>
-                        <p className="text-color3 text-sm">زمان باقی‌مانده</p>
+                        <p className="text-color3 text-sm font-primaryMedium">زمان باقی‌مانده</p>
                         <p className="font-primaryBold text-color4">12 روز و 12 ساعت</p>
                     </div>
                 </motion.div>
@@ -80,7 +80,7 @@ const ProjectId = () => {
                         <FaRegCommentDots className="text-color4 text-xl" />
                     </div>
                     <div>
-                        <p className="text-color3 text-sm">پیشنهادها</p>
+                        <p className="text-color3 text-sm font-primaryMedium">پیشنهادها</p>
                         <p className="font-primaryBold text-color4">2 پیشنهاد</p>
                     </div>
                 </motion.div>
@@ -95,7 +95,7 @@ const ProjectId = () => {
                         <FaDollarSign className="text-color4 text-xl" />
                     </div>
                     <div>
-                        <p className="text-color3 text-sm">بودجه</p>
+                        <p className="text-color3 text-sm font-primaryMedium">بودجه</p>
                         <p className="font-primaryBold text-color4">5 تا 7 میلیون</p>
                     </div>
                 </motion.div>
@@ -177,7 +177,7 @@ const ProjectId = () => {
                         <h2 className="text-xl font-primaryDemibold text-color4 mb-4 flex items-center gap-2">
                             <FaTools /> مهارت‌های مورد نیاز
                         </h2>
-                        <ul className="flex flex-wrap gap-3 text-sm mb-6">
+                        <ul className="flex flex-wrap gap-3 text-sm mb-6 font-primaryDemibold">
                             <li className="px-4 py-2 bg-color4 text-color5 rounded-lg cursor-pointer hover:translate-y-1 transition-transform duration-300 shadow-md">
                                 Android
                             </li>
@@ -195,7 +195,7 @@ const ProjectId = () => {
                             </li>
                         </ul>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-primaryMedium">
                             <div className="bg-color6 p-4 rounded-xl shadow-md">
                                 <h3 className="font-primaryBold text-color4 mb-2">جزئیات پروژه</h3>
                                 <ul className="space-y-2">
@@ -291,7 +291,7 @@ const ProjectId = () => {
                             <div className="flex justify-between items-center border-t border-color5 pt-4 mt-6">
                                 <div className="flex items-center gap-2">
                                     <input type="checkbox" id="terms" className="w-4 h-4" />
-                                    <label htmlFor="terms" className="text-color3">قوانین سایت را مطالعه کرده و می‌پذیرم</label>
+                                    <label htmlFor="terms" className="text-color3 font-primaryMedium">قوانین سایت را مطالعه کرده و می‌پذیرم</label>
                                 </div>
                                 <button className="py-2 px-6 bg-color4 text-color5 font-primaryBold text-md rounded-lg hover:bg-color8 transition flex items-center gap-2">
                                     <IoMdSend className="text-lg" /> ارسال پیشنهاد

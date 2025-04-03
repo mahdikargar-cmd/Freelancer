@@ -264,12 +264,13 @@ const Profile = () => {
         { icon: <FaUser />, placeholder: "نام خانوادگی", key: "lastName" },
         { icon: <FaPhone />, placeholder: "شماره تلفن", key: "phoneNumber" },
         { icon: <FaMapMarkerAlt />, placeholder: "آدرس", key: "address" },
-        { icon: <FaUniversity />, placeholder: "محل تحصیل", key: "placeOfStudy" }
+        { icon: <FaUniversity />, placeholder: "محل تحصیل", key: "placeOfStudy" },
+        { icon: <FaUniversity />, placeholder: "تصویر پروفایل", key: "profileImageUrl" }
     ];
 
     const calculateProfileCompletion = () => {
         const requiredFields: (keyof ProfileData)[] = ["firstName", "lastName", "phoneNumber", "address", "placeOfStudy"];
-        let filledFields = requiredFields.filter(field =>typeof profileData[field] === "string" && profileData[field].trim()).length;
+        let filledFields = requiredFields.filter(field => typeof profileData[field] === "string" && profileData[field].trim()).length;
         if (profileData.profileImageUrl) {
             filledFields += 1;
         }
@@ -320,18 +321,20 @@ const Profile = () => {
                                 isEditing ? (
                                     <div className="grid grid-cols-1 gap-4">
                                         {fields.map((item, index) => (
-                                            <div key={index} className="relative">
-                                                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-color4 text-lg">
-                                                    {item.icon}
-                                                </span>
-                                                <input
-                                                    type="text"
-                                                    placeholder={item.placeholder}
-                                                    value={String(profileData[item.key] ?? "")}
-                                                    onChange={(e) => setProfileData({ ...profileData, [item.key]: e.target.value })}
-                                                    className="border border-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-color4"
-                                                />
-                                            </div>
+                                            item.key !== "profileImageUrl" && ( // بررسی شرط قبل از رندر
+                                                <div key={index} className="relative">
+                                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-color4 text-lg">
+                                                        {item.icon}
+                                                    </span>
+                                                    <input
+                                                        type="text"
+                                                        placeholder={item.placeholder}
+                                                        value={String(profileData[item.key] ?? "")}
+                                                        onChange={(e) => setProfileData({ ...profileData, [item.key]: e.target.value })}
+                                                        className="border border-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-color4"
+                                                    />
+                                                </div>
+                                            )
                                         ))}
                                     </div>
                                 ) : (
