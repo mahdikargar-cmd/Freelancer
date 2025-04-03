@@ -21,8 +21,7 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
 
 
-
-    public AuthController(RegisterUserUseCase registerUserUseCase,JwtService jwtService, UserDetailsService userDetailsService, LoginUserUseCase loginUserUseCase) {
+    public AuthController(RegisterUserUseCase registerUserUseCase, JwtService jwtService, UserDetailsService userDetailsService, LoginUserUseCase loginUserUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUserUseCase = loginUserUseCase;
         this.jwtService = jwtService;
@@ -32,8 +31,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         try {
-            registerUserUseCase.register(request.getEmail(), request.getPassword());
-            return ResponseEntity.ok(new AuthResponse("User registered successfully"));
+            String token = registerUserUseCase.register(request.getEmail(), request.getPassword());
+            if (token != null) {
+                return ResponseEntity.ok(new AuthResponse("User registered successfully", token));
+            }else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new AuthResponse(" خطا در ثبت نام بک اند"));            }
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new AuthResponse(e.getMessage()));
@@ -50,6 +53,7 @@ public class AuthController {
                     .body(new AuthResponse("Invalid credentials"));
         }
     }
+
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

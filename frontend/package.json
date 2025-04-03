@@ -13,6 +13,7 @@
     "framer-motion": "^12.5.0",
     "freelancer": "file:",
     "js-cookie": "^3.0.5",
+    "lucide-react": "^0.487.0",
     "next": "15.1.7",
     "pg": "^8.13.3",
     "pg-promise": "^11.10.2",

@@ -226,10 +226,8 @@ public class ProfileInformationController {
                     logger.info("مسیر با موفقیت ایجاد شد: {}", uploadPath.toAbsolutePath());
                 } catch (IOException e) {
                     logger.error("خطا در ایجاد مسیر: {} - {}", uploadPath.toAbsolutePath(), e.getMessage());
-                    // بهتر است به جای پرتاب مجدد خطا، یک مسیر جایگزین را امتحان کنیم
                     try {
-                        // استفاده از مسیر مطلق به جای مسیر نسبی
-                        String alternativePath = System.getProperty("user.home") + "/freelancer-uploads/profile-images/";
+                        String alternativePath = System.getProperty("user.home") + "/uploads/profileImage/";
                         logger.info("تلاش برای ایجاد مسیر جایگزین: {}", alternativePath);
                         uploadPath = Paths.get(alternativePath);
                         Files.createDirectories(uploadPath);

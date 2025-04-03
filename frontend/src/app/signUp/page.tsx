@@ -4,6 +4,7 @@ import Image from 'next/image';
 import r_c from '../../img/right-corner.png';
 import { useRouter } from 'next/navigation';
 import Success from '@/components/Toast/success';
+import {useAuth} from "@/components/context/AuthContext";
 
 const SignUp = () => {
     const route = useRouter();
@@ -11,7 +12,7 @@ const SignUp = () => {
         email: "",
         password: ""
     });
-
+    const { register } = useAuth();
 
     const [showToast, setShowToast] = useState<boolean>(false);
     const [correct, setCorrect] = useState<string>("");
@@ -50,7 +51,8 @@ const SignUp = () => {
         fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(Info)
+            body: JSON.stringify(Info),
+            credentials: "include",
         })
             .then(response => {
                 if (!response.ok) {
@@ -59,19 +61,17 @@ const SignUp = () => {
                 return response.json();
             })
             .then(data => {
-                setCorrect("ثبت نام شما با موفقیت انجام شد.");
-                setShowToast(true);
-
-                setTimeout(() => {
-                    route.push('/login');
-                }, 3000);
+                if (data.token) {
+                    // ذخیره توکن بدون userId
+                    register(data.token, ""); // می‌توان اینجا userId را خالی گذاشت
+                } else {
+                    throw new Error("مشکلی در دریافت توکن پیش آمد!");
+                }
             })
             .catch(error => {
                 setEmailWarning(error.message);
             });
     };
-
-
     return (
         <div className="flex items-center justify-center min-h-screen relative">
             <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">

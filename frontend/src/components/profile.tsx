@@ -22,11 +22,10 @@ interface ProfileData {
     user: {
         id: string | null;
     };
-    status?: string; // اضافه کردن status به عنوان فیلد اختیاری
-    message?: string; // اضافه کردن message به عنوان فیلد اختیاری
+    status?: string;
+    message?: string;
 }
 
-// یا تعریف نوع جدید:
 type ProfileResponse = ProfileData & {
     error?: string;
     status?: string;
@@ -84,7 +83,6 @@ const Profile = () => {
                     return;
                 }
 
-                // در کد خود:
                 const response: AxiosResponse<ProfileResponse> = await api.get("http://localhost:8080/api/getProfileInformation");
 
                 if (response.data && response.data.status === "new_user") {
@@ -183,7 +181,7 @@ const Profile = () => {
                 }));
 
                 setProfileExists(true);
-                setIsEditing(false); // وقتی ذخیره شد، حالت ویرایش رو غیرفعال کن
+                setIsEditing(false);
 
                 handleShowToast(profileExists ? "پروفایل بروزرسانی شد" : "پروفایل با موفقیت ایجاد شد");
             }
