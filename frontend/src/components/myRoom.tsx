@@ -9,7 +9,7 @@
         const [step, setStep] = useState(1);
         const [projectName, setProjectName] = useState("");
         const [description, setDescription] = useState("");
-        const [technologies, setTechnologies] = useState([]);
+        const [technologies, setTechnologies] = useState<string[]>([]);
         const [skill, setSkill] = useState("");
         const [paymentMethod, setPaymentMethod] = useState("بر اساس ساعت");
         const [currency, setCurrency] = useState("ریالی");
@@ -21,7 +21,7 @@
             }
         };
 
-        const removeSkill = (index) => {
+        const removeSkill = (index: number) => {
             setTechnologies(technologies.filter((_, i) => i !== index));
         };
 

@@ -6,6 +6,7 @@ export default {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -17,7 +18,17 @@ export default {
         'color6':'#1A1A1A',
         'color7':'#BFBFBF',
         'color8':'#A4E600',
-        'color9':'#8FD400'
+        'color9':'#8FD400',
+        //light
+        'light-color1': '#FFFFFF', 
+        'light-color2': '#1C1C1C',
+        'light-color3': '#3A3A3A',
+        'light-color4': '#4CAF50', 
+        'light-color5': '#F5F5F5',
+        'light-color6': '#EAEAEA', 
+        'light-color7': '#666666',
+        'light-color8': '#66BB6A', 
+        'light-color9': '#57A64A', 
       },
     },
     fontFamily: {
