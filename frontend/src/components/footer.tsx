@@ -22,38 +22,48 @@ const Footer = () => {
     };
 
     return (
-        <footer className="bg-light-color5 dark:bg-color1 border-t border-light-color6 dark:border-color5 pt-10 pb-6">
-            <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div className="md:col-span-1">
-                        <h1 className="text-xl font-bold text-light-color2 dark:text-white mb-4">لوگوی سایت</h1>
-                        <p className="text-light-color3 dark:text-gray-400 mb-4 font-primaryMedium">
-                            فروشگاه آنلاین محصولات با بهترین کیفیت و قیمت مناسب. ما به دنبال جلب رضایت مشتریان عزیز هستیم.
-                        </p>
-                        <SocialLinks />
-                        {newsLetterForm()}
-                    </div>
-                    <MainFooter />
+    <footer className="bg-color6 text-color7 py-12">
+        <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 className="text-color4 font-primaryBold text-lg mb-4">Deadlinee.ir</h3>
+                    <p className="text-sm font-primaryLight">با بهترین فریلنسرها برای پروژه‌های خود ارتباط
+                        برقرار کنید.</p>
                 </div>
-                <div className="border-t border-light-color6 dark:border-gray-700 mt-8 pt-8">
-                    <div className="flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-light-color7 dark:text-gray-400 text-sm mb-4 md:mb-0 font-primaryMedium">
-                            © ۱۴۰۴ تمامی حقوق این سایت محفوظ است.
-                        </p>
-                        <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                            <Image
-                                src={enamad}
-                                alt="نماد اعتماد الکترونیکی"
-                                className="h-16 w-auto"
-                                width={100}
-                                height={100}
-                            />
-                        </div>
-                    </div>
+
+                <div>
+                    <h4 className="text-color2 font-primaryMedium mb-4">برای کارفرماها</h4>
+                    <ul className="space-y-2 text-sm font-primaryLight">
+                        <li><a href="#" className="hover:text-color4">راهنمای استخدام</a></li>
+                        <li><a href="#" className="hover:text-color4">بازار استعدادها</a></li>
+                        <li><a href="#" className="hover:text-color4">کاتالوگ پروژه</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="text-color2 font-primaryMedium mb-4">برای فریلنسرها</h4>
+                    <ul className="space-y-2 text-sm font-primaryLight">
+                        <li><a href="#" className="hover:text-color4">چگونه کار پیدا کنیم</a></li>
+                        <li><a href="#" className="hover:text-color4">قرارداد مستقیم</a></li>
+                        <li><a href="#" className="hover:text-color4">دریافت دستمزد</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="text-color2 font-primaryMedium mb-4">منابع</h4>
+                    <ul className="space-y-2 text-sm font-primaryLight">
+                        <li><a href="#" className="hover:text-color4">پشتیبانی و راهنما</a></li>
+                        <li><a href="#" className="hover:text-color4">داستان‌های موفقیت</a></li>
+                        <li><a href="#" className="hover:text-color4">جامعه کاربران</a></li>
+                    </ul>
                 </div>
             </div>
-        </footer>
-    );
+
+            <div className="pt-8 border-t border-color5 text-sm text-center font-primaryLight">
+                <p>&copy; {new Date().getFullYear()} ددلاین . تمامی حقوق محفوظ است.</p>
+            </div>
+        </div>
+    </footer>    );
 };
 
 export default Footer;

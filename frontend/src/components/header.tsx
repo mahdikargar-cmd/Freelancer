@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import img from '../img/logo-alt.png';
+import img from '../img/logo-2.ico';
 import API from "./utils/api";
 import Humberger from "./SVG/HumbergerMenu";
 import SignHead from "./signUpheader";
@@ -25,7 +25,7 @@ const Header = async () => {
             <div className="max-w-screen-xl xl:w-[1000px] flex flex-wrap items-center justify-between md:justify-around mx-2 md:mx-auto p-3 
                 bg-light-color5 dark:bg-color1 rounded-full border border-light-color6 dark:border-color5 transition-all duration-300">
                 <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <Image src={img} className="h-8 w-32" alt="Logo" width={100} height={128} />
+                    <Image src={img} className="h-12 w-12" alt="Logo" width={100} height={128} />
                 </Link>
                 <Humberger />
                 <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
@@ -33,7 +33,7 @@ const Header = async () => {
                         {posts.links.map((item) => (
                             <li key={item.id}>
                                 <Link
-                                    href="#"
+                                    href="/"
                                     className="inline-block py-2 px-4 text-sm text-light-color2 dark:text-color2
                                     hover:text-light-color4 dark:hover:text-color4 hover:bg-light-color6 dark:hover:bg-color5
                                     rounded-full transition-all duration-300"

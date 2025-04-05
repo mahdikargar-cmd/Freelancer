@@ -5,6 +5,7 @@ import r_c from '../../img/right-corner.png';
 import { useRouter } from 'next/navigation';
 import Success from '@/components/Toast/success';
 import { useAuth } from "@/components/context/AuthContext";
+import { FiMail, FiLock, FiUserPlus, FiArrowLeft } from 'react-icons/fi';
 
 const SignUp = () => {
     const route = useRouter();
@@ -18,7 +19,7 @@ const SignUp = () => {
     const [correct, setCorrect] = useState<string>("");
     const [emailWarning, setEmailWarning] = useState<string>("");
     const [passwordWarning, setPasswordWarning] = useState<string>("");
-
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -37,17 +38,16 @@ const SignUp = () => {
         if (password.length === 0) {
             setPasswordWarning("");
         } else if (!passwordRegex.test(password)) {
-            setPasswordWarning("مز عبور باید حداقل 8 کاراکتر باشد و شامل حداقل یک حرف بزرگ، یک حرف کوچک، یک عدد و یک نماد خاص باشد.");
+            setPasswordWarning("رمز عبور باید حداقل 8 کاراکتر باشد و شامل حداقل یک حرف بزرگ، یک حرف کوچک، یک عدد و یک نماد خاص باشد.");
         } else {
             setPasswordWarning("");
         }
     };
 
-
-
     const handleSubmit = () => {
         if (emailWarning || passwordWarning || !Info.email || !Info.password) return;
 
+        setIsLoading(true);
         fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -61,82 +61,120 @@ const SignUp = () => {
                 return response.json();
             })
             .then(data => {
-                setCorrect("ثبت نام شما با موفقیت انجام شد.");
-                setShowToast(true);
                 if (data.token) {
                     // ذخیره توکن بدون userId
-                    register(data.token, ""); // می‌توان اینجا userId را خالی گذاشت
+                    register(data.token, "");
+                    setCorrect("ثبت نام با موفقیت انجام شد");
+                    setShowToast(true);
+
+                    setTimeout(() => {
+                        setShowToast(false);
+                        route.push('/dashboardAd');
+                    }, 3000);
                 } else {
                     throw new Error("مشکلی در دریافت توکن پیش آمد!");
                 }
-                setTimeout(() => {
-                    route.push('/login');
-                }, 3000);
             })
             .catch(error => {
                 setEmailWarning(error.message);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     };
+
     return (
-        <div className="flex items-center justify-center min-h-screen relative">
-            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-light-color5 dark:bg-color1 rounded-3xl border border-light-color6 dark:border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
-                {showToast && <Success showToast={() => setShowToast(true)} text={correct} />}
+        <div className="flex items-center justify-center min-h-screen bg-color1 bg-gradient-to-br from-color1 to-color5">
+            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 flex flex-col justify-center bg-color1 rounded-3xl border border-color5 my-10 text-center px-6 py-12 space-y-8 md:mx-0 mx-4 shadow-xl transition-all duration-300 hover:shadow-color4/20">
+                {showToast && <Success showToast={() => setShowToast(false)} text={correct} />}
                 <Image
-                    className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px] pointer-events-none"
+                    className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px] pointer-events-none opacity-70"
                     src={r_c}
                     alt="corner"
                     width={200}
                     height={200}
                 />
-                <div className="space-y-3">
-                    <h1 className="md:text-3xl text-2xl font-primaryDemibold text-light-color4 dark:text-color4">ورود به سیستم</h1>
-                    <p className="text-light-color7 dark:text-color7 font-primaryLight text-md md:text-xl">خوش آمدید لطفا اطلاعات خود را وارد کنید</p>
+                <div className="space-y-4">
+                    <h1 className="md:text-4xl text-3xl font-primaryBold text-color4 tracking-wider">ثبت نام</h1>
+                    <p className="text-color7 font-primaryLight text-md md:text-xl">حساب جدید ایجاد کنید</p>
                 </div>
-                <div className="flex justify-center">
-                    <div className="grid gap-6 mb-6 md:grid-cols-2 place-items-center w-full max-w-[600px]">
-                        <div className="w-full">
+                <div className="flex justify-center w-full">
+                    <div className="grid gap-8 mb-6 md:grid-cols-1 place-items-center w-full max-w-[500px]">
+                        <div className="w-full relative group">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-color7">
+                                <FiMail className="text-xl" />
+                            </div>
                             <input
                                 type="email"
-                                className={`bg-light-color6 dark:bg-color6 border text-light-color3 dark:text-color3 text-sm rounded-full block w-full p-4 font-primaryRegular 
-                            ${emailWarning ? 'border-red-500 focus:ring-2 focus:ring-red-500'
-                                        : Info.email ? 'border-green-500 focus:ring-2 focus:ring-green-500'
-                                            : 'border-white focus:ring-2 focus:ring-gray-300'}`}
-                                placeholder="ایمیل خود را وارد کنید."
+                                className={`bg-color6 border-2 text-color3 text-sm rounded-xl block w-full p-4 pl-12 font-primaryRegular transition duration-300 placeholder-color7/70
+                                ${emailWarning ? 'border-red-500 focus:ring-2 focus:ring-red-500'
+                                    : Info.email ? 'border-green-500 focus:ring-2 focus:ring-green-500'
+                                        : 'border-color5 focus:ring-2 focus:ring-color4'}`}
+                                placeholder="ایمیل خود را وارد کنید..."
                                 value={Info.email}
                                 onChange={(e) => {
                                     SetInfo({ ...Info, email: e.target.value });
                                     validateEmail(e.target.value);
                                 }}
                             />
-                            {emailWarning && <p className="text-red-500 font-primaryMedium mt-2">{emailWarning}</p>}
+                            {emailWarning && (
+                                <p className="text-red-500 text-xs mt-1 text-left font-primaryLight">{emailWarning}</p>
+                            )}
                         </div>
-                        <div className="w-full">
+                        <div className="w-full relative group">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-color7">
+                                <FiLock className="text-xl" />
+                            </div>
                             <input
                                 type="password"
-                                className={`bg-light-color6 dark:bg-color6 border text-light-color3 dark:text-color3 text-sm rounded-full block w-full p-4 font-primaryRegular 
-                            ${passwordWarning ? 'border-red-500 focus:ring-2 focus:ring-red-500'
-                                        : Info.password ? 'border-green-500 focus:ring-2 focus:ring-green-500'
-                                            : 'border-white focus:ring-2 focus:ring-gray-300'}`}
-                                placeholder="رمز خود را وارد کنید."
+                                className={`bg-color6 border-2 text-color3 text-sm rounded-xl block w-full p-4 pl-12 font-primaryRegular transition duration-300 placeholder-color7/70
+                                ${passwordWarning ? 'border-red-500 focus:ring-2 focus:ring-red-500'
+                                    : Info.password ? 'border-green-500 focus:ring-2 focus:ring-green-500'
+                                        : 'border-color5 focus:ring-2 focus:ring-color4'}`}
+                                placeholder="رمز خود را وارد کنید..."
                                 value={Info.password}
                                 onChange={(e) => {
                                     SetInfo({ ...Info, password: e.target.value });
                                     validatePassword(e.target.value);
                                 }}
                             />
-                            {passwordWarning && <p className="text-red-500 font-primaryMedium mt-2">{passwordWarning}</p>}
+                            {passwordWarning && (
+                                <p className="text-red-500 text-xs mt-1 text-left font-primaryLight">{passwordWarning}</p>
+                            )}
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-center">
-                    <div className="grid gap-4 my-4 w-full md:w-1/2 px-4 place-items-center py-4">
+
+                <div className="flex justify-center w-full">
+                    <div className="grid gap-4 my-4 w-full max-w-[500px] place-items-center py-4">
                         <button
-                            className={`rounded-full text-light-color1 dark:text-color1 font-primaryMedium p-4 w-full 
-                    ${!!emailWarning || !!passwordWarning || !Info.email || !Info.password ? 'bg-gray-500 cursor-not-allowed' : 'bg-light-color4 dark:bg-color4'}`}
+                            className={`rounded-xl text-color1 font-primaryMedium p-4 w-full flex items-center justify-center gap-2 transition-all duration-300 text-lg
+                            ${!!emailWarning || !!passwordWarning || !Info.email || !Info.password || isLoading
+                                ? 'bg-color7/50 cursor-not-allowed'
+                                : 'bg-color4 hover:bg-color8 active:scale-98'}`}
                             onClick={handleSubmit}
-                            disabled={!!emailWarning || !!passwordWarning || !Info.email || !Info.password}
+                            disabled={!!emailWarning || !!passwordWarning || !Info.email || !Info.password || isLoading}
                         >
-                            ثبت نام کنید
+                            {isLoading ? (
+                                <div className="w-5 h-5 border-2 border-color1 border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                                <>
+                                    ثبت نام کنید
+                                    <FiUserPlus className="text-lg" />
+                                </>
+                            )}
+                        </button>
+                        <div className="flex items-center w-full my-2">
+                            <div className="flex-grow h-px bg-color5"></div>
+                            <span className="px-4 text-color7 text-sm">یا</span>
+                            <div className="flex-grow h-px bg-color5"></div>
+                        </div>
+                        <button
+                            className="bg-transparent rounded-xl border-2 border-color5 text-center text-color3 font-primaryMedium p-4 w-full hover:border-color4 hover:text-color4 transition-all duration-300 text-lg flex items-center justify-center gap-2"
+                            onClick={() => route.push('/login')}
+                        >
+                            بازگشت به صفحه ورود
+                            <FiArrowLeft className="text-lg" />
                         </button>
                     </div>
                 </div>
