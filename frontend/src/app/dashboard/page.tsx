@@ -8,13 +8,13 @@ const DashBoard = () => {
     const [selectedTab, setSelectedTab] = useState(1);
 
     return (
-            <div className="text-white mx-4 md:mx-auto">
-                <NavPro onSelect={setSelectedTab} />
+        <div className="mx-4 md:mx-auto text-light-color2 dark:text-white">
+            <NavPro onSelect={setSelectedTab} />
 
-                <div className="mt-6">
-                    {selectedTab === 1 ? <Profile /> : <Room />}
-                </div>
+            <div className="mt-6">
+                {selectedTab === 1 ? <Profile /> : <Room />}
             </div>
+        </div>
     );
 };
 

@@ -283,125 +283,124 @@ const Profile = () => {
         .map(({ placeholder }) => placeholder);
 
     return (
-        <div className="text-white max-w-screen-xl mx-auto my-8 relative">
-            {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
-                <div
-                    className="bg-color1 text-color2 p-4 rounded-2xl shadow-xl border border-color5 transition-all hover:shadow-2xl md:mx-2 mx-auto self-start w-full">
-                    <div className="grid grid-cols-1 items-center font-primaryMedium">
-                        <div className="flex flex-col justify-center items-center border-b-2 border-color3 mb-4 pb-4">
-                            <img
-                                src={
-                                    profileData.profileImageUrl
-                                        ? `http://localhost:8080/api/profileImages/${profileData.profileImageUrl}`
-                                        : "/file.svg"
-                                }
-                                alt="عکس پروفایل"
-                                className="w-32 h-32 rounded-full shadow-md object-cover"
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "/file.svg";
-                                }}
-                            />
-                            {profileExists ? (
-                                <label
-                                    className="mt-3 bg-color4 text-black px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-opacity-80 cursor-pointer">
-                                    تغییر عکس
-                                    <input type="file" accept="image/jpeg,image/png" onChange={handleUploadImage}
-                                        className="hidden" />
-                                </label>
-                            ) : (
-                                <p className="text-sm text-gray-300 mt-2">در ابتدا اطلاعات شخصی خود را تکمیل کنید .</p>
-                            )}
-                        </div>
-                        <div className="flex flex-col justify-center space-y-3">
-                            <h2 className="text-xl font-primaryBold mb-3 text-color4 text-center">
-                                {profileExists ? "اطلاعات پروفایل" : "تکمیل اطلاعات"}
-                            </h2>
-                            {
-                                isEditing ? (
-                                    <div className="grid grid-cols-1 gap-4">
-                                        {fields.map((item, index) => (
-                                            item.key !== "profileImageUrl" && ( // بررسی شرط قبل از رندر
-                                                <div key={index} className="relative">
-                                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-color4 text-lg">
-                                                        {item.icon}
-                                                    </span>
-                                                    <input
-                                                        type="text"
-                                                        placeholder={item.placeholder}
-                                                        value={String(profileData[item.key] ?? "")}
-                                                        onChange={(e) => setProfileData({ ...profileData, [item.key]: e.target.value })}
-                                                        className="border border-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-color4"
-                                                    />
-                                                </div>
-                                            )
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 gap-4">
-                                        {[
-                                            { icon: <FaUser />, label: profileData.firstName },
-                                            { icon: <FaUser />, label: profileData.lastName },
-                                            { icon: <FaPhone />, label: profileData.phoneNumber },
-                                            { icon: <FaMapMarkerAlt />, label: profileData.address },
-                                            { icon: <FaUniversity />, label: profileData.placeOfStudy }
-                                        ].map((item, index) => (
-                                            <div key={index} className="cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex items-center gap-2 shadow-md">
-                                                <span className="text-color4 text-lg">
+        <div className="text-white max-w-screen-xl mx-auto my-8 relative dark:bg-color1 dark:text-color2">
+        {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
+            <div
+                className="bg-light-color1 text-light-color2 p-4 rounded-2xl shadow-xl border border-light-color5 transition-all hover:shadow-2xl md:mx-2 mx-auto self-start w-full dark:bg-color1 dark:text-color2 dark:border-color5">
+                <div className="grid grid-cols-1 items-center font-primaryMedium">
+                    <div className="flex flex-col justify-center items-center border-b-2 border-light-color3 mb-4 pb-4 dark:border-color3">
+                        <img
+                            src={
+                                profileData.profileImageUrl
+                                    ? `http://localhost:8080/api/profileImages/${profileData.profileImageUrl}`
+                                    : "/file.svg"
+                            }
+                            alt="عکس پروفایل"
+                            className="w-32 h-32 rounded-full shadow-md object-cover"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = "/file.svg";
+                            }}
+                        />
+                        {profileExists ? (
+                            <label
+                                className="mt-3 bg-light-color4 text-black px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-opacity-80 cursor-pointer dark:bg-light-color8 dark:text-light-color1">
+                                تغییر عکس
+                                <input type="file" accept="image/jpeg,image/png" onChange={handleUploadImage}
+                                    className="hidden" />
+                            </label>
+                        ) : (
+                            <p className="text-sm text-light-color7 mt-2 dark:text-light-color7">در ابتدا اطلاعات شخصی خود را تکمیل کنید .</p>
+                        )}
+                    </div>
+                    <div className="flex flex-col justify-center space-y-3">
+                        <h2 className="text-xl font-primaryBold mb-3 text-light-color4 text-center dark:text-color4">
+                            {profileExists ? "اطلاعات پروفایل" : "تکمیل اطلاعات"}
+                        </h2>
+                        {
+                            isEditing ? (
+                                <div className="grid grid-cols-1 gap-4">
+                                    {fields.map((item, index) => (
+                                        item.key !== "profileImageUrl" && (
+                                            <div key={index} className="relative">
+                                                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-light-color4 text-lg dark:text-color4">
                                                     {item.icon}
                                                 </span>
-                                                <p className="bg-color6 border border-color5 text-color3 text-lg rounded-full block w-full py-3 pl-4 pr-10 font-primaryMedium text-center min-h-[44px]">
-                                                    {item.label}
-                                                </p>
+                                                <input
+                                                    type="text"
+                                                    placeholder={item.placeholder}
+                                                    value={String(profileData[item.key] ?? "")}
+                                                    onChange={(e) => setProfileData({ ...profileData, [item.key]: e.target.value })}
+                                                    className="border border-light-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-light-color4 dark:border-color5 dark:bg-light-color5 dark:text-light-color2"
+                                                />
                                             </div>
-                                        ))}
-                                    </div>
-                                )
-                            }
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200"
-                            >
-                                ویرایش
-                            </button>
-
-                            <button
-                                disabled={!isEditing}
-                                onClick={handleSaveProfile}
-                                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200
-                                ${isEditing ? "bg-green-500 hover:bg-green-600 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}
-                                `}
-                            >
-                                ذخیره
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
-                <div className="col-span-2 border border-color5 shadow-md p-4 rounded-xl">
-                    <div className="bg-color1 text-color2 p-4 rounded-xl shadow-lg mb-4 border border-color5">
-                        <h2 className="text-xl font-primaryBold mb-4">پیشرفت تکمیل پروفایل</h2>
-                        <div className="w-full bg-gray-700 rounded-full h-2.5">
-                            <div className="bg-color4 h-2.5 rounded-full transition-all duration-300" style={{ width: `${profileCompletion}%` }}></div>
-                        </div>
-                        <p className="mt-2 text-sm font-primaryRegular">{profileCompletion}% تکمیل شده</p>
-                    </div>
-                    {incompleteFields.length > 0 && (
-                        <div className="bg-color1 text-color2 p-6 rounded-2xl shadow-lg border border-color5">
-                            {incompleteFields.map((field, index) => (
-                                <div key={index} className="flex items-center gap-4 mb-4 p-4 border border-color5 rounded-xl shadow-md">
-                                    <FaCheckCircle className="text-color4 text-xl" />
-                                    <div>
-                                        <h1 className="text-lg font-primaryDemibold">تکمیل {field}</h1>
-                                        <p className="text-sm text-gray-300 my-2 font-primaryMedium">لطفا {field} خود را وارد کنید.</p>
-                                    </div>
+                                        )
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            ) : (
+                                <div className="grid grid-cols-1 gap-4">
+                                    {[{ icon: <FaUser />, label: profileData.firstName },
+                                      { icon: <FaUser />, label: profileData.lastName },
+                                      { icon: <FaPhone />, label: profileData.phoneNumber },
+                                      { icon: <FaMapMarkerAlt />, label: profileData.address },
+                                      { icon: <FaUniversity />, label: profileData.placeOfStudy }
+                                    ].map((item, index) => (
+                                        <div key={index} className="cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex items-center gap-2 shadow-md dark:bg-light-color6 dark:text-light-color1">
+                                            <span className="text-light-color4 text-lg dark:text-light-color4">
+                                                {item.icon}
+                                            </span>
+                                            <p className="bg-light-color6 border border-light-color5 text-light-color3 text-lg rounded-full block w-full py-3 pl-4 pr-10 font-primaryMedium text-center min-h-[44px] dark:bg-light-color5 dark:text-light-color2">
+                                                {item.label}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        }
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="bg-light-color8 hover:bg-light-color9 text-light-color1 font-semibold px-4 py-2 rounded-lg transition-all duration-200 dark:bg-light-color8 dark:hover:bg-light-color9">
+                            ویرایش
+                        </button>
+    
+                        <button
+                            disabled={!isEditing}
+                            onClick={handleSaveProfile}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200
+                            ${isEditing ? "bg-light-color4 hover:bg-light-color9 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"} dark:bg-light-color8 dark:text-light-color1 dark:hover:bg-light-color9`}>
+                            ذخیره
+                        </button>
+    
+                    </div>
                 </div>
             </div>
+            <div className="col-span-2 border border-light-color5 shadow-md p-4 rounded-xl dark:border-color5">
+                <div className="bg-light-color1 text-light-color2 p-4 rounded-xl shadow-lg mb-4 border border-light-color5 dark:bg-color1 dark:text-color2 dark:border-color5">
+                    <h2 className="text-xl font-primaryBold mb-4">پیشرفت تکمیل پروفایل</h2>
+                    <div className="w-full bg-light-color7 rounded-full h-2.5">
+                        <div className="bg-light-color4 h-2.5 rounded-full transition-all duration-300 dark:bg-color4" style={{ width: `${profileCompletion}%` }}></div>
+                    </div>
+                    <p className="mt-2 text-sm font-primaryRegular dark:text-color3">{profileCompletion}% تکمیل شده</p>
+                </div>
+                {incompleteFields.length > 0 && (
+                    <div className="bg-light-color1 text-light-color2 p-6 rounded-2xl shadow-lg border border-light-color5 dark:bg-color1 dark:text-color1 dark:border-color5">
+                        {incompleteFields.map((field, index) => (
+                            <div key={index} className="flex items-center gap-4 mb-4 p-4 border border-light-color5 rounded-xl shadow-md dark:border-color5">
+                                <FaCheckCircle className="text-light-color4 text-xl dark:text-color4" />
+                                <div>
+                                    <h1 className="text-lg font-primaryDemibold dark:text-color4">تکمیل {field}</h1>
+                                    <p className="text-sm text-light-color7 my-2 font-primaryMedium dark:text-color7">لطفا {field} خود را وارد کنید.</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
+    </div>
+    
+
+
     );
 };
 

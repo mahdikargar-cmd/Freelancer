@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="bg-color6" dir="rtl"
+        className="dark:bg-color6 bg-light-color1" dir="rtl"
       >
         <AuthProvider>
           <Header />

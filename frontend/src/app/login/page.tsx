@@ -76,7 +76,7 @@ const Login = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen">
-            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-black rounded-3xl border border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
+            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 aspect-square flex flex-col justify-center bg-light-color5 dark:bg-color1 rounded-3xl border border-light-color6 dark:border-color5 my-10 text-center px-6 py-8 space-y-6 md:mx-0 mx-4">
                 {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 {showToast.Failed && <Failed showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 <Image
@@ -87,15 +87,15 @@ const Login = () => {
                     height={200}
                 />
                 <div className="space-y-3">
-                    <h1 className="md:text-3xl text-2xl font-primaryDemibold text-color4">ورود به سیستم</h1>
-                    <p className="text-color7 font-primaryLight text-md md:text-xl">خوش آمدید لطفا اطلاعات خود را وارد کنید</p>
+                    <h1 className="md:text-3xl text-2xl font-primaryDemibold text-light-color4 dark:text-color4">ورود به سیستم</h1>
+                    <p className="text-light-color7 dark:text-color7 font-primaryLight text-md md:text-xl">خوش آمدید لطفا اطلاعات خود را وارد کنید</p>
                 </div>
                 <div className="flex justify-center">
                     <div className="grid gap-6 mb-6 md:grid-cols-2 place-items-center w-full max-w-[600px]">
                         <div className="w-full">
                             <input
                                 type="email"
-                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:ring-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
+                                className="bg-light-color6 dark:bg-color6 border border-light-color5 dark:border-color5 text-light-color3 dark:text-color3 text-sm rounded-full focus:ring-light-color4 dark:focus:ring-color4 focus:border-light-color4 dark:focus:border-color4 block w-full p-4 font-primaryRegular"
                                 placeholder="ایمیل خود را وارد کنید."
                                 required
                                 value={Info.email}
@@ -105,7 +105,7 @@ const Login = () => {
                         <div className="w-full">
                             <input
                                 type="password"
-                                className="bg-color6 border border-color5 text-color3 text-sm rounded-full focus:ring-color4 focus:border-color4 block w-full p-4 font-primaryRegular"
+                                className="bg-light-color6 dark:bg-color6 border border-light-color5 dark:border-color5 text-light-color3 dark:text-color3 text-sm rounded-full focus:ring-light-color4 dark:focus:ring-color4 focus:border-light-color4 dark:focus:border-color4 block w-full p-4 font-primaryRegular"
                                 placeholder="رمز خود را وارد کنید."
                                 required
                                 value={Info.password}
@@ -114,21 +114,21 @@ const Login = () => {
                         </div>
                     </div>
                 </div>
-                <Link href='/forgetPassword' className="text-color3 font-primaryMedium underline decoration-color3 mt-4">
-                    رمز عبور خود را فراموش کرده اید ؟
+                <Link href='/forgetPassword' className="text-light-color3 dark:text-color3 font-primaryMedium underline decoration-light-color3 dark:decoration-color3 mt-4">
+                    رمز عبور خود را فراموش کرده اید؟
                 </Link>
                 <div className="flex justify-center">
                     <div className="grid gap-4 my-6 w-full md:w-1/2 px-4 place-items-center py-4">
                         <button
-                            className={`rounded-full text-color1 font-primaryMedium p-4 w-full
-                            ${!Info.email || !Info.password ? 'bg-gray-500 cursor-not-allowed' : 'bg-color4'}`}
+                            className={`rounded-full text-light-color1 dark:text-color1 font-primaryMedium p-4 w-full 
+                    ${!Info.email || !Info.password ? 'bg-gray-500 cursor-not-allowed' : 'bg-light-color4 dark:bg-color4'}`}
                             onClick={handleSubmit}
                             disabled={!Info.email || !Info.password}
                         >
                             ورود به سیستم
                         </button>
                         <button
-                            className="bg-color1 rounded-3xl border border-color5 text-center text-color2 font-primaryMedium p-4 w-full" onClick={() => route.push('/signUp')}
+                            className="bg-light-color1 dark:bg-color1 rounded-3xl border border-light-color5 dark:border-color5 text-center text-light-color2 dark:text-color2 font-primaryMedium p-4 w-full" onClick={() => route.push('/signUp')}
                         >
                             ثبت نام کنید
                         </button>
