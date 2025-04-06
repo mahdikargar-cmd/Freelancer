@@ -22,7 +22,7 @@ export default function HeroSection() {
     };
 
     return (
-        <div className="dark:bg-color1 bg-light-color1 mt-2">
+        <div className="dark:bg-color6 bg-light-color1 mt-2">
             <motion.section
                 className="py-20 relative overflow-hidden"
                 initial="hidden"

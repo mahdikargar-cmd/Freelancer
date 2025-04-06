@@ -80,8 +80,8 @@ const Login = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-color1 bg-gradient-to-br from-color1 to-color5">
-            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 flex flex-col justify-center bg-color1 rounded-3xl border border-color5 my-10 text-center px-6 py-12 space-y-8 md:mx-0 mx-4 shadow-xl transition-all duration-300 hover:shadow-color4/20">
+        <div className="flex items-center justify-center min-h-screen dark:bg-color6 bg-light-color1">
+            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 flex flex-col justify-center dark:bg-color1 bg-light-color6 rounded-3xl border dark:border-color5 border-light-color5 my-10 text-center px-6 py-12 space-y-8 md:mx-0 mx-4 shadow-xl transition-all duration-300 dark:hover:shadow-color4/20 hover:shadow-light-color4/20">
                 {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 {showToast.Failed && <Failed showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
                 <Image
@@ -92,18 +92,18 @@ const Login = () => {
                     height={200}
                 />
                 <div className="space-y-4">
-                    <h1 className="md:text-4xl text-3xl font-primaryBold text-color4 tracking-wider">ورود به سیستم</h1>
-                    <p className="text-color7 font-primaryLight text-md md:text-xl">خوش آمدید لطفا اطلاعات خود را وارد کنید</p>
+                    <h1 className="md:text-4xl text-3xl font-primaryBold dark:text-color4 text-light-color4 tracking-wider">ورود به سیستم</h1>
+                    <p className="dark:text-color7 text-light-color7 font-primaryLight text-md md:text-xl">خوش آمدید لطفا اطلاعات خود را وارد کنید</p>
                 </div>
                 <div className="flex justify-center w-full">
                     <div className="grid gap-8 mb-6 md:grid-cols-1 place-items-center w-full max-w-[500px]">
                         <div className="w-full relative group">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-color7">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none dark:text-color7 text-light-color7">
                                 <FiMail className="text-xl" />
                             </div>
                             <input
                                 type="email"
-                                className="bg-color6 border-2 border-color5 text-color3 text-sm rounded-xl focus:ring-2 focus:ring-color4 focus:border-color4 block w-full p-4 pl-12 font-primaryRegular transition duration-300 placeholder-color7/70"
+                                className="dark:bg-color6 bg-light-color1 border-2 dark:text-color3 text-light-color3 text-sm rounded-xl block w-full p-4 pl-12 font-primaryRegular transition duration-300 dark:placeholder-color7/70 placeholder-light-color7/70"
                                 placeholder="ایمیل خود را وارد کنید..."
                                 required
                                 value={Info.email}
@@ -114,12 +114,12 @@ const Login = () => {
                             )}
                         </div>
                         <div className="w-full relative group">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-color7">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none dark:text-color7 text-light-color7">
                                 <FiLock className="text-xl" />
                             </div>
                             <input
                                 type="password"
-                                className="bg-color6 border-2 border-color5 text-color3 text-sm rounded-xl focus:ring-2 focus:ring-color4 focus:border-color4 block w-full p-4 pl-12 font-primaryRegular transition duration-300 placeholder-color7/70"
+                                className="dark:bg-color6 bg-light-color1 border-2 dark:text-color3 text-light-color3 text-sm rounded-xl block w-full p-4 pl-12 font-primaryRegular transition duration-300 dark:placeholder-color7/70 placeholder-light-color7/70"
                                 placeholder="رمز خود را وارد کنید..."
                                 required
                                 value={Info.password}
@@ -131,8 +131,8 @@ const Login = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-end w-full max-w-[500px] mx-auto">
-                    <Link href='/forgetPassword' className="text-color3 font-primaryMedium hover:text-color4 transition-colors text-sm">
+                <div className="flex w-full max-w-[500px] mx-auto justify-center">
+                    <Link href='/forgetPassword' className="dark:text-color3 font-primaryMedium dark:hover:text-color4 text-light-color3 hover:text-light-color4 transition-colors text-sm">
                         رمز عبور خود را فراموش کرده اید؟
                     </Link>
                 </div>
@@ -141,8 +141,8 @@ const Login = () => {
                         <button
                             className={`rounded-xl text-color1 font-primaryMedium p-4 w-full flex items-center justify-center gap-2 transition-all duration-300 text-lg
                             ${!Info.email || !Info.password || isLoading
-                                ? 'bg-color7/50 cursor-not-allowed'
-                                : 'bg-color4 hover:bg-color8 active:scale-98'}`}
+                                ? 'dark:bg-color7/50 bg-light-color7/50 cursor-not-allowed'
+                                : 'dark:bg-color4 bg-light-color4 dark:hover:bg-color8 hover:bg-light-color8  active:scale-98'}`}
                             onClick={handleSubmit}
                             disabled={!Info.email || !Info.password || isLoading}
                         >
@@ -156,12 +156,12 @@ const Login = () => {
                             )}
                         </button>
                         <div className="flex items-center w-full my-2">
-                            <div className="flex-grow h-px bg-color5"></div>
-                            <span className="px-4 text-color7 text-sm">یا</span>
-                            <div className="flex-grow h-px bg-color5"></div>
+                            <div className="flex-grow h-px dark:bg-color5 bg-light-color5"></div>
+                            <span className="px-4 dark:text-color7 text-light-color7 text-sm">یا</span>
+                            <div className="flex-grow h-px dark:bg-color5 bg-light-color5"></div>
                         </div>
                         <button
-                            className="bg-transparent rounded-xl border-2 border-color5 text-center text-color3 font-primaryMedium p-4 w-full hover:border-color4 hover:text-color4 transition-all duration-300 text-lg"
+                            className="bg-transparent rounded-xl border-2 dark:border-color5 border-light-color5 text-center dark:text-color3 text-light-color3 font-primaryMedium p-4 w-full dark:hover:border-color4 hover:border-light-color4 dark:hover:text-color4 hover:text-light-color4 transition-all duration-300 text-lg"
                             onClick={() => route.push('/signUp')}
                         >
                             ثبت نام کنید
