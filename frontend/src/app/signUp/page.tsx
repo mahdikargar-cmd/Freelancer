@@ -69,7 +69,7 @@ const SignUp = () => {
 
                     setTimeout(() => {
                         setShowToast(false);
-                        route.push('/dashboardAd');
+                        route.push('/dashboard');
                     }, 3000);
                 } else {
                     throw new Error("مشکلی در دریافت توکن پیش آمد!");

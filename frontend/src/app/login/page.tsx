@@ -65,7 +65,7 @@ const Login = () => {
                     setTimeout(() => {
                         setShowToast({ Success: false, Failed: false });
                         setWarning("");
-                        route.push('/dashboardAd');
+                        route.push('/dashboard');
                     }, 3000);
                 }
             })
