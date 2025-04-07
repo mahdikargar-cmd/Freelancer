@@ -10,7 +10,6 @@ public interface CategoryUc {
     CategoryDTO createCategory(CategoryDTO categoryDTO);
     CategoryDTO updateCategory(CategoryDTO categoryDTO);
     CategoryDTO findByParentCategory(CategoryDTO categoryDTO);
-
     CategoryDTO deleteCategoryById(Long id);
     CategoryDTO deleteCategoryByParentCategory(CategoryDTO categoryDTO);
 

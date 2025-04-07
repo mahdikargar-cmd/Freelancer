@@ -48,12 +48,10 @@ public class ProfileInformationRepositoryImpl implements ProfileInformationRepos
 
     @Override
     public ProfileInformation update(ProfileInformation profileInformation) {
-        // Check if entity exists
         if (!profileInformationJpaRepository.existsById(profileInformation.getId())) {
             return null;
         }
 
-        // Convert to DTO and save
         ProfileInformationDTO profileInformationDTO = profileInformationMapper.toDTO(profileInformation);
         ProfileInformationDTO updatedEntity = profileInformationJpaRepository.save(profileInformationDTO);
         return profileInformationMapper.toDomain(updatedEntity);

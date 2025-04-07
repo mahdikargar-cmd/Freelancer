@@ -6,23 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Entity
-@NoArgsConstructor
+@Table(name = "skills")
+@Data
 @AllArgsConstructor
-@Table(name = "category")
+@NoArgsConstructor
 @Builder
-public class CategoryDTO {
+public class SkillDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
-    @ManyToOne
-    @JoinColumn(name = "parent_category_id")
-    private CategoryDTO parentCategory;
-
-    public CategoryDTO(String upperCase) {
-    }
 }

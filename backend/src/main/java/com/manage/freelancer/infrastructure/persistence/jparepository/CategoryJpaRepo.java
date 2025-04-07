@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface CategoryJpaRepo extends JpaRepository<CategoryDTO, Long> {
     Optional<CategoryDTO> findByName(String name);
     List<CategoryDTO> findByParentCategory(CategoryDTO parentCategoryDTO);
+
+    CategoryDTO findByNameIgnoreCase(String name);
 }
