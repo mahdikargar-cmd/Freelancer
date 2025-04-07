@@ -17,8 +17,7 @@ import {
     Menu,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {Test} from "@/app/admin/test/page";
-
+import Test from "./test/page";
 // انیمیشن‌های انطباق نوار کناری
 const sidebarVariants = {
     open: { width: "240px", transition: { duration: 0.3 } },
