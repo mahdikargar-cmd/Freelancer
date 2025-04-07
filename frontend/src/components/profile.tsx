@@ -304,7 +304,7 @@ const Profile = () => {
                         />
                         {profileExists ? (
                             <label
-                                className="mt-3 bg-light-color4 text-black px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-opacity-80 cursor-pointer dark:bg-light-color8 dark:text-light-color1">
+                                className="mt-3 bg-light-color4 text-light-color1 px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-opacity-80 cursor-pointer dark:bg-color4 dark:text-color1">
                                 تغییر عکس
                                 <input type="file" accept="image/jpeg,image/png" onChange={handleUploadImage}
                                     className="hidden" />
@@ -331,7 +331,7 @@ const Profile = () => {
                                                     placeholder={item.placeholder}
                                                     value={String(profileData[item.key] ?? "")}
                                                     onChange={(e) => setProfileData({ ...profileData, [item.key]: e.target.value })}
-                                                    className="border border-light-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-light-color4 dark:border-color5 dark:bg-light-color5 dark:text-light-color2"
+                                                    className="border border-light-color5 shadow-md py-3 pr-12 pl-4 rounded-full w-full text-black focus:outline-none focus:ring-2 focus:ring-color4 dark:border-color5 dark:bg-color5 bg-light-color5 dark:text-color2"
                                                 />
                                             </div>
                                         )
@@ -345,11 +345,11 @@ const Profile = () => {
                                       { icon: <FaMapMarkerAlt />, label: profileData.address },
                                       { icon: <FaUniversity />, label: profileData.placeOfStudy }
                                     ].map((item, index) => (
-                                        <div key={index} className="cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex items-center gap-2 shadow-md dark:bg-light-color6 dark:text-light-color1">
-                                            <span className="text-light-color4 text-lg dark:text-light-color4">
+                                        <div key={index} className="cursor-pointer transition-transform duration-300 hover:-translate-y-1 flex items-center gap-2 dark:bg-color6 bg-light-color1 dark:text-color1 text-light-color1">
+                                            <span className="text-light-color4 text-lg dark:text-color4">
                                                 {item.icon}
                                             </span>
-                                            <p className="bg-light-color6 border border-light-color5 text-light-color3 text-lg rounded-full block w-full py-3 pl-4 pr-10 font-primaryMedium text-center min-h-[44px] dark:bg-light-color5 dark:text-light-color2">
+                                            <p className="bg-light-color6 border border-light-color5 text-light-color3 text-lg rounded-full block w-full py-3 pl-4 pr-10 font-primaryMedium text-center min-h-[44px] dark:bg-color6 dark:border-color5 dark:text-color3">
                                                 {item.label}
                                             </p>
                                         </div>
@@ -359,7 +359,7 @@ const Profile = () => {
                         }
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="bg-light-color8 hover:bg-light-color9 text-light-color1 font-semibold px-4 py-2 rounded-lg transition-all duration-200 dark:bg-light-color8 dark:hover:bg-light-color9">
+                            className="bg-light-color8 hover:bg-light-color9 text-light-color1 font-semibold px-4 py-2 rounded-lg transition-all duration-200 dark:bg-color8 dark:hover:bg-color9 dark:text-color1">
                             ویرایش
                         </button>
     
@@ -367,7 +367,7 @@ const Profile = () => {
                             disabled={!isEditing}
                             onClick={handleSaveProfile}
                             className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200
-                            ${isEditing ? "bg-light-color4 hover:bg-light-color9 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"} dark:bg-light-color8 dark:text-light-color1 dark:hover:bg-light-color9`}>
+                            ${isEditing ? "bg-light-color4 dark:bg-color4 hover:bg-light-color9 dark:hover:bg-color9 text-white dark:text-black" : "bg-gray-300 text-gray-500 cursor-not-allowed"} dark:bg-color8 bg-light-color8 dark:text-color1 text-light-color1 dark:hover:bg-color9 hover:bg-light-color9`}>
                             ذخیره
                         </button>
     

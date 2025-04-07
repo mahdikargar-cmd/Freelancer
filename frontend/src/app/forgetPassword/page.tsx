@@ -1,3 +1,4 @@
+import { FiMail } from 'react-icons/fi';
 import r_c from '../../img/right-corner.png';
 import Image from "next/image";
 
@@ -18,16 +19,19 @@ const ForPass = () => {
                 </div>
                 <div className="flex justify-center">
                     <div className="w-4/5 sm:w-4/5 md:w-3/5 lg:w-2/5">
-                        <div className="w-full flex justify-center">
+                        <div className="w-full flex relative justify-center">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none dark:text-color7 text-light-color7">
+                                <FiMail className="text-xl" />
+                            </div>
                             <input
                                 type="email"
-                                className="bg-light-color6 dark:bg-color6 border border-light-color5 dark:border-color5 text-light-color3 dark:text-color3 text-sm rounded-full focus:ring-light-color4 dark:focus:ring-color4 focus:border-light-color4 dark:focus:border-color4 block p-4 font-primaryRegular w-full"
+                                className="bg-light-color6 dark:bg-color6 border border-light-color5 dark:border-color5 text-light-color3 dark:text-color3 text-sm rounded-xl focus:ring-light-color4 dark:focus:ring-color4 focus:border-light-color4 dark:focus:border-color4 block p-4 font-primaryRegular w-full"
                                 placeholder="google@gmail.com"
                                 required
                             />
                         </div>
                         <div className="flex justify-center mt-4">
-                            <button className="bg-light-color4 dark:bg-color4 rounded-full text-light-color1 dark:text-color1 font-primaryMedium p-4 w-full">
+                            <button className="bg-light-color4 dark:bg-color4 rounded-xl text-light-color1 dark:text-color1 font-primaryMedium p-4 w-full">
                                 ارسال رمز عبور
                             </button>
                         </div>
