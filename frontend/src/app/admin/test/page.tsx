@@ -101,7 +101,6 @@ const CreateCategoryForm: React.FC = () => {
         const token = Cookies.get('token');
         if (!token) return;
 
-        // پیدا کردن دسته مورد نظر برای گرفتن parentCategory
         const category = categories.find((cat) => cat.id === id);
         if (!category) return;
 
@@ -127,6 +126,62 @@ const CreateCategoryForm: React.FC = () => {
                 fetchCategories();
             } else {
                 console.error('خطا در بروزرسانی');
+            }
+        } catch (error) {
+            console.error('خطا در ارتباط با سرور:', error);
+        }
+    };
+
+    // حذف دسته اصلی به همراه زیر دسته‌ها
+    const deleteCategoryWithChildren = async (categoryId: number) => {
+        const token = Cookies.get('token');
+
+        try {
+            // ابتدا تمام زیر دسته‌ها را حذف کنیم
+            const category = categories.find((cat) => cat.id === categoryId);
+            if (category && category.children) {
+                // حذف هر زیر دسته به صورت بازگشتی
+                for (const child of category.children) {
+                    await deleteCategoryWithChildren(child.id);
+                }
+            }
+
+            // حالا خود دسته اصلی را حذف می‌کنیم
+            const res = await fetch(`/api/app/delById/${categoryId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (res.ok) {
+                fetchCategories();  // بروزرسانی دسته‌ها
+            } else {
+                console.error('خطا در حذف دسته');
+            }
+        } catch (error) {
+            console.error('خطا در ارتباط با سرور:', error);
+        }
+    };
+
+    const handleDeleteById = async (id: number) => {
+        const token = Cookies.get('token');
+        if (!token) return;
+
+        try {
+            const res = await fetch(`/api/app/delById/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (res.ok) {
+                fetchCategories();  // بروزرسانی دسته‌ها
+            } else {
+                console.error('خطا در حذف زیر دسته');
             }
         } catch (error) {
             console.error('خطا در ارتباط با سرور:', error);
@@ -167,10 +222,24 @@ const CreateCategoryForm: React.FC = () => {
                             >
                                 ویرایش
                             </button>
+                            {/* دکمه حذف دسته اصلی */}
+                            <button
+                                onClick={() => deleteCategoryWithChildren(node.id)}
+                                className="text-red-600 text-sm hover:underline"
+                            >
+                                حذف دسته اصلی
+                            </button>
+                            {/* دکمه حذف زیر دسته */}
+                            {node.parentCategory && (
+                                <button
+                                    onClick={() => handleDeleteById(node.id)}
+                                    className="text-red-600 text-sm hover:underline"
+                                >
+                                    حذف زیر دسته
+                                </button>
+                            )}
                         </div>
                     )}
-
-                    {/* برای زیر دسته‌ها تورفتگی اضافه می‌کنیم */}
                     {node.children && node.children.length > 0 && (
                         <ul className="pl-6 mt-2 space-y-1 text-pink-500">{renderTree(node.children)}</ul>
                     )}
@@ -218,11 +287,11 @@ const CreateCategoryForm: React.FC = () => {
                     ایجاد دسته
                 </button>
 
-                {success && <p className="text-green-600 mt-2 text-center">✅ دسته با موفقیت ایجاد شد!</p>}
+                {success && <p className="text-green-600 mt-2 text-center"> دسته با موفقیت ایجاد شد!</p>}
             </form>
 
             <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-3 text-center">📂 لیست دسته‌ها (با امکان ویرایش):</h3>
+                <h3 className="text-lg font-semibold mb-3 text-center"> لیست دسته‌ها (با امکان ویرایش):</h3>
                 {tree.length > 0 ? renderTree(tree) : <p className="text-center">در حال دریافت دسته‌بندی‌ها...</p>}
             </div>
         </div>
