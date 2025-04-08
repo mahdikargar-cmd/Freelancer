@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
+import { Pencil, Trash2, X, Save } from 'lucide-react';
 
 interface Category {
     id: number;
@@ -190,86 +191,88 @@ const CreateCategoryForm: React.FC = () => {
 
 
     const renderTree = (nodes: Category[]) => (
-        <ul className="list-disc pr-4 space-y-2">
+        <ul className="list-disc pr-4 space-y-3">
             {nodes.map((node) => (
-                <li key={node.id} className="flex flex-col gap-1">
+                <li key={node.id} className="flex flex-col gap-2">
                     {editingId === node.id ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                             <input
                                 value={editingName}
                                 onChange={(e) => setEditingName(e.target.value)}
-                                className="border rounded p-1 text-black"
+                                className="bg-[#1A1A1A] border border-[#333] rounded-lg px-3 py-1 text-white"
                             />
                             <button
                                 onClick={() => handleUpdate(node.id)}
-                                className="bg-green-500 text-white px-2 py-1 rounded"
+                                className="bg-[#8FD400] text-[#1C1C1C] rounded-lg px-2 py-1 flex items-center gap-1"
                             >
+                                <Save size={16} />
                                 ذخیره
                             </button>
                             <button
                                 onClick={() => setEditingId(null)}
-                                className="text-sm text-gray-500 hover:underline"
+                                className="text-[#BFBFBF] hover:text-[#E4E4E7] text-sm flex items-center gap-1"
                             >
+                                <X size={16} />
                                 لغو
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-3">
-                            <span>{node.name}</span>
+                        <div className="flex items-center gap-4 text-[#E4E4E7]">
+                            <span className="font-primaryMedium">{node.name}</span>
                             <button
                                 onClick={() => handleEdit(node)}
-                                className="text-blue-600 text-sm hover:underline"
+                                className="text-[#CAFF33] hover:text-[#A4E600] text-sm flex items-center gap-1"
                             >
+                                <Pencil size={16} />
                                 ویرایش
                             </button>
-                            {/* دکمه حذف دسته اصلی */}
                             <button
                                 onClick={() => deleteCategoryWithChildren(node.id)}
-                                className="text-red-600 text-sm hover:underline"
+                                className="text-red-500 hover:text-red-400 text-sm flex items-center gap-1"
                             >
-                                حذف دسته اصلی
+                                <Trash2 size={16} />
+                                حذف دسته 
                             </button>
-                            {/* دکمه حذف زیر دسته */}
-                            {node.parentCategory && (
-                                <button
-                                    onClick={() => handleDeleteById(node.id)}
-                                    className="text-red-600 text-sm hover:underline"
-                                >
-                                    حذف زیر دسته
-                                </button>
-                            )}
                         </div>
                     )}
+
                     {node.children && node.children.length > 0 && (
-                        <ul className="pl-6 mt-2 space-y-1 text-pink-500">{renderTree(node.children)}</ul>
+                        <ul className="pl-6 mt-2 border-r-2 border-dotted border-[#333] ml-2">
+                            {renderTree(node.children)}
+                        </ul>
                     )}
                 </li>
             ))}
         </ul>
+
     );
 
     return (
-        <div className="max-w-2xl mx-auto mt-6 p-4 space-y-8">
-            <form onSubmit={handleSubmit} className="p-4 border rounded-xl shadow-sm space-y-4">
-                <h2 className="text-xl font-bold mb-2 text-center">ایجاد دسته / زیر دسته</h2>
+        <div className="max-w-2xl mx-auto mt-10 p-6 rounded-2xl shadow-xl bg-[#1C1C1C] text-[#E4E4E7] space-y-10 font-primaryRegular">
+            {/* فرم افزودن دسته */}
+            <form
+                onSubmit={handleSubmit}
+                className="bg-[#262626] rounded-2xl p-6 space-y-5 border border-[#333] shadow-md"
+            >
+                <h2 className="text-2xl font-primaryBold text-[#CAFF33] text-center">ایجاد دسته / زیر دسته</h2>
 
                 <div>
-                    <label className="block mb-1">نام دسته:</label>
+                    <label className="block mb-1 text-[#BFBFBF] font-primaryMedium">نام دسته:</label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full p-2 border rounded text-black"
+                        className="w-full p-3 bg-[#1A1A1A] border border-[#333] rounded-xl text-white focus:ring-2 focus:ring-[#8FD400] outline-none"
                         required
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1">انتخاب دسته پدر (اختیاری):</label>
+                    <label className="block mb-1 text-[#BFBFBF] font-primaryMedium">انتخاب دسته پدر (اختیاری):</label>
                     <select
                         value={parentId ?? ''}
                         onChange={(e) => setParentId(e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-full p-2 border rounded text-black"
+                        className="w-full p-3 bg-[#1A1A1A] border border-[#333] rounded-xl text-white"
                     >
                         <option value="">--- بدون دسته پدر (اصلی) ---</option>
                         {categories.map((cat) => (
@@ -282,19 +285,31 @@ const CreateCategoryForm: React.FC = () => {
 
                 <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
+                    className="w-full bg-[#8FD400] hover:bg-[#A4E600] text-[#1C1C1C] font-primaryBold py-2 rounded-xl transition"
                 >
                     ایجاد دسته
                 </button>
 
-                {success && <p className="text-green-600 mt-2 text-center"> دسته با موفقیت ایجاد شد!</p>}
+                {success && (
+                    <p className="text-[#A4E600] text-center font-primaryMedium mt-2">
+                        دسته با موفقیت ایجاد شد!
+                    </p>
+                )}
             </form>
 
-            <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-3 text-center"> لیست دسته‌ها (با امکان ویرایش):</h3>
-                {tree.length > 0 ? renderTree(tree) : <p className="text-center">در حال دریافت دسته‌بندی‌ها...</p>}
+            {/* لیست دسته‌ها */}
+            <div>
+                <h3 className="text-xl font-primaryDemibold text-center mb-4">لیست دسته‌ها (با امکان ویرایش)</h3>
+                {tree.length > 0 ? (
+                    <ul className="list-disc pr-4 space-y-3">
+                        {renderTree(tree)}
+                    </ul>
+                ) : (
+                    <p className="text-center text-[#BFBFBF]">در حال دریافت دسته‌بندی‌ها...</p>
+                )}
             </div>
         </div>
+
     );
 };
 
