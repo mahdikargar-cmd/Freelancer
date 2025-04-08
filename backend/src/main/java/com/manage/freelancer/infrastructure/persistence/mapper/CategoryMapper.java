@@ -7,11 +7,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoryMapper {
 
+
     public Category toDomain(CategoryDTO categoryDTO) {
         if (categoryDTO == null) return null;
+
         return Category.builder()
                 .id(categoryDTO.getId())
-                .name(categoryDTO.getName())
+                .name(categoryDTO.getName() != null ? categoryDTO.getName() : "Unknown")  // مقدار پیش‌فرض
                 .parentCategory(toDomain(categoryDTO.getParentCategory()))
                 .build();
     }

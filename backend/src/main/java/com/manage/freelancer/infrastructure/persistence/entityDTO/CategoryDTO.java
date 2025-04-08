@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "category")
 @Builder
+@NoArgsConstructor
 public class CategoryDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

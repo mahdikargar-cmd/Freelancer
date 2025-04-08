@@ -22,4 +22,9 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<UserDTO> findByEmail(String email) {
         return jpaUserRepository.findByEmail(email);
     }
+
+    @Override
+    public Optional<UserDTO> findById(Long id) {
+        return jpaUserRepository.findById(id);
+    }
 }

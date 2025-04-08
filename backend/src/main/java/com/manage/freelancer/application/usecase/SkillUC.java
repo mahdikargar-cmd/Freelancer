@@ -11,4 +11,6 @@ public interface SkillUC {
     SkillDTO updateSkill(SkillDTO skillDTO);
     void deleteSkill(int id);
     SkillDTO getSkillByName(String name);
+    List<SkillDTO> findByIds(List<Long> ids);
+
 }

@@ -1,21 +1,16 @@
-/*
 package com.manage.freelancer.infrastructure.persistence.entityDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
-import com.manage.freelancer.domain.entity.Category;
 import com.manage.freelancer.domain.entity.ProjectStatus;
 import com.manage.freelancer.domain.entity.ProjectType;
-import com.manage.freelancer.domain.entity.Skills;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "project")
@@ -41,19 +36,24 @@ public class ProjectDTO {
     private double priceEnded;
 
 
-    @ManyToOne
-    @JoinColumn(name = "skill_id") // این اختیاریه ولی بهتره اضافه کنی
-    @ElementCollection
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "project_skills",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
     private List<SkillDTO> skills;
 
-    @ManyToOne
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryDTO category;
 
-    private long suggested; // تعداد پیشنهادهای ثبت‌شده
+    private long suggested;
 
     @Column(nullable = false)
-    private int deadline; // تعداد روزها یا ساعات (بر اساس تعریف)
+    private int deadline;
 
 
     @Column(nullable = false)
@@ -66,10 +66,8 @@ public class ProjectDTO {
     @Column(nullable = false)
     private ProjectStatus status;
 
-
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserDTO employerId;
 }
-*/

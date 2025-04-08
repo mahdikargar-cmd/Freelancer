@@ -23,6 +23,10 @@ public class SkillRepoImpl implements SkillRepo {
         return skillsJPARepo.findById(Long.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("Skill not found with id: " + id));
     }
+    @Override
+    public List<SkillDTO> findByIds(List<Long> ids) {
+        return skillsJPARepo.findByIdIn(ids);  // از متد صحیح استفاده کنید
+    }
 
     @Override
     public SkillDTO save(SkillDTO skillDTO) {

@@ -1,4 +1,3 @@
-/*
 package com.manage.freelancer.infrastructure.persistence.repositoryimpl;
 
 import com.manage.freelancer.domain.entity.Project;
@@ -17,15 +16,39 @@ import java.util.stream.Collectors;
 @Repository
 @AllArgsConstructor
 public class ProjectRepoImpl implements ProjectRepo {
-    private final ProjectMapper projectMapper;
     private final ProjectJPARepo projectJPARepo;
     private CategoryJpaRepo categoryJPARepo; // اضافه کن اگر نداری
-
+    private final ProjectMapper projectMapper;
 
     @Override
     public List<ProjectDTO> findAll() {
         return projectJPARepo.findAll().stream()
+                .map(this::ensureRelationsLoaded)
                 .collect(Collectors.toList());
+    }
+    private ProjectDTO ensureRelationsLoaded(ProjectDTO project) {
+        if (project.getId() > 0) {
+            // Force reload the entity with all relations
+            return projectJPARepo.findByIdWithRelations(project.getId()).orElse(project);
+        }
+        return project;
+    }
+
+    // Add a helper method to ensure relationships are loaded
+    private void loadRelationships(ProjectDTO project) {
+        if (project.getSkills() != null) {
+            project.getSkills().forEach(skill -> {
+                if (skill != null) {
+                    skill.getName();
+                }
+            });
+        }
+        if (project.getCategory() != null) {
+            System.out.println("Category: " + project.getCategory().getName());
+        }
+        if (project.getEmployerId() != null) {
+            project.getEmployerId().getEmail();
+        }
     }
 
     @Override
@@ -35,12 +58,14 @@ public class ProjectRepoImpl implements ProjectRepo {
 
     @Override
     public ProjectDTO findById(Long id) {
-        return projectJPARepo.findById(id).orElse(null);
+        return projectJPARepo.findByIdWithRelations(id).orElse(null);
     }
 
     @Override
     public ProjectDTO save(ProjectDTO projectDTO) {
-        return projectJPARepo.save(projectDTO);
+        ProjectDTO saved = projectJPARepo.save(projectDTO);
+        // After saving, load the full object with relationships
+        return projectJPARepo.findByIdWithRelations(saved.getId()).orElse(saved);
     }
 
     @Override
@@ -54,7 +79,7 @@ public class ProjectRepoImpl implements ProjectRepo {
     }
 
     @Override
-    public List<Project> findBySkills(String skills) {
+    public List<ProjectDTO> findBySkills(String skills) {
         return projectJPARepo.findBySkillNameContainingIgnoreCase(skills);
     }
 
@@ -65,8 +90,9 @@ public class ProjectRepoImpl implements ProjectRepo {
         List<ProjectDTO> projects = projectJPARepo.findByCategory(categoryDTO);
         return projects.isEmpty() ? null : projects.get(0);
     }
+
     @Override
     public List<ProjectDTO> findByEmployerId(Long employerId) {
         return projectJPARepo.findByEmployerId_Id(employerId);
     }
-}*/
+}

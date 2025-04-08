@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/createProfileInformation").authenticated()
                         .requestMatchers("/api/uploadProfileImage/**").authenticated()
                         .requestMatchers("/api/updateProfileImage/**").authenticated()
+                        .requestMatchers("/api/getPInfoById/**").authenticated()
                         .requestMatchers("/app/**").authenticated()
                         .anyRequest().authenticated()
                 )

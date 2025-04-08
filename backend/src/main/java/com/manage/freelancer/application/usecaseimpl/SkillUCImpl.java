@@ -24,6 +24,11 @@ public class SkillUCImpl implements SkillUC {
     }
 
     @Override
+    public List<SkillDTO> findByIds(List<Long> ids) {
+        return skillRepo.findByIds(ids);
+    }
+
+    @Override
     public SkillDTO saveSkill(SkillDTO skillDTO) {
         return skillRepo.save(skillDTO);
     }

@@ -1,9 +1,9 @@
-/*
 package com.manage.freelancer.presentation.controller;
 
 import com.manage.freelancer.application.usecaseimpl.ProjectUCImpl;
 import com.manage.freelancer.domain.entity.Project;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
+import com.manage.freelancer.infrastructure.persistence.mapper.ProjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectUCImpl projectUC;
+    private final ProjectMapper projectMapper;
 
     @GetMapping("/getProjects")
     public ResponseEntity<List<ProjectDTO>> getProjects() {
@@ -22,8 +23,12 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProject(@PathVariable Long id) {
-        return ResponseEntity.ok(projectUC.findById(id));
+    public ResponseEntity<ProjectDTO> getProject(@PathVariable Long id) {
+        ProjectDTO projectDTO = projectUC.getProjectById(id);
+        if (projectDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(projectDTO);
     }
 
 
@@ -49,7 +54,7 @@ public class ProjectController {
     }
 
     @GetMapping("/getSkills")
-    public ResponseEntity<List<Project>> getSkills(@RequestParam String skills) {
+    public ResponseEntity<List<ProjectDTO>> getSkills(@RequestParam String skills) {
         return ResponseEntity.ok(projectUC.getProjectBySkills(skills));
     }
 
@@ -58,8 +63,9 @@ public class ProjectController {
         return ResponseEntity.ok(projectUC.getProjectByCategory(category));
     }
 
+
     @GetMapping("/getEmployer")
     public ResponseEntity<List<ProjectDTO>> getEmployer(@RequestParam Long id) {
         return ResponseEntity.ok(projectUC.getProjectByEmployerId(id.toString()));
     }
-}*/
+}
