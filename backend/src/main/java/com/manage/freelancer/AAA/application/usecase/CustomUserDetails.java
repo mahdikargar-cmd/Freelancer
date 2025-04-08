@@ -1,20 +1,18 @@
 package com.manage.freelancer.AAA.application.usecase;
 
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
     private final UserDTO user;
 
     public CustomUserDetails(UserDTO user) {
         this.user = user;
-    }
-
-    public UserDTO getUser() {
-        return user;
     }
 
     @Override

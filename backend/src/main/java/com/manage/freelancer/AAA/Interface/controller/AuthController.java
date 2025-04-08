@@ -6,6 +6,7 @@ import com.manage.freelancer.AAA.Interface.dto.RegisterRequest;
 import com.manage.freelancer.AAA.application.usecase.LoginUserUseCase;
 import com.manage.freelancer.AAA.application.usecase.RegisterUserUseCase;
 import com.manage.freelancer.AAA.config.JwtService;
+import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,9 +35,10 @@ public class AuthController {
             String token = registerUserUseCase.register(request.getEmail(), request.getPassword());
             if (token != null) {
                 return ResponseEntity.ok(new AuthResponse("User registered successfully", token));
-            }else {
+            } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new AuthResponse(" خطا در ثبت نام بک اند"));            }
+                        .body(new AuthResponse(" خطا در ثبت نام بک اند"));
+            }
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new AuthResponse(e.getMessage()));
@@ -51,6 +53,17 @@ public class AuthController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new AuthResponse("Invalid credentials"));
+        }
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            UserDTO user = loginUserUseCase.getById(id);
+            return ResponseEntity.ok(user);
+        }
+        catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 

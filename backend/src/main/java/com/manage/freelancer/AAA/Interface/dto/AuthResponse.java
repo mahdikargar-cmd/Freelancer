@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AuthResponse {
     private String message;
-    private String token; // Optional: for JWT token support
+    private String token;
 
     public AuthResponse(String message) {
         this.message = message;

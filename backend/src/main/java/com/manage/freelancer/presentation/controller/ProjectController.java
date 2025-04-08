@@ -1,7 +1,6 @@
 package com.manage.freelancer.presentation.controller;
 
 import com.manage.freelancer.application.usecaseimpl.ProjectUCImpl;
-import com.manage.freelancer.domain.entity.Project;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
 import com.manage.freelancer.infrastructure.persistence.mapper.ProjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectUC.updateProject(projectDTO));
     }
 
-    @DeleteMapping("/deleteProject")
+    @DeleteMapping("/deleteProject/{id}")
     public ResponseEntity<Void> deleteProject(@RequestParam Long id) {
         projectUC.deleteProject(id);
         return ResponseEntity.noContent().build();
@@ -62,7 +61,6 @@ public class ProjectController {
     public ResponseEntity<ProjectDTO> getCategory(@RequestParam String category) {
         return ResponseEntity.ok(projectUC.getProjectByCategory(category));
     }
-
 
     @GetMapping("/getEmployer")
     public ResponseEntity<List<ProjectDTO>> getEmployer(@RequestParam Long id) {

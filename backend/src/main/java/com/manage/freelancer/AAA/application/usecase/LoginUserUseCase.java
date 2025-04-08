@@ -31,4 +31,9 @@ public class LoginUserUseCase {
         }
         return null;
     }
+
+    public UserDTO getById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found with id: " + id));
+
+    }
 }
