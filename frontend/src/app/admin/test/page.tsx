@@ -11,6 +11,7 @@ interface Category {
 }
 
 const CreateCategoryForm: React.FC = () => {
+    const [showModal, setShowModal] = useState(false);
     const [name, setName] = useState('');
     const [parentId, setParentId] = useState<number | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -199,29 +200,29 @@ const CreateCategoryForm: React.FC = () => {
                             <input
                                 value={editingName}
                                 onChange={(e) => setEditingName(e.target.value)}
-                                className="bg-[#1A1A1A] border border-[#333] rounded-lg px-3 py-1 text-white"
+                                className="bg-color6 border border-color5 rounded-lg px-3 py-1 text-color2"
                             />
                             <button
                                 onClick={() => handleUpdate(node.id)}
-                                className="bg-[#8FD400] text-[#1C1C1C] rounded-lg px-2 py-1 flex items-center gap-1"
+                                className="bg-color9 text-color1 rounded-lg px-2 py-1 flex items-center gap-1"
                             >
                                 <Save size={16} />
                                 ذخیره
                             </button>
                             <button
                                 onClick={() => setEditingId(null)}
-                                className="text-[#BFBFBF] hover:text-[#E4E4E7] text-sm flex items-center gap-1"
+                                className="text-color7 hover:text-color2 text-sm flex items-center gap-1"
                             >
                                 <X size={16} />
                                 لغو
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-4 text-[#E4E4E7]">
-                            <span className="font-primaryMedium">{node.name}</span>
+                        <div className="flex items-center gap-4">
+                            <span className="font-primaryMedium text-color3">{node.name}</span>
                             <button
                                 onClick={() => handleEdit(node)}
-                                className="text-[#CAFF33] hover:text-[#A4E600] text-sm flex items-center gap-1"
+                                className="text-color4 hover:text-color8 text-sm flex items-center gap-1"
                             >
                                 <Pencil size={16} />
                                 ویرایش
@@ -231,73 +232,95 @@ const CreateCategoryForm: React.FC = () => {
                                 className="text-red-500 hover:text-red-400 text-sm flex items-center gap-1"
                             >
                                 <Trash2 size={16} />
-                                حذف دسته 
+                                حذف دسته
                             </button>
                         </div>
                     )}
-
                     {node.children && node.children.length > 0 && (
-                        <ul className="pl-6 mt-2 border-r-2 border-dotted border-[#333] ml-2">
+                        <ul className="pl-6 mt-2 border-r-2 border-dotted border-white ml-2">
+                            <li className='text-color4'>
                             {renderTree(node.children)}
+                            </li>
                         </ul>
                     )}
                 </li>
             ))}
         </ul>
-
     );
 
     return (
-        <div className="max-w-2xl mx-auto mt-10 p-6 rounded-2xl shadow-xl bg-[#1C1C1C] text-[#E4E4E7] space-y-10 font-primaryRegular">
-            {/* فرم افزودن دسته */}
-            <form
-                onSubmit={handleSubmit}
-                className="bg-[#262626] rounded-2xl p-6 space-y-5 border border-[#333] shadow-md"
+        <div className="max-w-2xl mx-auto mt-10 p-6 rounded-2xl shadow-xl bg-color1 text-color3 space-y-10 font-primaryRegular">
+            {/* Trigger button */}
+            <button
+                onClick={() => setShowModal(true)}
+                className="bg-color8 hover:bg-color4 text-color1 font-primaryBold py-2 px-4 rounded-xl transition w-full md:w-auto"
             >
-                <h2 className="text-2xl font-primaryBold text-[#CAFF33] text-center">ایجاد دسته / زیر دسته</h2>
+                + افزودن دسته جدید
+            </button>
+            {/* Modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                    <div className="bg-color1 border border-color5 rounded-2xl p-6 w-full max-w-md mx-auto shadow-2xl">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl text-color4 font-primaryBold">ایجاد دسته / زیر دسته</h2>
+                            <button onClick={() => setShowModal(false)} className="text-color7 hover:text-red-400 text-lg font-bold">
+                                ×
+                            </button>
+                        </div>
 
-                <div>
-                    <label className="block mb-1 text-[#BFBFBF] font-primaryMedium">نام دسته:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full p-3 bg-[#1A1A1A] border border-[#333] rounded-xl text-white focus:ring-2 focus:ring-[#8FD400] outline-none"
-                        required
-                    />
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div>
+                                <label className="block mb-1 text-[#BFBFBF] font-primaryMedium">نام دسته:</label>
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="w-full p-3 bg-color6 border border-color5 rounded-xl text-color2 focus:ring-2 focus:ring-color9 outline-none"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block mb-1 text-color3 font-primaryMedium">انتخاب دسته پدر (اختیاری):</label>
+                                <select
+                                    value={parentId ?? ''}
+                                    onChange={(e) => setParentId(e.target.value ? parseInt(e.target.value) : null)}
+                                    className="w-full p-3 bg-color6 border border-color5 rounded-xl text-color2"
+                                >
+                                    <option value="">--- بدون دسته پدر (اصلی) ---</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="flex justify-between items-center pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowModal(false)}
+                                    className="bg-color6 text-color2 px-4 py-2 rounded-xl hover:bg-color5 transition border border-color5"
+                                >
+                                    لغو
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-color9 hover:bg-color8 text-color1 font-primaryBold py-2 px-4 rounded-xl transition"
+                                >
+                                    ایجاد دسته
+                                </button>
+                            </div>
+
+                            {success && (
+                                <p className="text-color8 text-center font-primaryMedium mt-2">
+                                    دسته با موفقیت ایجاد شد!
+                                </p>
+                            )}
+                        </form>
+                    </div>
                 </div>
-
-                <div>
-                    <label className="block mb-1 text-[#BFBFBF] font-primaryMedium">انتخاب دسته پدر (اختیاری):</label>
-                    <select
-                        value={parentId ?? ''}
-                        onChange={(e) => setParentId(e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-full p-3 bg-[#1A1A1A] border border-[#333] rounded-xl text-white"
-                    >
-                        <option value="">--- بدون دسته پدر (اصلی) ---</option>
-                        {categories.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                                {cat.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <button
-                    type="submit"
-                    className="w-full bg-[#8FD400] hover:bg-[#A4E600] text-[#1C1C1C] font-primaryBold py-2 rounded-xl transition"
-                >
-                    ایجاد دسته
-                </button>
-
-                {success && (
-                    <p className="text-[#A4E600] text-center font-primaryMedium mt-2">
-                        دسته با موفقیت ایجاد شد!
-                    </p>
-                )}
-            </form>
-
-            {/* لیست دسته‌ها */}
+            )}
             <div>
                 <h3 className="text-xl font-primaryDemibold text-center mb-4">لیست دسته‌ها (با امکان ویرایش)</h3>
                 {tree.length > 0 ? (
@@ -305,11 +328,10 @@ const CreateCategoryForm: React.FC = () => {
                         {renderTree(tree)}
                     </ul>
                 ) : (
-                    <p className="text-center text-[#BFBFBF]">در حال دریافت دسته‌بندی‌ها...</p>
+                    <p className="text-center text-color7">در حال دریافت دسته‌بندی‌ها...</p>
                 )}
             </div>
         </div>
-
     );
 };
 
