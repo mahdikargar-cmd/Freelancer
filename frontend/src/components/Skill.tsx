@@ -15,6 +15,7 @@ const Skill = () => {
     const [Input, setInput] = useState("");
     const [editId, setEditId] = useState<number | null>(null);
     const [editValue, setEditValue] = useState("");
+    const [searchQuery, setSearchQuery] = useState(""); // تغییر نام متغیر برای شفافیت بیشتر
 
     useEffect(() => {
         fetch("/api/app/skills", {
@@ -35,6 +36,11 @@ const Skill = () => {
                 alert(err)
             });
     }, []);
+
+    // تابع فیلتر مهارت‌ها بر اساس جستجو
+    const filteredSkills = Skills.filter(skill => 
+        skill.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const handleSubmit = async () => {
         if (!Input.trim()) return alert("لطفاً مهارت را وارد کنید.");
@@ -136,8 +142,20 @@ const Skill = () => {
                     ثبت مهارت
                 </button>
             </div>
+            
+            {/* بخش جستجو */}
+            <div className="bg-color5 p-4 rounded-xl shadow-md">
+                <input
+                    type="text"
+                    value={searchQuery}
+                    placeholder="جستجوی مهارت‌ها"
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-6 py-3 rounded-xl border border-color3 bg-color2 focus:outline-none focus:ring-2 focus:ring-color4 text-color6 font-primaryRegular"
+                />
+            </div>
+
             <ul className="space-y-6">
-                {Skills.map((item) => (
+                {filteredSkills.map((item) => (
                     <li
                         key={item.id}
                         className="flex items-center justify-between bg-color5 p-6 rounded-xl shadow-sm hover:shadow-lg transition"
