@@ -38,8 +38,7 @@ public class ProjectUCImpl implements ProjectUC {
 
     @Override
     public Project findById(Long id) {
-        ProjectDTO dto = projectRepo.findById(id); // اصلاح‌شده
-        return projectMapper.toDomain(dto);
+        return projectMapper.toDomain( projectRepo.findById(id));
     }
 
 
@@ -81,12 +80,6 @@ public class ProjectUCImpl implements ProjectUC {
             // Replace with actual skills from database
             List<SkillDTO> dbSkills = skillUC.findByIds(skillIds);
             projectDTO.setSkills(dbSkills);
-        }
-        if (projectDTO.getCategory() != null) {
-
-        }
-        if (projectDTO.getEmployerId() != null) {
-
         }
         return projectRepo.update(projectDTO);
     }

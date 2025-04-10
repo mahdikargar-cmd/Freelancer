@@ -13,9 +13,11 @@ public class UserMapper {
 
         return User.builder()
                 .id(userDTO.getId())
-                .email(userDTO.getEmail() != null ? userDTO.getEmail() : "Unknown")  // مقدار پیش‌فرض
-                .password(userDTO.getPassword() != null ? userDTO.getPassword() : "Unknown")  // مقدار پیش‌فرض
+                .email(userDTO.getEmail() != null ? userDTO.getEmail() : "Unknown")
+                .password(userDTO.getPassword() != null ? userDTO.getPassword() : "Unknown")
+                .role(userDTO.getRole())
                 .build();
+
     }
 
 
@@ -26,6 +28,7 @@ public class UserMapper {
                 .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .role(user.getRole())
                 .build();
     }
 }

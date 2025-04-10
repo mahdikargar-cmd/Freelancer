@@ -3,6 +3,7 @@ package com.manage.freelancer.AAA.application.usecase;
 import com.manage.freelancer.AAA.config.JwtService;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
+import com.manage.freelancer.domain.entity.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public class LoginUserUseCase {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    //متد سازنده
+    // Constructor
     public LoginUserUseCase(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -26,14 +27,28 @@ public class LoginUserUseCase {
 
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
             UserDTO user = userOpt.get();
-            CustomUserDetails userDetails = new CustomUserDetails(user); // تبدیل `User` به `UserDetails`
-            return jwtService.generateToken(userDetails); // تولید و بازگشت JWT
+            // Set a default role if it's null
+            if (user.getRole() == null) {
+                user.setRole(Role.FREELANCER);  // Default role
+                userRepository.save(user);
+            }
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+            return jwtService.generateToken(userDetails);
         }
         return null;
     }
 
     public UserDTO getById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found with id: " + id));
+    }
 
+    public UserDTO getByEmail(String email) {
+        UserDTO user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User Not Found with email: " + email));
+        // Set a default role if it's null
+        if (user.getRole() == null) {
+            user.setRole(Role.FREELANCER);  // Default role
+            userRepository.save(user);
+        }
+        return user;
     }
 }

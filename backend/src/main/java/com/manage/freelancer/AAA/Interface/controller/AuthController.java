@@ -7,6 +7,7 @@ import com.manage.freelancer.AAA.application.usecase.LoginUserUseCase;
 import com.manage.freelancer.AAA.application.usecase.RegisterUserUseCase;
 import com.manage.freelancer.AAA.config.JwtService;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
+import com.manage.freelancer.domain.entity.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,27 +35,34 @@ public class AuthController {
         try {
             String token = registerUserUseCase.register(request.getEmail(), request.getPassword());
             if (token != null) {
-                return ResponseEntity.ok(new AuthResponse("User registered successfully", token));
+                UserDTO user = loginUserUseCase.getByEmail(request.getEmail());
+                String roleStr = user.getRole() != null ? user.getRole().toString() : "UNKNOWN";
+                return ResponseEntity.ok(new AuthResponse("User registered successfully", token, roleStr));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new AuthResponse(" خطا در ثبت نام بک اند"));
+                        .body(new AuthResponse("خطا در ثبت نام بک اند", null, null));
             }
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new AuthResponse(e.getMessage()));
+                    .body(new AuthResponse(e.getMessage(), null, null));
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         String token = loginUserUseCase.login(request.getEmail(), request.getPassword());
+
         if (token != null) {
-            return ResponseEntity.ok(new AuthResponse("Login successful", token));
+            UserDTO user = loginUserUseCase.getByEmail(request.getEmail());
+            // Handle null role case
+            String roleStr = user.getRole() != null ? user.getRole().toString() : "UNKNOWN";
+            return ResponseEntity.ok(new AuthResponse("Login successful", token, roleStr));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse("Invalid credentials"));
+                    .body(new AuthResponse("Invalid credentials", null, null));
         }
     }
+
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {

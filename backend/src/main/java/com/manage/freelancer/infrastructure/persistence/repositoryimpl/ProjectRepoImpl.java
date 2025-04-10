@@ -34,22 +34,6 @@ public class ProjectRepoImpl implements ProjectRepo {
         return project;
     }
 
-    // Add a helper method to ensure relationships are loaded
-    private void loadRelationships(ProjectDTO project) {
-        if (project.getSkills() != null) {
-            project.getSkills().forEach(skill -> {
-                if (skill != null) {
-                    skill.getName();
-                }
-            });
-        }
-        if (project.getCategory() != null) {
-            System.out.println("Category: " + project.getCategory().getName());
-        }
-        if (project.getEmployerId() != null) {
-            project.getEmployerId().getEmail();
-        }
-    }
 
     @Override
     public List<ProjectDTO> findByProjectName(String projectName) {

@@ -1,5 +1,6 @@
 package com.manage.freelancer.AAA.infrastructure.entity;
 
+import com.manage.freelancer.domain.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,4 +20,9 @@ public class UserDTO {
     private String email;
 
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role; // نقش کاربر: فریلنسر یا کارفرما
+
+
 }

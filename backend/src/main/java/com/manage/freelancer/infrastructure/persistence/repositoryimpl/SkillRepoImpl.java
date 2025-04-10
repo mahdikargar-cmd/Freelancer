@@ -25,7 +25,7 @@ public class SkillRepoImpl implements SkillRepo {
     }
     @Override
     public List<SkillDTO> findByIds(List<Long> ids) {
-        return skillsJPARepo.findByIdIn(ids);  // از متد صحیح استفاده کنید
+        return skillsJPARepo.findByIdIn(ids);
     }
 
     @Override
