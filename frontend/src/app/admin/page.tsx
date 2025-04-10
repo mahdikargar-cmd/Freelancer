@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {DashboardAd} from "@/app/admin/dashboardAd/page";
+import { DashboardAd } from "@/app/admin/dashboardAd/page";
 import {
     BadgeIcon,
     BarChart3,
@@ -17,7 +17,8 @@ import {
     Menu,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Test from "./test/page";
+import ProjectSetting from "./test/page";
+import ProjectsList from "@/components/ProjectsList";
 // انیمیشن‌های انطباق نوار کناری
 const sidebarVariants = {
     open: { width: "240px", transition: { duration: 0.3 } },
@@ -54,12 +55,14 @@ const Admin = () => {
         { text: "کاربران", id: 2, component: "users", icon: <Users size={20} /> },
         { text: "گزارش‌ها", id: 3, component: "reports", icon: <BarChart3 size={20} /> },
         { text: "پیام‌ها", id: 4, component: "messages", icon: <MessageSquare size={20} /> },
+
     ];
 
     const settingsMenuItems = [
         { text: "تنظیمات", id: 5, component: "settings", icon: <Settings size={20} /> },
         { text: "راهنما", id: 6, component: "help", icon: <HelpCircle size={20} /> },
-        { text: "تست", id: 7, component: "test", icon: <SunIcon size={20} /> },
+        { text: "تنظیمات پروژه", id: 7, component: "ProjectSetting", icon: <SunIcon size={20} /> },
+        { text: "لیست پروژه ها", id: 8, component: "ProjectsList", icon: <MessageSquare size={20} /> }
     ];
 
     // تابعی برای رندر کردن کامپوننت‌ها
@@ -67,8 +70,10 @@ const Admin = () => {
         switch (component) {
             case "dashboardAd":
                 return <DashboardAd />;
-            case "test":
-                return <Test />;
+            case "ProjectSetting":
+                return <ProjectSetting />;
+            case "ProjectsList":
+                return <ProjectsList />;
             default:
                 return <DashboardAd />;
         }
@@ -109,9 +114,8 @@ const Admin = () => {
                     placeholder="جستجو..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`w-full bg-color6 rounded-lg py-2 text-color2 focus:outline-none focus:ring-1 focus:ring-color4 ${
-                        isOpen ? "pl-4 pr-10" : "px-2"
-                    }`}
+                    className={`w-full bg-color6 rounded-lg py-2 text-color2 focus:outline-none focus:ring-1 focus:ring-color4 ${isOpen ? "pl-4 pr-10" : "px-2"
+                        }`}
                 />
                 <Search size={18} className="absolute left-3 top-2.5 text-color7" />
             </div>
@@ -127,9 +131,8 @@ const Admin = () => {
                         whileHover={{ backgroundColor: "#262626" }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setComponent(item.component)}
-                        className={`flex items-center py-2 px-3 w-full rounded-lg transition-colors ${
-                            component === item.component ? "bg-color6 text-color4" : "text-color2 hover:bg-color6"
-                        }`}
+                        className={`flex items-center py-2 px-3 w-full rounded-lg transition-colors ${component === item.component ? "bg-color6 text-color4" : "text-color2 hover:bg-color6"
+                            }`}
                     >
                         <div className={component === item.component ? "text-color4" : "text-color7"}>
                             {item.icon}
@@ -150,14 +153,13 @@ const Admin = () => {
                         whileHover={{ backgroundColor: "#262626" }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setComponent(item.component)}
-                        className={`flex items-center py-2 px-3 w-full rounded-lg transition-colors ${
-                            component === item.component ? "bg-color6 text-color4" : "text-color2 hover:bg-color6"
-                        }`}
+                        className={`flex items-center py-2 px-3 w-full rounded-lg transition-colors ${component === item.component ? "bg-color6 text-color4" : "text-color2 hover:bg-color6"
+                            }`}
                     >
                         <div className={component === item.component ? "text-color4" : "text-color7"}>
                             {item.icon}
                         </div>
-                        {isOpen && <span className="mr-3 whitespace-nowrap">{item.text}</span>}
+                        {isOpen && <span className="mr-3 whitespace-nowrap font-primaryMedium">{item.text}</span>}
                     </motion.button>
                 ))}
             </div>

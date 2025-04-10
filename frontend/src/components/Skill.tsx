@@ -36,8 +36,6 @@ const Skill = () => {
                 alert(err)
             });
     }, []);
-
-    // تابع فیلتر مهارت‌ها بر اساس جستجو
     const filteredSkills = Skills.filter(skill => 
         skill.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -142,8 +140,6 @@ const Skill = () => {
                     ثبت مهارت
                 </button>
             </div>
-            
-            {/* بخش جستجو */}
             <div className="bg-color5 p-4 rounded-xl shadow-md">
                 <input
                     type="text"
@@ -153,7 +149,6 @@ const Skill = () => {
                     className="w-full px-6 py-3 rounded-xl border border-color3 bg-color2 focus:outline-none focus:ring-2 focus:ring-color4 text-color6 font-primaryRegular"
                 />
             </div>
-
             <ul className="space-y-6">
                 {filteredSkills.map((item) => (
                     <li
