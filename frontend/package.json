@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.1.7",
     "axios": "^1.8.3",
     "framer-motion": "^12.5.0",
     "freelancer": "file:",
