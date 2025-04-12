@@ -4,7 +4,6 @@ import React, { JSX, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { FiClock, FiDollarSign, FiCalendar, FiFolder, FiAlertCircle, FiCheckCircle, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { p } from "framer-motion/m";
 import { CategorySelect } from "./CategoryCustom";
 
 interface Skill {
@@ -127,10 +126,6 @@ const ProjectsList: React.FC = () => {
       console.error('Error details:', err);
       alert(err.message || 'خطا در حذف پروژه');
     }
-  };
-
-  const getParentCategories = (): Category[] => {
-    return categories.filter(category => category.parentCategory === null);
   };
 
   const getChildCategories = (parentId: number): Category[] => {
