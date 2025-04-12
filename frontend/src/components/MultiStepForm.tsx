@@ -159,7 +159,7 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({
                                 </div>
                             ))
                         ) : (
-                            <p className="text-light-color4 dark:text-color4">هیچ مهارتی اضافه نشده است.</p>
+                            <p className="text-light-color4 dark:text-color4 font-primaryMedium">هیچ مهارتی اضافه نشده است.</p>
                         )}
                     </div>
                 </motion.div>

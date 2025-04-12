@@ -4,7 +4,6 @@ import React, { JSX, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { FiClock, FiDollarSign, FiCalendar, FiFolder, FiAlertCircle, FiCheckCircle, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { p } from "framer-motion/m";
 import { CategorySelect } from "./CategoryCustom";
 
 interface Skill {
@@ -134,7 +133,10 @@ const ProjectsList: React.FC = () => {
     }
   };
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> d5af291c91d47ee85499d3a56afbaba0f31d95f4
   const getChildCategories = (parentId: number): Category[] => {
     return categories.filter(category =>
       category.parentCategory && category.parentCategory.id === parentId
