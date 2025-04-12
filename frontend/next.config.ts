@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         source: "/api/:path*", // درخواست‌های سمت فرانت که به /api می‌روند
         destination: "http://localhost:8080/:path*", // ارسال به سرور بک‌اند
       },
+      {
+        source: "/app/:path*",
+        destination: "http://localhost:8080/:path*",
+      }
     ];
   },
 };

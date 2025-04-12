@@ -113,11 +113,16 @@ const ProjectsList: React.FC = () => {
       });
 
       console.log('Delete response status:', res.status);
-      const data = await res.json();
-      console.log('Delete response data:', data);
+
+      // اگر وضعیت پاسخ 204 باشد، نیازی به پارس کردن JSON نیست.
+      let data = null;
+      if (res.status !== 204) {
+        data = await res.json();
+        console.log('Delete response data:', data);
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || 'خطا در حذف پروژه');
+        throw new Error((data && data.message) || 'خطا در حذف پروژه');
       }
 
       setProjects(prev => prev.filter(item => item.id !== id));
@@ -128,6 +133,10 @@ const ProjectsList: React.FC = () => {
     }
   };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5af291c91d47ee85499d3a56afbaba0f31d95f4
   const getChildCategories = (parentId: number): Category[] => {
     return categories.filter(category =>
       category.parentCategory && category.parentCategory.id === parentId

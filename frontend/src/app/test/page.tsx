@@ -28,7 +28,7 @@ export default function CategorySelector() {
   
 
   useEffect(() => {
-    fetch('/api/app/getCategories', {
+    fetch('/app/getCategories', {
     method:"GET",
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ export default function CategorySelector() {
     };
 
     try {
-      const res = await fetch('/api/app/createCategory', {
+      const res = await fetch('/app/createCategory', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
