@@ -5,8 +5,7 @@ import {
     FaTools,
     FaMoneyBillWave,
     FaDollarSign,
-    FaCheckCircle,
-    FaProjectDiagram
+    FaCheckCircle
 } from "react-icons/fa";
 import { IoTime, IoAddCircle } from "react-icons/io5";
 import { CategorySelect } from './CategoryCustom';

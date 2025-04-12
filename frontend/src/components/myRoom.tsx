@@ -54,7 +54,8 @@ type ProjectPayload = {
 }
 
 interface Data {
-    name: string; // فرض بر این است که هر مهارت یک شیء با خصوصیت name دارد
+    id: number;
+    name: string;
 }
 
 const Room = () => {
@@ -71,8 +72,8 @@ const Room = () => {
     })
     const [step, setStep] = useState(1);
     const [categories, setCategories] = useState<Category[]>([])
-    const [skills, setSkills] = useState<string[]>([]) // آرایه‌ای برای ذخیره مهارت‌ها
-    const [allSkills, setAllSkills] = useState<string[]>([]) // لیست تمام مهارت‌های سیستم
+    const [skills, setSkills] = useState<Data[]>([]) // آرایه‌ای برای ذخیره مهارت‌ها
+    const [allSkills, setAllSkills] = useState<Data[]>([]) // لیست تمام مهارت‌های سیستم
     const [filteredSkills, setFilteredSkills] = useState<string[]>([]) // مهارت‌های فیلتر شده براساس متن ورودی
     const [showSuggestions, setShowSuggestions] = useState(false) // نمایش پنل پیشنهادها
     const autocompleteRef = useRef<HTMLDivElement>(null) // رفرنس برای کنترل کلیک خارج از پنل
@@ -130,8 +131,8 @@ const Room = () => {
             })
             .then((data: Data[]) => {
                 // فقط نام مهارت‌ها را از داده‌ها استخراج می‌کنیم
-                const skillNames = data.map((skill) => skill.name);
-                setAllSkills(skillNames); // ذخیره تمام مهارت‌ها
+                // const skillNames = data.map((skill) => skill.name);
+                setAllSkills(data); // ذخیره تمام مهارت‌ها
             })
             .catch((err) => {
                 alert(err); // در صورت خطا نمایش داده می‌شود
@@ -143,32 +144,33 @@ const Room = () => {
             HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
         >
     ) => {
-        const { name, value } = e.target
-
+        const { name, value } = e.target;
+    
         if (name === 'skill') {
             // فیلتر کردن مهارت‌ها براساس متن ورودی
             const filtered = allSkills.filter(skill =>
-                skill.toLowerCase().includes(value.toLowerCase()) &&
-                !skills.includes(skill)
+                skill.name.toLowerCase().includes(value.toLowerCase()) &&
+                !skills.some(s => s.id === skill.id) // بررسی وجود نداشتن در لیست انتخاب‌شده
             );
-            setFilteredSkills(filtered);
+            setFilteredSkills(filtered.map(skill => skill.name)); // فقط نام‌ها را برای نمایش بفرستید
             setShowSuggestions(value.trim() !== '');
         }
+    
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
-        setFormData(prev => ({ ...prev, [name]: value }))
-    }
-
-    const handleSelectSkill = (selectedSkill: string) => {
-        if (!skills.includes(selectedSkill) && skills.length < 5) {
-            setSkills(prevSkills => [...prevSkills, selectedSkill]);
+    const handleSelectSkill = (selectedSkillName: string) => {
+        const selectedSkill = allSkills.find(skill => skill.name === selectedSkillName);
+        if (selectedSkill && !skills.some(s => s.id === selectedSkill.id) && skills.length < 5) {
+            setSkills(prev => [...prev, selectedSkill]);
         }
         setFormData(prev => ({ ...prev, skill: '' }));
         setShowSuggestions(false);
-    }
+    };
 
     const handleRemoveSkill = (skillToRemove: string) => {
-        setSkills(prevSkills => prevSkills.filter(skill => skill !== skillToRemove))
-    }
+        setSkills(prevSkills => prevSkills.filter(skill => skill.name !== skillToRemove));
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -188,7 +190,7 @@ const Room = () => {
             description: formData.description,
             priceStarted: parseFloat(formData.priceStarted),
             priceEnded: parseFloat(formData.priceEnded),
-            skills: skills.map(skill => ({ id: 1, name: skill })), // تبدیل آرایه مهارت‌ها
+            skills: skills,
             category: selectedCategory,
             suggested: 0,
             deadline: parseInt(formData.deadline),
@@ -281,7 +283,7 @@ const Room = () => {
                         <MultiStepForm
                             step={step}
                             formData={formData}
-                            skills={skills}
+                            skills={skills.map(skill => skill.name)}
                             categories={categories}
                             filteredSkills={filteredSkills}
                             showSuggestions={showSuggestions}
@@ -301,7 +303,7 @@ const Room = () => {
                         <NavigationButtons
                             step={step}
                             formData={formData}
-                            skills={skills}
+                            skills={skills.map(skill => skill.name)}
                             prevStep={prevStep}
                             nextStep={nextStep}
                         />
