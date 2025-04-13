@@ -35,8 +35,8 @@ public class ProjectDTO {
     @Column(nullable = false)
     private double priceEnded;
 
-
-    @ManyToMany(fetch = FetchType.EAGER)
+    // تغییر حالت بارگذاری از EAGER به LAZY برای skills
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "project_skills",
             joinColumns = @JoinColumn(name = "project_id"),
@@ -44,9 +44,8 @@ public class ProjectDTO {
     )
     private List<SkillDTO> skills;
 
-
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    // تغییر حالت بارگذاری از EAGER به LAZY برای category
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryDTO category;
 
@@ -54,7 +53,6 @@ public class ProjectDTO {
 
     @Column(nullable = false)
     private int deadline;
-
 
     @Column(nullable = false)
     private ProjectType type;
@@ -66,7 +64,8 @@ public class ProjectDTO {
     @Column(nullable = false)
     private ProjectStatus status;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    // تغییر حالت بارگذاری از EAGER به LAZY برای employerId
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserDTO employerId;

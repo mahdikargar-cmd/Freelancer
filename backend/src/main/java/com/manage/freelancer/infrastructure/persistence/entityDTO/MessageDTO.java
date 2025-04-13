@@ -1,22 +1,33 @@
 package com.manage.freelancer.infrastructure.persistence.entityDTO;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "skills")
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "message")
 @Builder
+@NoArgsConstructor
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class SkillDTO {
+public class MessageDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private UserDTO sender;
+    private String content;
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private ProjectDTO projectId;
+    private LocalDateTime createTime;
 }

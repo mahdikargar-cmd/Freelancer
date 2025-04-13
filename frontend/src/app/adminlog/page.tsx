@@ -1,5 +1,3 @@
-// pages/login.tsx
-import Link from "next/link";
 
 const LoginPage = () => {
     return (

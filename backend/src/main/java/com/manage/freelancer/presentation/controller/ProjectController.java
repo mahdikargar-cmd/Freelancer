@@ -4,6 +4,10 @@ import com.manage.freelancer.application.usecaseimpl.ProjectUCImpl;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
 import com.manage.freelancer.infrastructure.persistence.mapper.ProjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +21,13 @@ public class ProjectController {
     private final ProjectMapper projectMapper;
 
     @GetMapping("/getProjects")
-    public ResponseEntity<List<ProjectDTO>> getProjects() {
-        return ResponseEntity.ok(projectUC.getAllProjects());
+    public ResponseEntity<Page<ProjectDTO>> getProjects(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        return ResponseEntity.ok(projectUC.getAllProjects(pageable));
     }
 
     @GetMapping("/{id}")
@@ -29,7 +38,6 @@ public class ProjectController {
         }
         return ResponseEntity.ok(projectDTO);
     }
-
 
     @PostMapping("/createProject")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDTO) {

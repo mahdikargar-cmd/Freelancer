@@ -8,6 +8,8 @@ import com.manage.freelancer.infrastructure.persistence.jparepository.ProjectJPA
 import com.manage.freelancer.infrastructure.persistence.mapper.ProjectMapper;
 import com.manage.freelancer.infrastructure.persistence.repository.ProjectRepo;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,23 +19,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ProjectRepoImpl implements ProjectRepo {
     private final ProjectJPARepo projectJPARepo;
-    private CategoryJpaRepo categoryJPARepo; // اضافه کن اگر نداری
-    private final ProjectMapper projectMapper;
+    private CategoryJpaRepo categoryJPARepo;
 
     @Override
-    public List<ProjectDTO> findAll() {
-        return projectJPARepo.findAll().stream()
-                .map(this::ensureRelationsLoaded)
-                .collect(Collectors.toList());
+    public Page<ProjectDTO> findAll(Pageable pageable) {
+        return projectJPARepo.findAll(pageable);
     }
-    private ProjectDTO ensureRelationsLoaded(ProjectDTO project) {
-        if (project.getId() > 0) {
-            // Force reload the entity with all relations
-            return projectJPARepo.findByIdWithRelations(project.getId()).orElse(project);
-        }
-        return project;
-    }
-
 
     @Override
     public List<ProjectDTO> findByProjectName(String projectName) {
@@ -48,7 +39,6 @@ public class ProjectRepoImpl implements ProjectRepo {
     @Override
     public ProjectDTO save(ProjectDTO projectDTO) {
         ProjectDTO saved = projectJPARepo.save(projectDTO);
-        // After saving, load the full object with relationships
         return projectJPARepo.findByIdWithRelations(saved.getId()).orElse(saved);
     }
 

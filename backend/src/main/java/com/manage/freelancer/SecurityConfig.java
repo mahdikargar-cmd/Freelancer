@@ -38,6 +38,7 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers("/auth/login", "/auth/register", "/auth/validate").permitAll()
                         .requestMatchers("/api/profileImages/**", "/api/getHeader", "/api/footer", "/api/notfound").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
 
                         // Profile endpoints that need authentication
                         .requestMatchers("/api/getProfileInformation").authenticated()
