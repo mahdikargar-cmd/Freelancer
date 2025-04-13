@@ -133,10 +133,6 @@ const ProjectsList: React.FC = () => {
     }
   };
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d5af291c91d47ee85499d3a56afbaba0f31d95f4
   const getChildCategories = (parentId: number): Category[] => {
     return categories.filter(category =>
       category.parentCategory && category.parentCategory.id === parentId
@@ -274,6 +270,7 @@ const ProjectsList: React.FC = () => {
               <p className="text-color7 font-primaryMedium">با تغییر فیلترها دوباره امتحان کنید</p>
             </div>
           ) : (
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProjects.map((project) => (
                 <motion.div
@@ -362,6 +359,7 @@ const ProjectsList: React.FC = () => {
             </div>
           )
         }
+        
       </div >
     </div >
   );
