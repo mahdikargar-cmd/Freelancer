@@ -19,6 +19,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import ProjectSetting from "./test/page";
 import ProjectsList from "@/components/ProjectsList";
+import UserList from "@/components/userList";
 // انیمیشن‌های انطباق نوار کناری
 const sidebarVariants = {
     open: { width: "240px", transition: { duration: 0.3 } },
@@ -61,8 +62,9 @@ const Admin = () => {
     const settingsMenuItems = [
         { text: "تنظیمات", id: 5, component: "settings", icon: <Settings size={20} /> },
         { text: "راهنما", id: 6, component: "help", icon: <HelpCircle size={20} /> },
-        { text: "تنظیمات پروژه", id: 7, component: "ProjectSetting", icon: <SunIcon size={20} /> },
-        { text: "لیست پروژه ها", id: 8, component: "ProjectsList", icon: <MessageSquare size={20} /> }
+        { text: "تنظیمات پروژه", id: 7, component: "ProjectSetting", icon: <Settings size={20} /> },
+        { text: "لیست پروژه ها", id: 8, component: "ProjectsList", icon: <MessageSquare size={20} />},
+        {text:"لیست کاربران" , id:9 , component:"UserList" , icon:<User size={20} />},
     ];
 
     // تابعی برای رندر کردن کامپوننت‌ها
@@ -74,6 +76,8 @@ const Admin = () => {
                 return <ProjectSetting />;
             case "ProjectsList":
                 return <ProjectsList />;
+            case "UserList":
+                return <UserList />
             default:
                 return <DashboardAd />;
         }
