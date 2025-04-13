@@ -28,12 +28,12 @@ public class SuggestProjectController {
         return suggestProjectUC.updateSuggestProject(suggestProjectDTO);
     }
 
-    @GetMapping("/getById")
+    @GetMapping("/IdSuggest/{id}")
     public SuggestProjectDTO getById(@RequestParam Long id) {
         return suggestProjectUC.findById(id).orElse(null);
     }
 
-    @DeleteMapping("/deleteById")
+    @DeleteMapping("/delSuggestP/{id}")
     public void deleteById(@RequestParam Long id) {
         suggestProjectUC.deleteSuggestProject(id);
     }

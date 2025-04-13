@@ -9,6 +9,7 @@ export default function UpgradeSubscriptionPanel() {
                 "امکان اضافه کردن 2 نفر به پنل چت",
                 "پشتیبانی 24 ساعته",
                 "ابزارهای پایه",
+                "سین خوردن آنلاین کاربران ",
             ],
             cta: "شروع کنید",
             featured: false,
@@ -21,6 +22,7 @@ export default function UpgradeSubscriptionPanel() {
                 "پشتیبانی VIP",
                 "ابزارهای پیشرفته",
                 "سین خوردن آنلاین کاربران ",
+                "امکان ارتباط و مکالمه تصویری با فریلنسر ها"
             ],
             cta: "ارتقا دهید",
             featured: true,

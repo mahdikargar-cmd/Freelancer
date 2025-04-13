@@ -2,11 +2,15 @@ package com.manage.freelancer.application.usecase;
 
 import com.manage.freelancer.domain.entity.Project;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface ProjectUC {
-    List<ProjectDTO> getAllProjects();
+    // نسخه صفحه‌بندی متد دریافت پروژه‌ها
+    Page<ProjectDTO> getAllProjects(Pageable pageable);
+
     ProjectDTO getProjectById(Long id);
     Project findById(Long id);
     ProjectDTO createProject(ProjectDTO projectDTO);

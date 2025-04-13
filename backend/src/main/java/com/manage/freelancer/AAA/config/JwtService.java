@@ -1,8 +1,12 @@
 package com.manage.freelancer.AAA.config;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,12 +17,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.Base64;
+import java.util.logging.Logger;
 
 @Service
 public class JwtService {
-    // Use this for development only - in production, store in environment variables
+    private static final Logger logger = Logger.getLogger(JwtService.class.getName());
     private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60 * 1000; // 24 hours
 
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
@@ -43,7 +48,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -53,8 +58,47 @@ public class JwtService {
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
+    public boolean TokenValid(String token) {
+        try {
+            extractAllClaims(token);
+            return !isTokenExpired(token);
+        } catch (ExpiredJwtException e) {
+            logger.warning("JWT Token has expired: " + e.getMessage());
+            return false;
+        } catch (SignatureException e) {
+            logger.warning("Invalid JWT signature: " + e.getMessage());
+            return false;
+        } catch (MalformedJwtException e) {
+            logger.warning("Invalid JWT token: " + e.getMessage());
+            return false;
+        } catch (UnsupportedJwtException e) {
+            logger.warning("JWT token is unsupported: " + e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            logger.warning("JWT claims string is empty: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            logger.warning("JWT validation error: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public Long extractUserId(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return claims.get("userId", Long.class);
+        } catch (Exception e) {
+            logger.warning("Error extracting userId from token: " + e.getMessage());
+            return null;
+        }
+    }
+
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
     private Date extractExpiration(String token) {

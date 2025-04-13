@@ -1,5 +1,6 @@
 package com.manage.freelancer.infrastructure.persistence.entityDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +8,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Entity
 @AllArgsConstructor
 @Table(name = "category")
 @Builder
 @NoArgsConstructor
+@Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CategoryDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
