@@ -37,7 +37,7 @@ public class AuthController {
             if (token != null) {
                 UserDTO user = loginUserUseCase.getByEmail(request.getEmail());
                 String roleStr = user.getRole() != null ? user.getRole().toString() : "UNKNOWN";
-                return ResponseEntity.ok(new AuthResponse("User registered successfully", token, roleStr));
+                return ResponseEntity.ok(new AuthResponse("User registered successfully", token, roleStr, user.getId().toString()));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new AuthResponse("خطا در ثبت نام بک اند", null, null));
