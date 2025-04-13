@@ -42,7 +42,7 @@ interface Project {
 }
 
 const ProjectsList: React.FC = () => {
-  const token = Cookies.get("token");
+  const token = Cookies.get("adminToken");
   const [projects, setProjects] = useState<Project[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

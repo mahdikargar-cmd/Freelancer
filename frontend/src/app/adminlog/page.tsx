@@ -1,7 +1,10 @@
 'use client'
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { FiLock, FiUser, FiEye, FiEyeOff, FiLogIn } from 'react-icons/fi';
 import Finger from '@/components/SVG/Finger';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+
 interface FormData {
   username: string;
   password: string;
@@ -13,6 +16,9 @@ const AdminLogin = () => {
     username: '',
     password: ''
   });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,9 +28,44 @@ const AdminLogin = () => {
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/admin/auth/login', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'خطا در ورود به سیستم');
+      }
+
+      Cookies.set('adminToken', data.token, { expires: 1 });
+      alert("ورود موفقیت امیز بود")
+      router.push('/admin');
+      
+    } catch (err: any) {
+      setError(err.message || 'خطا در ارتباط با سرور');
+      console.log(err.message)
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    const token = Cookies.get('adminToken');
+    if (token) {
+      router.push('/admin');
+    }
+  }, [router]);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row dark:bg-color1 bg-light-color1">
@@ -48,7 +89,13 @@ const AdminLogin = () => {
             <h1 className="text-2xl font-primaryRegular dark:text-color2 text-light-color2 mt-4">ورود به پنل مدیریت</h1>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
             <div className="mb-6">
               <label htmlFor="username" className="block text-sm font-primaryMedium dark:text-color3 text-light-color3 mb-2">
                 نام کاربری
@@ -70,7 +117,6 @@ const AdminLogin = () => {
               </div>
             </div>
 
-            {/* Password Input */}
             <div className="mb-6">
               <label htmlFor="password" className="block text-sm font-medium dark:text-color3 text-light-color3 mb-2">
                 رمز عبور
@@ -99,6 +145,7 @@ const AdminLogin = () => {
                 </button>
               </div>
             </div>
+            
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <input
@@ -117,14 +164,23 @@ const AdminLogin = () => {
                 </a>
               </div>
             </div>
+            
             <button
               type="submit"
-              className="font-primaryMedium w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium dark:text-color1 text-light-color1 dark:bg-color4 bg-light-color4 dark:hover:bg-color8 hover:bg-light-color8 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-color9 focus:ring-light-color9 transition-all duration-200"
+              disabled={loading}
+              className={`font-primaryMedium w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium dark:text-color1 text-light-color1 dark:bg-color4 bg-light-color4 dark:hover:bg-color8 hover:bg-light-color8 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-color9 focus:ring-light-color9 transition-all duration-200 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              <FiLogIn className="ml-2 w-5 h-5" />
-              ورود به سیستم
+              {loading ? (
+                <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></span>
+              ) : (
+                <>
+                  <FiLogIn className="ml-2 w-5 h-5" />
+                  ورود به سیستم
+                </>
+              )}
             </button>
           </form>
+          
           <div className="mt-8 text-center text-sm dark:text-color7 text-light-color7 font-primaryMedium">
             <p>© {new Date().getFullYear()} سیستم مدیریت. تمام حقوق محفوظ است.</p>
           </div>

@@ -21,7 +21,7 @@ const CreateCategoryForm: React.FC = () => {
     const [editingName, setEditingName] = useState('');
 
     const fetchCategories = async () => {
-        const token = Cookies.get('token');
+        const token = Cookies.get('adminToken');
         if (!token) return;
 
         const res = await fetch('/api/app/getCategories', {

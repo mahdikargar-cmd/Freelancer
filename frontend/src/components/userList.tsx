@@ -19,7 +19,7 @@ const UserList = () => {
     const [page, setPage] = useState(1)
     const [hasMore, setHasMore] = useState(true)
     const loaderRef = useRef(null)
-    const token = Cookies.get("token")
+    const token = Cookies.get("adminToken")
 
     const fetchUsers = async (pageNumber: number) => {
         try {

@@ -10,7 +10,7 @@ interface Data {
 }
 
 const Skill = () => {
-    const token = Cookies.get("token");
+    const token = Cookies.get("adminToken");
     const [Skills, setSkills] = useState<Data[]>([]);
     const [Input, setInput] = useState("");
     const [editId, setEditId] = useState<number | null>(null);
