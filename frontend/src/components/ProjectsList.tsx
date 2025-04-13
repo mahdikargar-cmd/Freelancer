@@ -51,51 +51,72 @@ const ProjectsList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isFetchingMore, setIsFetchingMore] = useState<boolean>(false);
+
+  const fetchProjects = async (page: number) => {
+    try {
+      const res = await fetch(`/api/app/getProjects?page=${page}&size=10`, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error("مشکلی در دریافت پروژه‌ها پیش آمد.");
+      }
+
+      const data = await res.json();
+
+      const newProjects: Project[] = data.content || [];
+
+      setProjects(prev => {
+        const existingIds = new Set(prev.map(p => p.id));
+        const filteredNewProjects = newProjects.filter(p => !existingIds.has(p.id));
+        return [...prev, ...filteredNewProjects];
+      });
+      setHasMore(!data.last); // اگه صفحه آخره، دیگه "بارگذاری بیشتر" نشون داده نشه
+      setCurrentPage(data.number + 1); // افزایش شماره صفحه برای بعدی
+
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch projects
-        const projectsRes = await fetch("/api/app/getProjects", {
-          method: "GET",
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (!projectsRes.ok) {
-          throw new Error("مشکلی در دریافت پروژه‌ها پیش آمد.");
-        }
-
-        const projectsData = await projectsRes.json();
-        setProjects(projectsData);
-
-        // Fetch categories
-        const categoriesRes = await fetch("/api/app/getCategories", {
-          method: "GET",
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (!categoriesRes.ok) {
-          throw new Error("مشکلی در دریافت دسته‌بندی‌ها پیش آمد.");
-        }
-
-        const categoriesData = await categoriesRes.json();
-        setCategories(categoriesData);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-        setCategoriesLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchProjects(0); // بار اول صفحه 0
+    fetchCategories(); // دسته‌بندی‌ها جداگانه
   }, []);
+  
+  const fetchCategories = async () => {
+    try {
+      const categoriesRes = await fetch("/api/app/getCategories", {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      if (!categoriesRes.ok) {
+        throw new Error("مشکلی در دریافت دسته‌بندی‌ها پیش آمد.");
+      }
+  
+      const categoriesData = await categoriesRes.json();
+      setCategories(categoriesData);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+  
 
   const handleDelete = async (id: number) => {
     console.log('Attempting to delete project with ID:', id);
@@ -257,7 +278,7 @@ const ProjectsList: React.FC = () => {
           </motion.div>
         </div>
         {
-          loading ? (
+          hasMore && loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-primaryMedium">
               در حال بارگذاری
             </div>
@@ -270,7 +291,7 @@ const ProjectsList: React.FC = () => {
               <p className="text-color7 font-primaryMedium">با تغییر فیلترها دوباره امتحان کنید</p>
             </div>
           ) : (
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProjects.map((project) => (
                 <motion.div
@@ -359,7 +380,7 @@ const ProjectsList: React.FC = () => {
             </div>
           )
         }
-        
+
       </div >
     </div >
   );
