@@ -13,6 +13,8 @@ public class AuthResponse {
     private String message;
     private String token;
     private String role;
+    private String userId;
 
-
+    public AuthResponse(String message, Object o, Object o1) {
+    }
 }

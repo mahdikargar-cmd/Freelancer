@@ -56,10 +56,11 @@ public class AuthController {
             UserDTO user = loginUserUseCase.getByEmail(request.getEmail());
             // Handle null role case
             String roleStr = user.getRole() != null ? user.getRole().toString() : "UNKNOWN";
-            return ResponseEntity.ok(new AuthResponse("Login successful", token, roleStr));
+            // Add userId to the response
+            return ResponseEntity.ok(new AuthResponse("Login successful", token, roleStr, user.getId().toString()));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse("Invalid credentials", null, null));
+                    .body(new AuthResponse("Invalid credentials", null, null, null));
         }
     }
 

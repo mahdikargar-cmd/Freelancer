@@ -2,7 +2,7 @@
 
 import React, { JSX, useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { FiClock, FiDollarSign, FiCalendar, FiFolder, FiAlertCircle, FiCheckCircle, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiClock, FiDollarSign, FiCalendar, FiFolder, FiAlertCircle, FiChevronDown } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { CategorySelect } from "./CategoryCustom";
 

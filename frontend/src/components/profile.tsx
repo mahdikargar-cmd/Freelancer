@@ -34,6 +34,7 @@ type ProfileResponse = ProfileData & {
 
 const Profile = () => {
     const { isLoggedIn, userId } = useAuth();
+    console.log( "user",isLoggedIn, userId);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [profileExists, setProfileExists] = useState<boolean>(false);
