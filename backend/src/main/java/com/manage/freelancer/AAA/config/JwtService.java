@@ -1,5 +1,6 @@
 package com.manage.freelancer.AAA.config;
 
+import com.manage.freelancer.AAA.domain.model.Admin;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -40,7 +41,13 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        if (userDetails instanceof Admin) {
+            Admin admin = (Admin) userDetails;
+            extraClaims.put("userId", admin.getId());
+        }
+
+        return generateToken(extraClaims, userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
@@ -112,4 +119,6 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+
 }

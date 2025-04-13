@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
+                        .requestMatchers("/admin/auth/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/register", "/auth/validate").permitAll()
                         .requestMatchers("/api/profileImages/**", "/api/getHeader", "/api/footer", "/api/notfound").permitAll()
                         .requestMatchers("/ws/**").permitAll()
