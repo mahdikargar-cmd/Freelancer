@@ -4,7 +4,8 @@ import { FiLock, FiUser, FiEye, FiEyeOff, FiLogIn } from 'react-icons/fi';
 import Finger from '@/components/SVG/Finger';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-
+import Success from '@/components/Toast/success';
+import Failed from '@/components/Toast/failed';
 interface FormData {
   username: string;
   password: string;
@@ -18,6 +19,11 @@ const AdminLogin = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState({
+    Success: false,
+    Failed: false
+  });
+  const [warning, setWarning] = useState("");
   const router = useRouter();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -49,9 +55,14 @@ const AdminLogin = () => {
       }
 
       Cookies.set('adminToken', data.token, { expires: 1 });
-      alert("ورود موفقیت امیز بود")
-      router.push('/admin');
-      
+      setWarning("خوش آمدید.");
+      setShowToast({ Success: true, Failed: false });
+      setTimeout(() => {
+        setShowToast({ Success: false, Failed: false });
+        setWarning("");
+        router.push('/admin');
+      }, 3000);
+
     } catch (err: any) {
       setError(err.message || 'خطا در ارتباط با سرور');
       console.log(err.message)
@@ -80,7 +91,9 @@ const AdminLogin = () => {
           </p>
         </div>
       </div>
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-8 relative">
+        {showToast.Success && <Success showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
+        {showToast.Failed && <Failed showToast={() => setShowToast({ Success: false, Failed: false })} text={warning} />}
         <div className="w-full max-w-md dark:bg-color5 bg-light-color5 rounded-xl shadow-lg p-8">
           <div className="text-center mb-8">
             <div className="w-12 h-12 dark:bg-color6 bg-light-color6 rounded-lg flex items-center justify-center mx-auto">
@@ -145,7 +158,7 @@ const AdminLogin = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <input
@@ -164,7 +177,7 @@ const AdminLogin = () => {
                 </a>
               </div>
             </div>
-            
+
             <button
               type="submit"
               disabled={loading}
@@ -180,7 +193,7 @@ const AdminLogin = () => {
               )}
             </button>
           </form>
-          
+
           <div className="mt-8 text-center text-sm dark:text-color7 text-light-color7 font-primaryMedium">
             <p>© {new Date().getFullYear()} سیستم مدیریت. تمام حقوق محفوظ است.</p>
           </div>
