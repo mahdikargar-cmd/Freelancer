@@ -27,6 +27,7 @@ const Header = async () => {
                 <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
                     <Image src={img} className="h-12 w-12" alt="Logo" width={100} height={128} />
                 </Link>
+                <ThemeSwitcher />
                 <Humberger />
                 <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
                     <ul className="flex flex-col p-4 md:p-0 mt-4 font-primaryMedium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
@@ -44,7 +45,6 @@ const Header = async () => {
                         ))}
                     </ul>
                 </div>
-                <ThemeSwitcher />
                 <SignHead />
             </div>
         </nav>
