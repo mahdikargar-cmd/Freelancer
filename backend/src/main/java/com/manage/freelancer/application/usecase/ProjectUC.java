@@ -19,5 +19,6 @@ public interface ProjectUC {
     ProjectDTO getProjectBySubject(String subject);
     List<ProjectDTO> getProjectBySkills(String skills);
     ProjectDTO getProjectByCategory(String category);
-    List<ProjectDTO> getProjectByEmployerId(String employerId);
+    List<ProjectDTO> getProjectByEmployerId(Long employerId);
+
 }

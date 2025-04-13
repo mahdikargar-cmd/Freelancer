@@ -55,6 +55,9 @@ public class ProjectDTO {
     private int deadline;
 
     @Column(nullable = false)
+    private boolean active = false;
+
+    @Column(nullable = false)
     private ProjectType type;
 
     private List<String> suggestions;

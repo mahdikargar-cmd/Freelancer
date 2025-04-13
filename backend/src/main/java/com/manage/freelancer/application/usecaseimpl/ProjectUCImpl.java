@@ -34,7 +34,6 @@ public class ProjectUCImpl implements ProjectUC {
     }
 
 
-
     @Override
     public ProjectDTO getProjectById(Long id) {
         return projectRepo.findById(id);
@@ -104,12 +103,12 @@ public class ProjectUCImpl implements ProjectUC {
     }
 
     @Override
-    public List<ProjectDTO> getProjectByEmployerId(String employerId) {
+    public List<ProjectDTO> getProjectByEmployerId(Long employerId) {
         try {
-            Long id = Long.parseLong(employerId);
-            return projectRepo.findByEmployerId(id);
+            return projectRepo.findByEmployerId(employerId);
         } catch (NumberFormatException e) {
-            return List.of();
+            return null;
         }
     }
+
 }

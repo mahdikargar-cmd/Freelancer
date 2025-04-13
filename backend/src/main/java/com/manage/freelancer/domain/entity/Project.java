@@ -23,6 +23,7 @@ public class Project {
     private Category category; // This should also be a domain entity, not DTO
     private long suggested;
     private int deadline;
+    private boolean active = false;
     private ProjectType type;
     private List<String> suggestions;
     private LocalDate createdDate;

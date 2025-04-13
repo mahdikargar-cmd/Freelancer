@@ -44,10 +44,12 @@ public class ProjectController {
         return ResponseEntity.ok(projectUC.createProject(projectDTO));
     }
 
-    @PutMapping("/updateProject")
-    public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO projectDTO) {
+    @PutMapping("/updateProject/{id}")
+    public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
+        projectDTO.setId(id); // مقداردهی به id
         return ResponseEntity.ok(projectUC.updateProject(projectDTO));
     }
+
 
     @DeleteMapping("/deleteProject/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
@@ -72,6 +74,6 @@ public class ProjectController {
 
     @GetMapping("/getEmployer")
     public ResponseEntity<List<ProjectDTO>> getEmployer(@RequestParam Long id) {
-        return ResponseEntity.ok(projectUC.getProjectByEmployerId(id.toString()));
+        return ResponseEntity.ok(projectUC.getProjectByEmployerId(id));
     }
 }

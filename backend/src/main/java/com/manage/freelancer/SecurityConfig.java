@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/auth/register", "/auth/validate").permitAll()
                         .requestMatchers("/api/profileImages/**", "/api/getHeader", "/api/footer", "/api/notfound").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/admin/project/**").hasAuthority("ROLE_ADMIN")
 
                         // Profile endpoints that need authentication
                         .requestMatchers("/api/getProfileInformation").authenticated()

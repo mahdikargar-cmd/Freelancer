@@ -14,9 +14,5 @@ public class AuthResponse {
     private String token;
     private String role;
 
-    public AuthResponse(String message) {
-        this.message = message;
-        this.token = null;
-        this.role = null;
-    }
+
 }
