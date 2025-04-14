@@ -20,6 +20,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProjectSetting from "./test/page";
 import ProjectsList from "@/components/ProjectsList";
 import UserList from "@/components/userList";
+import Cookies from "js-cookie"
+import { useRouter } from "next/navigation";
 // انیمیشن‌های انطباق نوار کناری
 const sidebarVariants = {
     open: { width: "240px", transition: { duration: 0.3 } },
@@ -37,7 +39,7 @@ const Admin = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-
+    const route = useRouter();
     useEffect(() => {
         const handleResize = () => {
             const mobile = window.innerWidth < 768;
@@ -63,8 +65,8 @@ const Admin = () => {
         { text: "تنظیمات", id: 5, component: "settings", icon: <Settings size={20} /> },
         { text: "راهنما", id: 6, component: "help", icon: <HelpCircle size={20} /> },
         { text: "تنظیمات پروژه", id: 7, component: "ProjectSetting", icon: <Settings size={20} /> },
-        { text: "لیست پروژه ها", id: 8, component: "ProjectsList", icon: <MessageSquare size={20} />},
-        {text:"لیست کاربران" , id:9 , component:"UserList" , icon:<User size={20} />},
+        { text: "لیست پروژه ها", id: 8, component: "ProjectsList", icon: <MessageSquare size={20} /> },
+        { text: "لیست کاربران", id: 9, component: "UserList", icon: <User size={20} /> },
     ];
 
     // تابعی برای رندر کردن کامپوننت‌ها
@@ -185,7 +187,10 @@ const Admin = () => {
             )}
         </motion.div>
     );
-
+    const logout = () => {
+        Cookies.remove("adminToken");
+        route.push('/')
+    }
     // کامپوننت Header (سربرگ)
     const Header = () => (
         <header className="bg-color5 p-4 flex justify-between items-center">
@@ -246,9 +251,9 @@ const Admin = () => {
                                         <Settings size={16} className="ml-2 text-color7" />
                                         <span>تنظیمات</span>
                                     </button>
-                                    <button className="w-full flex items-center p-2 hover:bg-color6 rounded-lg transition text-red-500">
+                                    <button className="w-full flex items-center p-2 hover:bg-color6 rounded-lg transition text-red-500 font-primaryMedium" onClick={logout}>
                                         <LogOut size={16} className="ml-2" />
-                                        <span>خروج</span>
+                                            خروج
                                     </button>
                                 </div>
                             </motion.div>
@@ -258,6 +263,8 @@ const Admin = () => {
             </div>
         </header>
     );
+
+
 
     return (
         <div className="flex flex-col md:flex-row h-screen bg-color1 text-color2 overflow-hidden">
