@@ -1,11 +1,12 @@
-'use client'
-import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+"use client";
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { FiLock, FiUser, FiEye, FiEyeOff, FiLogIn } from 'react-icons/fi';
 import Finger from '@/components/SVG/Finger';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import Success from '@/components/Toast/success';
 import Failed from '@/components/Toast/failed';
+
 interface FormData {
   username: string;
   password: string;
@@ -62,21 +63,19 @@ const AdminLogin = () => {
         setWarning("");
         router.push('/admin');
       }, 3000);
-
     } catch (err: any) {
       setError(err.message || 'خطا در ارتباط با سرور');
-      console.log(err.message)
+      setShowToast({ Success: false, Failed: true });
+      setWarning(err.message || 'خطا در ارتباط با سرور');
+      setTimeout(() => {
+        setShowToast({ Success: false, Failed: false });
+        setWarning("");
+      }, 3000);
+      console.log(err.message);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const token = Cookies.get('adminToken');
-    if (token) {
-      router.push('/admin');
-    }
-  }, [router]);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row dark:bg-color1 bg-light-color1">
