@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@/components/lib/useAuth";
+import {useEffect, useState, useCallback} from "react";
+import {useAuth} from "@/components/lib/useAuth";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -11,7 +11,7 @@ interface Project {
     priceStarted: number;
     priceEnded: number;
     deadLine: number;
-    status: string;
+    status: "PENDING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
     proposals?: number;
     unreadMessages?: number;
 }
@@ -32,14 +32,14 @@ interface ProjectListChatProps {
     onViewProposals?: (projectId: number) => void;
 }
 
-const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
+const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
     const [activeTab, setActiveTab] = useState<"client" | "freelancer">("client");
     const [showProposalsModal, setShowProposalsModal] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [clientProjects, setClientProjects] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null); // Added error state
-    const { userId } = useAuth();
+    const {userId} = useAuth();
 
     // Fetch projects with useCallback to prevent unnecessary re-renders
     const getClientProjects = useCallback(async () => {
@@ -166,19 +166,27 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                 "تخصص من طراحی رابط کاربری جذاب و کاربرپسند است.",
         },
     ];
-
-    const getStatusColor = (status: string) => {
+    const statusToPersian: Record<Project["status"], string> = {
+        PENDING: "در انتظار",
+        OPEN: "باز",
+        IN_PROGRESS: "در حال اجرا",
+        COMPLETED: "تکمیل شده",
+        CANCELLED: "لغو شده",
+    };
+    const getStatusColor = (status: Project["status"]) => {
         switch (status) {
-            case "در حال مذاکره":
-                return "bg-yellow-500";
-            case "در حال انجام":
-                return "bg-light-color4 dark:bg-color4";
-            case "در انتظار تأیید":
-                return "bg-blue-500";
-            case "تکمیل شده":
-                return "bg-green-600";
+            case "PENDING":
+                return "bg-blue-500"; // 在等待
+            case "OPEN":
+                return "bg-yellow-500"; // 开放
+            case "IN_PROGRESS":
+                return "bg-light-color4 dark:bg-color4"; // 进行中
+            case "COMPLETED":
+                return "bg-green-600"; // 已完成
+            case "CANCELLED":
+                return "bg-red-500"; // 已取消
             default:
-                return "bg-gray-500";
+                return "bg-gray-500"; // 未知状态
         }
     };
 
@@ -211,7 +219,8 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
         <div className="max-w-4xl mx-auto my-8 px-4">
             {/* Error Display */}
             {error && (
-                <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-6 text-center">
+                <div
+                    className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-6 text-center">
                     {error}
                 </div>
             )}
@@ -311,11 +320,11 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                                     </h3>
                                     <span
                                         className={`px-3 py-1 rounded-full text-xs text-light-color2 dark:text-color1 ${getStatusColor(
-                                            project.status || "در حال مذاکره"
+                                            project.status
                                         )}`}
                                     >
-                    {project.status || "در حال مذاکره"}
-                  </span>
+                        {statusToPersian[project.status]}
+                    </span>
                                 </div>
                                 <p className="text-light-color7 dark:text-color7 text-sm mb-4">
                                     {project.description}
@@ -419,7 +428,7 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                                     <div className="w-full bg-light-color6 dark:bg-color1 rounded-full h-2">
                                         <div
                                             className="bg-light-color4 dark:bg-color4 h-2 rounded-full"
-                                            style={{ width: `${project.progress}%` }}
+                                            style={{width: `${project.progress}%`}}
                                         ></div>
                                     </div>
                                 </div>
@@ -485,7 +494,8 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
             {/* Proposals Modal */}
             {showProposalsModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+                    <div
+                        className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-primaryMedium text-light-color2 dark:text-color2">
                                 پیشنهادهای دریافتی
@@ -542,10 +552,12 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                                                                 d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
                                                             />
                                                         </svg>
-                                                        <span className="text-sm text-light-color7 dark:text-color7 mr-1">
+                                                        <span
+                                                            className="text-sm text-light-color7 dark:text-color7 mr-1">
                               {proposal.rating}
                             </span>
-                                                        <span className="text-xs text-light-color7 dark:text-color7 mr-2">
+                                                        <span
+                                                            className="text-xs text-light-color7 dark:text-color7 mr-2">
                               ({proposal.completedProjects} پروژه تکمیل شده)
                             </span>
                                                     </div>

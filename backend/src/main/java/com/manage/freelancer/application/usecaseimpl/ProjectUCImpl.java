@@ -49,27 +49,23 @@ public class ProjectUCImpl implements ProjectUC {
 
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
-        // Get authenticated user from SecurityContext
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new IllegalStateException("User must be authenticated to create a project");
+            throw new IllegalStateException("کاربر باید احراز هویت شده باشد تا پروژه ایجاد کند");
         }
 
-        // Assume the principal contains the UserDTO or user ID
         Long employerId;
         if (authentication.getPrincipal() instanceof UserDTO) {
             employerId = ((UserDTO) authentication.getPrincipal()).getId();
         } else {
-            // If principal is a String (e.g., username), fetch user by username
-            String username = authentication.getName();
-            UserDTO user = userRepo.findByUsername(username)
-                    .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found"));
+            String email = authentication.getName();
+            UserDTO user = userRepo.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("کاربر احراز هویت‌شده یافت نشد"));
             employerId = user.getId();
         }
 
-        // Set employerId in projectDTO
         UserDTO fullUser = userRepo.findById(employerId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid employer ID"));
+                .orElseThrow(() -> new IllegalArgumentException("شناسه کارفرما نامعتبر است"));
         projectDTO.setEmployerId(fullUser);
 
         // Validate and set skills

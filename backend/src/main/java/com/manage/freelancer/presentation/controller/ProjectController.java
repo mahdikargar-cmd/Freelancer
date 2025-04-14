@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectUCImpl projectUC;
-    private final ProjectMapper projectMapper;
 
     @GetMapping("/getProjects")
     public ResponseEntity<Page<ProjectDTO>> getProjects(

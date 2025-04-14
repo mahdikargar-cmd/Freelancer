@@ -49,6 +49,9 @@ public class ProjectMapper {
                 .skills(skillsDomain)
                 .category(category)
                 .employerId(employer)
+                .createdDate(projectDTO.getCreatedDate()) // اضافه کردن
+                .endDate(projectDTO.getEndDate()) // اضافه کردن
+                .status(projectDTO.getStatus())
                 .build();
     }
 
@@ -77,6 +80,9 @@ public class ProjectMapper {
                 .skills(skillsDTO)
                 .category(categoryDTO)
                 .employerId(employerDTO)
+                .createdDate(project.getCreatedDate()) // اضافه کردن
+                .endDate(project.getEndDate()) // اضافه کردن
+                .status(project.getStatus())
                 .build();
     }
 }

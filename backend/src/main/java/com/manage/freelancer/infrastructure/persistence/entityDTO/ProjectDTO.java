@@ -61,15 +61,27 @@ public class ProjectDTO {
     private ProjectType type;
 
     private List<String> suggestions;
-    private LocalDate createdDate;
-    private LocalDate endDate;
 
+    @Column(name = "created_date")
+    private LocalDate createdDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
     @Column(nullable = false)
     private ProjectStatus status;
 
-    // تغییر حالت بارگذاری از EAGER به LAZY برای employerId
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserDTO employerId;
+
+
+    // اضافه کردن متد برای تنظیم خودکار createdDate
+    @PrePersist
+    public void prePersist() {
+        if (this.createdDate == null) {
+            this.createdDate = LocalDate.now();
+        }
+
+    }
 }
