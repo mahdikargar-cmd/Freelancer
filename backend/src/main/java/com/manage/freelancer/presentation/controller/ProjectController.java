@@ -41,7 +41,12 @@ public class ProjectController {
 
     @PostMapping("/createProject")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDTO) {
-        return ResponseEntity.ok(projectUC.createProject(projectDTO));
+        try {
+            ProjectDTO createdProject = projectUC.createProject(projectDTO);
+            return ResponseEntity.ok(createdProject);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @PutMapping("/updateProject/{id}")
@@ -71,9 +76,20 @@ public class ProjectController {
     public ResponseEntity<ProjectDTO> getCategory(@RequestParam String category) {
         return ResponseEntity.ok(projectUC.getProjectByCategory(category));
     }
-
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<ProjectDTO>> getProjectsByEmployer(@PathVariable Long userId) {
+        List<ProjectDTO> projects = projectUC.getProjectByEmployerId(userId);
+        if (projects == null || projects.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(projects);
+    }
     @GetMapping("/getEmployer")
     public ResponseEntity<List<ProjectDTO>> getEmployer(@RequestParam Long id) {
-        return ResponseEntity.ok(projectUC.getProjectByEmployerId(id));
+        List<ProjectDTO> projects = projectUC.getProjectByEmployerId(id);
+        if (projects == null || projects.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(projects);
     }
 }

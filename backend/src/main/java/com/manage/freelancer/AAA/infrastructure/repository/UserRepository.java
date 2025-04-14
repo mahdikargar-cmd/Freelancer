@@ -9,4 +9,6 @@ public interface UserRepository {
     void save(UserDTO  user);
     Optional<UserDTO> findByEmail(String name);
     Optional<UserDTO> findById(Long id);
+
+    <T> ScopedValue<T> findByUsername(String username);
 }

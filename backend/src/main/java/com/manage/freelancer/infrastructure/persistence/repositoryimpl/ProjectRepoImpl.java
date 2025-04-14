@@ -64,9 +64,9 @@ public class ProjectRepoImpl implements ProjectRepo {
         List<ProjectDTO> projects = projectJPARepo.findByCategory(categoryDTO);
         return projects.isEmpty() ? null : projects.get(0);
     }
-
     @Override
     public List<ProjectDTO> findByEmployerId(Long employerId) {
         return projectJPARepo.findByEmployerId_Id(employerId);
     }
+
 }

@@ -13,8 +13,11 @@ import com.manage.freelancer.infrastructure.persistence.repository.ProjectRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +49,30 @@ public class ProjectUCImpl implements ProjectUC {
 
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
+        // Get authenticated user from SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new IllegalStateException("User must be authenticated to create a project");
+        }
+
+        // Assume the principal contains the UserDTO or user ID
+        Long employerId;
+        if (authentication.getPrincipal() instanceof UserDTO) {
+            employerId = ((UserDTO) authentication.getPrincipal()).getId();
+        } else {
+            // If principal is a String (e.g., username), fetch user by username
+            String username = authentication.getName();
+            UserDTO user = userRepo.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found"));
+            employerId = user.getId();
+        }
+
+        // Set employerId in projectDTO
+        UserDTO fullUser = userRepo.findById(employerId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid employer ID"));
+        projectDTO.setEmployerId(fullUser);
+
+        // Validate and set skills
         if (projectDTO.getSkills() != null && !projectDTO.getSkills().isEmpty()) {
             List<Long> skillIds = projectDTO.getSkills()
                     .stream()
@@ -54,18 +81,28 @@ public class ProjectUCImpl implements ProjectUC {
             List<SkillDTO> dbSkills = skillUC.findByIds(skillIds);
             projectDTO.setSkills(dbSkills);
         }
+
+        // Validate and set category
         if (projectDTO.getCategory() != null && projectDTO.getCategory().getId() != null) {
             CategoryDTO fullCategory = categoryRepo.findByIdWithDetails(projectDTO.getCategory().getId());
-            if (fullCategory != null) {
-                projectDTO.setCategory(fullCategory);
+            if (fullCategory == null) {
+                throw new IllegalArgumentException("Invalid category ID");
             }
+            projectDTO.setCategory(fullCategory);
+        } else {
+            throw new IllegalArgumentException("Category is required");
         }
-        if (projectDTO.getEmployerId() != null && projectDTO.getEmployerId().getId() > 0) {
-            UserDTO fullUser = userRepo.findById(projectDTO.getEmployerId().getId())
-                    .orElse(projectDTO.getEmployerId());
-            projectDTO.setEmployerId(fullUser);
-        }
+
         return projectRepo.save(projectDTO);
+    }
+
+    @Override
+    public List<ProjectDTO> getProjectByEmployerId(Long employerId) {
+        List<ProjectDTO> projects = projectRepo.findByEmployerId(employerId);
+        if (projects == null || projects.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return projects;
     }
 
     @Override
@@ -102,13 +139,6 @@ public class ProjectUCImpl implements ProjectUC {
         return projectRepo.findByCategory(category);
     }
 
-    @Override
-    public List<ProjectDTO> getProjectByEmployerId(Long employerId) {
-        try {
-            return projectRepo.findByEmployerId(employerId);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
+
 
 }

@@ -1,16 +1,15 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*", // درخواست‌های سمت فرانت که به /api می‌روند
-        destination: "http://localhost:8080/:path*", // ارسال به سرور بک‌اند
+        source: '/api/:path*',
+        destination: 'http://localhost:8080/:path*',
       },
       {
-        source: "/app/:path*",
-        destination: "http://localhost:8080/:path*",
-      }
+        source: '/app/:path*',
+        destination: 'http://localhost:8080/app/:path*', // مسیر دقیق‌تر
+      },
     ];
   },
 };

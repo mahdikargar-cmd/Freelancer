@@ -4,8 +4,8 @@ import Image from 'next/image';
 import r_c from '../../img/right-corner.png';
 import { useRouter } from 'next/navigation';
 import Success from '@/components/Toast/success';
-import { useAuth } from "@/components/context/AuthContext";
 import { FiMail, FiLock, FiUserPlus, FiArrowLeft } from 'react-icons/fi';
+import {useAuth} from "@/components/lib/useAuth";
 
 const SignUp = () => {
     const route = useRouter();
@@ -56,14 +56,16 @@ const SignUp = () => {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("شما قبلا ثبت نام کرده‌اید.");
+                    if (response.status === 409) {
+                        throw new Error("شما قبلا ثبت نام کرده‌اید.");
+                    }
+                    throw new Error("خطایی در ثبت‌نام رخ داد.");
                 }
                 return response.json();
             })
             .then(data => {
-                if (data.token) {
-                    // ذخیره توکن بدون userId
-                    register(data.token, "");
+                if (data.token && data.userId) {
+                    register(data.token, data.userId); // ذخیره توکن و userId
                     setCorrect("ثبت نام با موفقیت انجام شد");
                     setShowToast(true);
 
@@ -72,7 +74,7 @@ const SignUp = () => {
                         route.push('/dashboard');
                     }, 3000);
                 } else {
-                    throw new Error("مشکلی در دریافت توکن پیش آمد!");
+                    throw new Error("اطلاعات ناقص از سرور دریافت شد!");
                 }
             })
             .catch(error => {

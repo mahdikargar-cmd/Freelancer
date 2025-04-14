@@ -33,8 +33,8 @@ public interface ProjectJPARepo extends JpaRepository<ProjectDTO, Long> {
 
     List<ProjectDTO> findByCategory(CategoryDTO category);
 
+    @EntityGraph(attributePaths = {"skills", "category", "employerId"})
     List<ProjectDTO> findByEmployerId_Id(Long employerId);
-
     // اضافه کردن متد صفحه‌بندی برای دریافت پروژه‌ها
     @EntityGraph(attributePaths = {"skills", "category", "employerId"})
     Page<ProjectDTO> findAll(Pageable pageable);

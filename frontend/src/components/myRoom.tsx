@@ -1,23 +1,12 @@
 'use client'
 import React, { useState, useEffect, useRef, JSX } from 'react'
 import Cookies from 'js-cookie'
-import {
-    FaRegStickyNote,
-    FaTools,
-    FaMoneyBillWave,
-    FaDollarSign,
-    FaCheckCircle,
-} from "react-icons/fa";
-import { IoTime } from "react-icons/io5";
-import { IoMdAddCircle } from "react-icons/io";
+
 import { motion } from "framer-motion";
-import { CategorySelect } from './CategoryCustom';
 import HeaderProject from './headerProject';
 import ProgressBarProject from './ProgressBarProject';
-import ProjectSummary from './ProjectSummary';
 import NavigationButtons from './NavigationButton';
 import MultiStepForm from './MultiStepForm';
-// نوع داده‌ای برای دسته‌بندی‌ها
 type Category = {
     id: number
     name: string
@@ -145,7 +134,7 @@ const Room = () => {
         >
     ) => {
         const { name, value } = e.target;
-    
+
         if (name === 'skill') {
             // فیلتر کردن مهارت‌ها براساس متن ورودی
             const filtered = allSkills.filter(skill =>
@@ -155,7 +144,7 @@ const Room = () => {
             setFilteredSkills(filtered.map(skill => skill.name)); // فقط نام‌ها را برای نمایش بفرستید
             setShowSuggestions(value.trim() !== '');
         }
-    
+
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 

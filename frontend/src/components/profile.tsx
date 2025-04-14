@@ -213,6 +213,7 @@ const Profile = () => {
 
     const calculateProfileCompletion = () => {
         const requiredFields: (keyof ProfileData)[] = ['firstName', 'lastName', 'phoneNumber', 'address', 'placeOfStudy'];
+        // @ts-ignore
         let filledFields = requiredFields.filter((field) => profileData[field]?.trim()).length;
         if (profileData.profileImageUrl) filledFields += 1;
         return Math.round((filledFields / (requiredFields.length + 1)) * 100);
