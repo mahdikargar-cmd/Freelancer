@@ -2,7 +2,6 @@ package com.manage.freelancer.presentation.controller;
 
 import com.manage.freelancer.application.usecaseimpl.ProjectUCImpl;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
-import com.manage.freelancer.infrastructure.persistence.mapper.ProjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,11 +21,21 @@ public class ProjectController {
     @GetMapping("/getProjects")
     public ResponseEntity<Page<ProjectDTO>> getProjects(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sort) {
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "id,desc") String sort,
+            @RequestParam(required = false) Boolean active) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        return ResponseEntity.ok(projectUC.getAllProjects(pageable));
+        String[] sortParams = sort.split(",");
+        String sortField = sortParams[0];
+        Sort.Direction sortDirection = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("asc")
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortField));
+        Page<ProjectDTO> projects = active != null
+                ? projectUC.getProjectsByActive(active, pageable)
+                : projectUC.getAllProjects(pageable);
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{id}")
@@ -50,10 +59,25 @@ public class ProjectController {
 
     @PutMapping("/updateProject/{id}")
     public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
-        projectDTO.setId(id); // مقداردهی به id
-        return ResponseEntity.ok(projectUC.updateProject(projectDTO));
+        projectDTO.setId(id);
+        try {
+            ProjectDTO updatedProject = projectUC.updateProject(projectDTO);
+            return ResponseEntity.ok(updatedProject);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    @PutMapping("/updateProjectStatus/{id}")
+    public ResponseEntity<String> updateProjectStatus(@PathVariable Long id, @RequestBody ProjectStatusUpdate statusUpdate) {
+        ProjectDTO existingProject = projectUC.getProjectById(id);
+        if (existingProject == null) {
+            return ResponseEntity.status(404).body("Project not found");
+        }
+        existingProject.setActive(statusUpdate.isActive());
+        projectUC.updateProject(existingProject);
+        return ResponseEntity.ok("Project status updated successfully");
+    }
 
     @DeleteMapping("/deleteProject/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
@@ -75,7 +99,8 @@ public class ProjectController {
     public ResponseEntity<ProjectDTO> getCategory(@RequestParam String category) {
         return ResponseEntity.ok(projectUC.getProjectByCategory(category));
     }
-    @GetMapping("/{userId}")
+
+    @GetMapping("/employer/{userId}")
     public ResponseEntity<List<ProjectDTO>> getProjectsByEmployer(@PathVariable Long userId) {
         List<ProjectDTO> projects = projectUC.getProjectByEmployerId(userId);
         if (projects == null || projects.isEmpty()) {
@@ -83,6 +108,7 @@ public class ProjectController {
         }
         return ResponseEntity.ok(projects);
     }
+
     @GetMapping("/getEmployer")
     public ResponseEntity<List<ProjectDTO>> getEmployer(@RequestParam Long id) {
         List<ProjectDTO> projects = projectUC.getProjectByEmployerId(id);
@@ -90,5 +116,17 @@ public class ProjectController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(projects);
+    }
+}
+
+class ProjectStatusUpdate {
+    private boolean active;
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -1,5 +1,6 @@
 package com.manage.freelancer.infrastructure.persistence.jparepository;
 
+import com.manage.freelancer.domain.entity.Project;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.CategoryDTO;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
 import org.springframework.data.domain.Page;
@@ -38,4 +39,7 @@ public interface ProjectJPARepo extends JpaRepository<ProjectDTO, Long> {
     // اضافه کردن متد صفحه‌بندی برای دریافت پروژه‌ها
     @EntityGraph(attributePaths = {"skills", "category", "employerId"})
     Page<ProjectDTO> findAll(Pageable pageable);
+
+    Page<ProjectDTO> findByActive(boolean active, Pageable pageable);
+
 }

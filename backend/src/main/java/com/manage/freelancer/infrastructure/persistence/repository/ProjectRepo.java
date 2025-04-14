@@ -25,4 +25,7 @@ public interface ProjectRepo {
     List<ProjectDTO> findByEmployerId(Long employerId);
 
     Page<ProjectDTO> findAll(Pageable pageable);
+
+    Page<ProjectDTO> findByActive(boolean active, Pageable pageable);
 }
+

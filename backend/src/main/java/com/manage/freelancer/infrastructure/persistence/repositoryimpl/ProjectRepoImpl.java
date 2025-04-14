@@ -1,11 +1,9 @@
 package com.manage.freelancer.infrastructure.persistence.repositoryimpl;
 
-import com.manage.freelancer.domain.entity.Project;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.CategoryDTO;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
 import com.manage.freelancer.infrastructure.persistence.jparepository.CategoryJpaRepo;
 import com.manage.freelancer.infrastructure.persistence.jparepository.ProjectJPARepo;
-import com.manage.freelancer.infrastructure.persistence.mapper.ProjectMapper;
 import com.manage.freelancer.infrastructure.persistence.repository.ProjectRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
@@ -25,6 +22,12 @@ public class ProjectRepoImpl implements ProjectRepo {
     public Page<ProjectDTO> findAll(Pageable pageable) {
         return projectJPARepo.findAll(pageable);
     }
+
+    @Override
+    public Page<ProjectDTO> findByActive(boolean active, Pageable pageable) {
+        return projectJPARepo.findByActive(active, pageable);
+    }
+
 
     @Override
     public List<ProjectDTO> findByProjectName(String projectName) {

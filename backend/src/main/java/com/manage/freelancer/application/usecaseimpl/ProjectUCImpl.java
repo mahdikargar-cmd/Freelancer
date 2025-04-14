@@ -135,6 +135,7 @@ public class ProjectUCImpl implements ProjectUC {
         return projectRepo.findByCategory(category);
     }
 
-
-
+    public Page<ProjectDTO> getProjectsByActive(boolean active, Pageable pageable) {
+        return projectRepo.findByActive(active, pageable);
+    }
 }

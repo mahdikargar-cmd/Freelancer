@@ -1,4 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { jwtDecode } from 'jwt-decode';
+
+interface DecodedToken {
+    userId: number;
+    sub: string;
+    exp: number;
+    [key: string]: any;
+}
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -10,7 +18,19 @@ export function middleware(request: NextRequest) {
 
     // کوکی ادمین
     const adminToken = request.cookies.get('adminToken')?.value;
-    const isAdminAuthenticated = !!adminToken;
+    let isAdminAuthenticated = false;
+
+    // بررسی اعتبار توکن ادمین
+    if (adminToken) {
+        try {
+            const decoded: DecodedToken = jwtDecode(adminToken);
+            const currentTime = Date.now() / 1000;
+            isAdminAuthenticated = decoded.exp > currentTime;
+        } catch (error) {
+            console.error("Invalid admin token:", error);
+            isAdminAuthenticated = false;
+        }
+    }
 
     console.log('🔍 Middleware:', {
         pathname,
@@ -40,11 +60,13 @@ export function middleware(request: NextRequest) {
     // مسیرهای ادمین (مثل /admin و زیرمسیرهای آن)
     if (pathname.startsWith('/admin')) {
         if (!isAdminAuthenticated) {
-            console.warn('🔍 Middleware: Access denied to admin path', { pathname });
-            return NextResponse.redirect(new URL('/adminlog', request.url));
+            // ذخیره مسیر قبلی برای بازگشت پس از ورود
+            const redirectUrl = new URL('/adminlog', request.url);
+            redirectUrl.searchParams.set('callbackUrl', pathname);
+            return NextResponse.redirect(redirectUrl);
         }
         const response = NextResponse.next();
-        // تنظیم هدر برای ادمین (اختیاری)
+        // تنظیم هدر برای ادمین
         response.headers.set('x-admin', 'true');
         return response;
     }
@@ -52,7 +74,10 @@ export function middleware(request: NextRequest) {
     // مسیرهای غیرعمومی برای کاربران عمومی
     if (!isUserAuthenticated) {
         console.warn('🔍 Middleware: Access denied to protected path', { pathname });
-        return NextResponse.redirect(new URL('/login', request.url));
+        // ذخیره مسیر قبلی برای بازگشت پس از ورود
+        const redirectUrl = new URL('/login', request.url);
+        redirectUrl.searchParams.set('callbackUrl', pathname);
+        return NextResponse.redirect(redirectUrl);
     }
 
     const response = NextResponse.next();

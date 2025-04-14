@@ -1,44 +1,80 @@
 "use client";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
-export function useAdminAuth() {
-    const router = useRouter();
-    const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
+interface DecodedToken {
+    userId: number;
+    sub: string;
+    iat: number;
+    exp: number;
+    [key: string]: any;
+}
+
+export const useAdminAuth = () => {
+    const [userId, setUserId] = useState<number | null>(null);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [username, setUsername] = useState<string | null>(null);
 
     useEffect(() => {
-        const token = Cookies.get("adminToken");
-        const loggedIn = !!token;
-        setIsAdminLoggedIn(loggedIn);
+        const checkAuth = () => {
+            setIsLoading(true);
+            const token = Cookies.get("adminToken");
 
-        console.log("🔍 useAdminAuth - Checking admin login:", {
-            token: token?.substring(0, 20),
-            loggedIn,
-        });
+            if (token) {
+                try {
+                    const decoded: DecodedToken = jwtDecode(token);
+                    const currentTime = Date.now() / 1000;
 
-        // اگر توکن وجود داشت و کاربر در صفحه ورود است، به داشبورد هدایت شود
-        if (loggedIn && router.pathname === "/admin/login") {
-            router.push("/admin");
-        }
-    }, [router]);
+                    console.log("Token decoded:", {
+                        userId: decoded.userId,
+                        username: decoded.sub,
+                        expires: new Date(decoded.exp * 1000).toLocaleString(),
+                    });
 
-    const login = (token: string) => {
-        console.log("🔍 useAdminAuth - Logging in admin:", { token: token?.substring(0, 20) });
-        Cookies.set("adminToken", token, {
-            expires: 7,
-            secure: process.env.NODE_ENV === "production",
-        });
-        setIsAdminLoggedIn(true);
-        router.push("/admin");
-    };
+                    if (decoded.exp < currentTime) {
+                        console.warn("Token expired, logging out");
+                        Cookies.remove("adminToken");
+                        setIsLoggedIn(false);
+                        setUserId(null);
+                        setUsername(null);
+                    } else {
+                        setIsLoggedIn(true);
+                        setUserId(decoded.userId);
+                        setUsername(decoded.sub);
+                    }
+                } catch (error) {
+                    console.error("Error decoding token:", error);
+                    Cookies.remove("adminToken");
+                    setIsLoggedIn(false);
+                    setUserId(null);
+                    setUsername(null);
+                }
+            } else {
+                console.log("No admin token found");
+                setIsLoggedIn(false);
+                setUserId(null);
+                setUsername(null);
+            }
+            setIsLoading(false);
+        };
+
+        checkAuth();
+    }, []);
 
     const logout = () => {
-        console.log("🔍 useAdminAuth - Logging out admin");
         Cookies.remove("adminToken");
-        setIsAdminLoggedIn(false);
-        router.push("/admin/login");
+        setIsLoggedIn(false);
+        setUserId(null);
+        setUsername(null);
     };
 
-    return { isAdminLoggedIn, login, logout };
-}
+    return {
+        userId,
+        username,
+        isLoggedIn,
+        isLoading,
+        logout,
+    };
+};
