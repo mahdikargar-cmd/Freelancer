@@ -1,18 +1,30 @@
-'use client';
+"use client";
 
-import { FaUser } from 'react-icons/fa';
-import Link from 'next/link';
-import { useState } from 'react';
-import {useAuth} from "@/components/lib/useAuth";
+import { FaUser } from "react-icons/fa";
+import Link from "next/link";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/lib/useAuth";
 
 const SignHead = () => {
     const { isLoggedIn, logout } = useAuth();
     const [showDropdown, setShowDropdown] = useState(false);
+    const router = useRouter();
+
+    const toggleDropdown = useCallback(() => {
+        setShowDropdown((prev) => !prev);
+    }, []);
+
+    const handleLogout = useCallback(() => {
+        logout();
+        setShowDropdown(false);
+        router.push("/login"); // هدایت به صفحه ورود بدون رفرش
+    }, [logout, router]);
 
     return (
         <div className="relative">
             <button
-                onClick={() => setShowDropdown(!showDropdown)}
+                onClick={toggleDropdown}
                 className="flex items-center dark:text-color4 text-light-color4 hover:text-color8 transition-colors"
             >
                 <FaUser className="text-xl" />
@@ -26,17 +38,14 @@ const SignHead = () => {
                                     <Link
                                         href="/dashboard"
                                         className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
-                                        onClick={() => setShowDropdown(false)}
+                                        onClick={toggleDropdown}
                                     >
                                         داشبورد
                                     </Link>
                                 </li>
                                 <li>
                                     <button
-                                        onClick={() => {
-                                            logout();
-                                            setShowDropdown(false);
-                                        }}
+                                        onClick={handleLogout}
                                         className="block w-full text-left px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
                                     >
                                         خروج
@@ -49,7 +58,7 @@ const SignHead = () => {
                                     <Link
                                         href="/login"
                                         className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
-                                        onClick={() => setShowDropdown(false)}
+                                        onClick={toggleDropdown}
                                     >
                                         ورود
                                     </Link>
@@ -58,7 +67,7 @@ const SignHead = () => {
                                     <Link
                                         href="/signUp"
                                         className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
-                                        onClick={() => setShowDropdown(false)}
+                                        onClick={toggleDropdown}
                                     >
                                         ثبت‌نام
                                     </Link>
