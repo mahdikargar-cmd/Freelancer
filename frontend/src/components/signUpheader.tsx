@@ -1,65 +1,72 @@
 'use client';
 
-import { useAuth } from "@/components/context/AuthContext";
-import { FaUser } from "react-icons/fa";
-import Link from "next/link";
-import { useState, useEffect } from "react";
+import { FaUser } from 'react-icons/fa';
+import Link from 'next/link';
+import { useState } from 'react';
+import {useAuth} from "@/components/lib/useAuth";
 
 const SignHead = () => {
     const { isLoggedIn, logout } = useAuth();
-    const [showDropdown, setShowDropdown] = useState<boolean>(false);
-    useEffect(() => {
-        if (isLoggedIn) {
-            setShowDropdown(false);
-        }
-    }, [isLoggedIn]);
+    const [showDropdown, setShowDropdown] = useState(false);
 
     return (
-        <div className="relative w-full md:flex hidden md:w-auto md:order-1 rtl:space-x-reverse gap-2">
-            {isLoggedIn ? (
-                <div className="relative">
-                    <button
-                        onClick={() => setShowDropdown(!showDropdown)}
-                        className="flex items-center p-2 rounded-full bg-white text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                    >
-                        <FaUser className="text-light-color4 dark:text-color4" />
-                    </button>
-                    {showDropdown && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-color6 shadow-lg rounded-lg font-primaryMedium">
-                            <Link
-                                href="/dashboard"
-                                className="block px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                            >
-                                حساب کاربری
-                            </Link>
-                            <button
-                                onClick={logout}
-                                className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100 dark:text-red-400 dark:hover:bg-gray-700"
-                            >
-                                خروج
-                            </button>
-                        </div>
-                    )}
+        <div className="relative">
+            <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center dark:text-color4 text-light-color4 hover:text-color8 transition-colors"
+            >
+                <FaUser className="text-xl" />
+            </button>
+            {showDropdown && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-light-color6 dark:bg-color1 border dark:border-color5 border-light-color5 rounded-lg shadow-lg z-10">
+                    <ul className="py-2">
+                        {isLoggedIn ? (
+                            <>
+                                <li>
+                                    <Link
+                                        href="/dashboard"
+                                        className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
+                                        onClick={() => setShowDropdown(false)}
+                                    >
+                                        داشبورد
+                                    </Link>
+                                </li>
+                                <li>
+                                    <button
+                                        onClick={() => {
+                                            logout();
+                                            setShowDropdown(false);
+                                        }}
+                                        className="block w-full text-left px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
+                                    >
+                                        خروج
+                                    </button>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li>
+                                    <Link
+                                        href="/login"
+                                        className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
+                                        onClick={() => setShowDropdown(false)}
+                                    >
+                                        ورود
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/signUp"
+                                        className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
+                                        onClick={() => setShowDropdown(false)}
+                                    >
+                                        ثبت‌نام
+                                    </Link>
+                                </li>
+                            </>
+                        )}
+                    </ul>
                 </div>
-            ) : (
-                <ul className="flex flex-col p-4 md:p-0 mt-4 font-primaryMedium rounded-lg md:space-x-4 rtl:space-x-reverse md:flex-row md:mt-0">
-                    <li>
-                        <Link
-                            href="/signUp"
-                            className="inline-block py-2 px-4 text-sm text-gray-900 hover:text-light-color4 hover:bg-light-color5 dark:text-white dark:hover:text-color4 dark:hover:bg-color5 rounded-full"
-                        >
-                            ثبت نام
-                        </Link>
-                    </li>
-                    <li>
-                        <Link
-                            href="/login"
-                            className="inline-block py-2 px-4 text-sm bg-light-color4 text-white hover:bg-light-color9 dark:bg-color4 dark:text-color1 dark:hover:bg-color5 dark:hover:text-color4 rounded-full"
-                        >
-                            ورود
-                        </Link>
-                    </li>
-                </ul>
             )}
         </div>
     );

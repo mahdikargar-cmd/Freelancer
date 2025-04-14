@@ -5,10 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class JwtResponse {
     private String token;
+    private Long userId;
     private String message;
+
+    // Constructor with token and message for backward compatibility
+    public JwtResponse(String token, String message) {
+        this.token = token;
+        this.message = message;
+    }
 }

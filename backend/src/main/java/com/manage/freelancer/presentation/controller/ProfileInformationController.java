@@ -29,7 +29,7 @@ import java.util.*;
 public class ProfileInformationController {
     private final ProfileInformationUseCase profileInformationUseCase;
     private final UserRepository userRepository;
-    private final String UPLOAD_DIR = "F:\\Uni_project\\Freelancer\\backend\\uploads\\profileImage";
+    private final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/profileImage/";
     private static final Logger logger = LoggerFactory.getLogger(ProfileInformationController.class);
 
     @GetMapping("/getProfileInformation")
@@ -72,7 +72,7 @@ public class ProfileInformationController {
     }
 
     private Long extractUserId(Object principal) {
-        logger.debug("Extracting user ID from principal: {}", principal.getClass().getName());
+        logger.debug("Extracting user ID from principal: {}", principal);
 
         if (principal instanceof CustomUserDetails) {
             Long id = ((CustomUserDetails) principal).getUser().getId();
@@ -82,18 +82,39 @@ public class ProfileInformationController {
             Long id = ((UserDTO) principal).getId();
             logger.debug("Extracted ID from UserDTO: {}", id);
             return id;
+        } else if (principal instanceof org.springframework.security.core.userdetails.User) {
+            // Handle the standard Spring Security User object
+            String username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
+            logger.debug("Principal is a Spring Security User with username: {}", username);
+
+            // Look up the user by email/username
+            Optional<UserDTO> userOpt = userRepository.findByEmail(username);
+            if (userOpt.isPresent()) {
+                Long id = userOpt.get().getId();
+                logger.debug("Found user by email {}, ID: {}", username, id);
+                return id;
+            } else {
+                logger.warn("No user found with email: {}", username);
+            }
         } else if (principal instanceof String) {
-            logger.debug("Principal is a String: {}", principal);
-            Optional<UserDTO> userOpt = userRepository.findByEmail((String) principal);
-            Long id = userOpt.map(UserDTO::getId).orElse(null);
-            logger.debug("Looked up user by email, found ID: {}", id);
-            return id;
+            String email = (String) principal;
+            logger.debug("Principal is a String (email): {}", email);
+
+            // Try to find user by email
+            Optional<UserDTO> userOpt = userRepository.findByEmail(email);
+            if (userOpt.isPresent()) {
+                Long id = userOpt.get().getId();
+                logger.debug("Found user by email {}, ID: {}", email, id);
+                return id;
+            } else {
+                logger.warn("No user found with email: {}", email);
+            }
         }
 
-        logger.warn("Could not extract user ID from principal type: {}", principal.getClass().getName());
+        logger.warn("Could not extract user ID from principal type: {}",
+                principal != null ? principal.getClass().getName() : "null");
         return null;
     }
-
     @PostMapping("/createProfileInformation")
     public ResponseEntity<?> createProfileInformation(@RequestBody ProfileInformation profileInformation) {
         try {

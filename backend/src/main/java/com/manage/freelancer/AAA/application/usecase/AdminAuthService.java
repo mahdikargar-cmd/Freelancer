@@ -1,6 +1,5 @@
 package com.manage.freelancer.AAA.application.usecase;
 
-
 import com.manage.freelancer.AAA.Interface.dto.JwtResponse;
 import com.manage.freelancer.AAA.config.JwtService;
 import com.manage.freelancer.AAA.domain.model.Admin;
@@ -28,8 +27,9 @@ public class AdminAuthService {
         }
 
         String token = jwtService.generateToken(admin);
-        return new JwtResponse(token, "ورود موفق");
+        return new JwtResponse(token, admin.getId(), "ورود موفق");
     }
+
     public JwtResponse register(AdminRegisterRequest request) {
         boolean exists = adminRepository.findByUsername(request.getUsername()).isPresent();
         if (exists) {
@@ -41,11 +41,9 @@ public class AdminAuthService {
                 .password(passwordEncoder.encode(request.getPassword())) // هش رمز
                 .build();
 
-        adminRepository.save(admin);
+        Admin savedAdmin = adminRepository.save(admin);
 
-        String token = jwtService.generateToken(admin);
-        return new JwtResponse(token, "ثبت‌نام موفق");
+        String token = jwtService.generateToken(savedAdmin);
+        return new JwtResponse(token, savedAdmin.getId(), "ثبت‌نام موفق");
     }
-
 }
-

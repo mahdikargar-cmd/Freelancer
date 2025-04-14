@@ -13,7 +13,7 @@ const SignUp = () => {
         email: "",
         password: ""
     });
-    const { register } = useAuth();
+    const { register,userId } = useAuth();
 
     const [showToast, setShowToast] = useState<boolean>(false);
     const [correct, setCorrect] = useState<string>("");
