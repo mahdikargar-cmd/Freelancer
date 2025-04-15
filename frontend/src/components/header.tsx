@@ -10,6 +10,7 @@ interface HeaderLink {
     id: number;
     title: string;
     titleId?: number;
+    link:string;
 }
 
 interface HeaderData {
@@ -34,7 +35,7 @@ const Header = async () => {
                         {posts.links.map((item) => (
                             <li key={item.id}>
                                 <Link
-                                    href="/"
+                                    href={`${item.link}`}
                                     className="inline-block py-2 px-4 text-sm text-light-color2 dark:text-color2
                                     hover:text-light-color4 dark:hover:text-color4 hover:bg-light-color6 dark:hover:bg-color5
                                     rounded-full transition-all duration-300"
