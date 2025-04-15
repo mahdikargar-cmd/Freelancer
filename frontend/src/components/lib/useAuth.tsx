@@ -21,11 +21,6 @@ export function useAuth() {
         setIsLoggedIn(loggedIn);
         setUserId(loggedIn ? userId : null);
 
-        console.log("🔍 useAuth - Checking login:", {
-            token: token?.substring(0, 20),
-            userId,
-            loggedIn,
-        });
     }, []);
 
     useEffect(() => {
@@ -37,7 +32,7 @@ export function useAuth() {
 
         window.addEventListener("storage", handleStorageChange);
 
-        const interval = setInterval(checkAuthStatus, 1000);
+        const interval = setInterval(checkAuthStatus, 10000);
 
         return () => {
             window.removeEventListener("storage", handleStorageChange);

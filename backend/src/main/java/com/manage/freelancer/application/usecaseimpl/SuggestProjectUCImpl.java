@@ -32,7 +32,8 @@ public class SuggestProjectUCImpl implements SuggestProjectUC {
     @Override
     public SuggestProjectDTO createSuggestProject(SuggestProjectDTO suggestProjectDTO) {
         if (suggestProjectDTO.getFreelancerId() != null && suggestProjectDTO.getFreelancerId().getId() > 0) {
-            UserDTO fullUser = userRepo.findById(suggestProjectDTO.getFreelancerId().getId()).orElse(suggestProjectDTO.getFreelancerId());
+            UserDTO fullUser = userRepo.findById(suggestProjectDTO.getFreelancerId().getId())
+                    .orElse(suggestProjectDTO.getFreelancerId());
             suggestProjectDTO.setFreelancerId(fullUser);
         }
         if (suggestProjectDTO.getProjectId() != null && suggestProjectDTO.getProjectId().getId() > 0) {
@@ -40,22 +41,19 @@ public class SuggestProjectUCImpl implements SuggestProjectUC {
             suggestProjectDTO.setProjectId(projects);
         }
 
-        // Add validation for milestones
+        // اعتبارسنجی و تنظیم پیش‌فرض برای milestones
         if (suggestProjectDTO.getMilestones() != null && !suggestProjectDTO.getMilestones().isEmpty()) {
             suggestProjectDTO.getMilestones().forEach(milestone -> {
                 if (milestone.getName() == null) {
                     milestone.setName("Milestone");
                 }
-                if (milestone.getDescription() == null) {
-                    milestone.setDescription("Milestone description");
-                }
+
                 if (milestone.getDurationDays() == null) {
-                    milestone.setDurationDays(7); // Default to 7 days if not specified
+                    milestone.setDurationDays(7); // پیش‌فرض 7 روز
                 }
-                // Amount is already set in your example so we don't need to handle it
+                // amount و dueDate از فرانت‌اند می‌آیند
             });
         }
-
 
         return suggestProjectRepo.save(suggestProjectDTO);
     }

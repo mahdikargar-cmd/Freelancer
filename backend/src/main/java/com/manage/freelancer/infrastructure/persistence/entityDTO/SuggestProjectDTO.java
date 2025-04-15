@@ -35,6 +35,8 @@ public class SuggestProjectDTO {
     private String content;
     private Double proposedBudget;
     private Integer estimatedDuration;
+
+    @Column(name = "created_date")
     private LocalDateTime submittedAt;
 
     @Enumerated(EnumType.STRING)
@@ -42,6 +44,13 @@ public class SuggestProjectDTO {
 
     @ElementCollection
     @CollectionTable(name = "suggest_project_milestones", joinColumns = @JoinColumn(name = "suggest_project_id"))
-    @Column(nullable = false) // Add this constraint for required fields
+    @Column(nullable = false)
     private List<Milestone> milestones;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.submittedAt == null) {
+            this.submittedAt = LocalDateTime.now();
+        }
+    }
 }

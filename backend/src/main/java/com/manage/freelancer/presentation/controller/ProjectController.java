@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app")
@@ -39,14 +40,17 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDTO> getProject(@PathVariable Long id) {
-        ProjectDTO projectDTO = projectUC.getProjectById(id);
-        if (projectDTO == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Object> getProject(@PathVariable Long id) {
+        try {
+            ProjectDTO projectDTO = projectUC.getProjectById(id);
+            if (projectDTO == null) {
+                return ResponseEntity.status(404).body(Map.of("error", "Project not found with ID: " + id));
+            }
+            return ResponseEntity.ok(projectDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
-        return ResponseEntity.ok(projectDTO);
     }
-
     @PostMapping("/createProject")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDTO) {
         try {
