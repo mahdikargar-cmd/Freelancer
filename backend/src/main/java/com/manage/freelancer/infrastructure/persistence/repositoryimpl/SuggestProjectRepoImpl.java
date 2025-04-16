@@ -43,4 +43,14 @@ class SuggestProjectRepoImpl implements SuggestProjectRepo {
     public SuggestProjectDTO save(SuggestProjectDTO suggestProjectDTO) {
         return suggestsProjectJPARepo.save(suggestProjectDTO);
     }
+
+    @Override
+    public List<SuggestProjectDTO> findByProjectId(Long projectId) {
+        return suggestsProjectJPARepo.findByProjectId_Id(projectId);
+    }
+
+    @Override
+    public List<SuggestProjectDTO> findByFreelancerId(Long freelancerId) {
+        return suggestsProjectJPARepo.findByFreelancerId_Id(freelancerId);
+    }
 }

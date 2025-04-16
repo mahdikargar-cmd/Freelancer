@@ -1,5 +1,3 @@
-// src/components/TabsInprojectId/DetailsTabProps.tsx
-'use client';
 import { FaTools } from 'react-icons/fa';
 
 export interface Skill {
@@ -22,9 +20,7 @@ const DetailsTab = ({ skills, category, deadline, createdDate }: DetailsTabProps
         </div>
     );
 
-    // تبدیل createdDate به فرمت تاریخ پارسی
     const formatDate = (dateArray: [number, number, number] | null | undefined): string => {
-        // اگر تاریخ null یا نامعتبر باشد، تاریخ فعلی را برگردان
         if (!Array.isArray(dateArray) || dateArray.length !== 3) {
             return new Date().toLocaleDateString('fa-IR', {
                 year: 'numeric',
@@ -35,7 +31,6 @@ const DetailsTab = ({ skills, category, deadline, createdDate }: DetailsTabProps
 
         const [year, month, day] = dateArray;
 
-        // بررسی معتبر بودن تاریخ
         if (
             isNaN(year) ||
             isNaN(month) ||

@@ -14,5 +14,7 @@ public interface SuggestProjectUC {
 
     void deleteSuggestProject(Long id);
 
+    List<SuggestProjectDTO> getByid(Long id);
+
     Optional<SuggestProjectDTO> findById(Long id);
 }

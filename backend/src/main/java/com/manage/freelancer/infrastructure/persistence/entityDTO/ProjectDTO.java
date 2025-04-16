@@ -2,86 +2,84 @@ package com.manage.freelancer.infrastructure.persistence.entityDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
-import com.manage.freelancer.domain.entity.ProjectStatus;
-import com.manage.freelancer.domain.entity.ProjectType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "project")
-@Data
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class ProjectDTO {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String subject;
 
-    @Column(nullable = false)
+    @Column(length = 1000)
     private String description;
 
-    @Column(nullable = false)
-    private double priceStarted;
+    @Column(name = "price_started")
+    private Double priceStarted;
 
-    @Column(nullable = false)
-    private double priceEnded;
+    @Column(name = "price_ended")
+    private Double priceEnded;
 
-    // تغییر حالت بارگذاری از EAGER به LAZY برای skills
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "project_skills",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "skill_id")
-    )
-    private List<SkillDTO> skills;
-
-    // تغییر حالت بارگذاری از EAGER به LAZY برای category
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryDTO category;
-
-    private long suggested;
-
-    @Column(nullable = false)
-    private int deadline;
-
-    @Column(nullable = false)
-    private boolean active = false;
-
-    @Column(nullable = false)
-    private ProjectType type;
-
-    private List<String> suggestions;
+    private Integer deadline;
 
     @Column(name = "created_date")
     private LocalDate createdDate;
 
     @Column(name = "end_date")
     private LocalDate endDate;
-    @Column(nullable = false)
-    private ProjectStatus status;
 
+    private String type;
+
+    private String status;
+
+    private boolean active;
+
+    @Column(name = "suggested")
+    private long suggested;
+
+    @NotNull(message = "Employer ID cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"projects", "hibernateLazyInitializer", "handler"})
     private UserDTO employerId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private CategoryDTO category;
 
-    // اضافه کردن متد برای تنظیم خودکار createdDate
-    @PrePersist
-    public void prePersist() {
-        if (this.createdDate == null) {
-            this.createdDate = LocalDate.now();
-        }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "project_skills",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<SkillDTO> skills = new ArrayList<>();
 
-    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "project_freelancers",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "freelancer_id")
+    )
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<UserDTO> suggestions = new ArrayList<>();
+
+
 }

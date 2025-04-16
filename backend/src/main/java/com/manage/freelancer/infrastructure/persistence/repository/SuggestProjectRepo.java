@@ -16,4 +16,7 @@ public interface SuggestProjectRepo {
     SuggestProjectDTO update(SuggestProject suggestProject);
 
     SuggestProjectDTO save(SuggestProjectDTO suggestProjectDTO);
+
+    List<SuggestProjectDTO> findByProjectId(Long projectId); // جدید
+    List<SuggestProjectDTO> findByFreelancerId(Long freelancerId); // جدید
 }

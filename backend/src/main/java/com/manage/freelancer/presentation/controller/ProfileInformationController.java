@@ -1,5 +1,6 @@
 package com.manage.freelancer.presentation.controller;
 
+import com.codingapi.security.jwt.Jwt;
 import com.manage.freelancer.AAA.application.usecase.CustomUserDetails;
 import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import com.manage.freelancer.application.usecase.ProfileInformationUseCase;
@@ -54,7 +55,6 @@ public class ProfileInformationController {
                 return ResponseEntity.ok(new ProfileInformationResponse(profile));
             } else {
                 logger.info("No profile found for user ID: {}", userId);
-                // Return a custom response for new users
                 Map<String, Object> responseMap = new HashMap<>();
                 responseMap.put("status", "new_user");
                 responseMap.put("message", "پروفایل یافت نشد - می‌توانید پروفایل جدید ایجاد کنید");
@@ -65,6 +65,7 @@ public class ProfileInformationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(createErrorResponse("خطای سرور در دریافت اطلاعات پروفایل"));
         }
     }
+
     private Map<String, String> createErrorResponse(String errorMessage) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", errorMessage);
@@ -115,57 +116,73 @@ public class ProfileInformationController {
                 principal != null ? principal.getClass().getName() : "null");
         return null;
     }
+
+
     @PostMapping("/createProfileInformation")
     public ResponseEntity<?> createProfileInformation(@RequestBody ProfileInformation profileInformation) {
         try {
-            // Get the authenticated user from the security context
+            logger.info("Received profile creation request: {}", profileInformation);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            logger.debug("Authentication: {}", authentication);
             if (authentication == null || !authentication.isAuthenticated()) {
+                logger.warn("No authenticated user found");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorResponse("کاربر احراز هویت نشده است"));
             }
 
-            // Handle different principal types
             UserDTO currentUser = null;
             Object principal = authentication.getPrincipal();
+            logger.debug("Principal: {}", principal);
+            logger.debug("Principal type: {}", principal != null ? principal.getClass().getName() : "null");
 
             if (principal instanceof CustomUserDetails) {
                 currentUser = ((CustomUserDetails) principal).getUser();
-            } else if (principal instanceof UserDTO) {
-                currentUser = (UserDTO) principal;
-            } else if (principal instanceof String) {
-                // Try to load user by username if the principal is just a String
-                try {
-                    Optional<UserDTO> userOpt = userRepository.findByEmail((String) principal);
-                    if (userOpt.isPresent()) {
-                        currentUser = userOpt.get();
-                    }
-                } catch (Exception e) {
-                    logger.error("Error loading user by username: {}", e.getMessage());
+                logger.debug("Extracted user from CustomUserDetails: {}", currentUser);
+            } else if (principal instanceof org.springframework.security.core.userdetails.User) {
+                String username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
+                logger.debug("Principal is Spring Security User with username: {}", username);
+                Optional<UserDTO> userOpt = userRepository.findByEmail(username);
+                if (userOpt.isPresent()) {
+                    currentUser = userOpt.get();
+                    logger.debug("Found user by email {}: {}", username, currentUser);
+                } else {
+                    logger.warn("No user found with email: {}", username);
                 }
+            } else {
+                logger.warn("Unexpected principal type: {}", principal != null ? principal.getClass().getName() : "null");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorResponse("نوع غیرمنتظره برای principal"));
             }
 
             if (currentUser == null) {
+                logger.error("Failed to identify current user");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorResponse("کاربر احراز هویت نشده است"));
             }
 
-            profileInformation.setUser(currentUser);
+            // بررسی وجود پروفایل برای کاربر
+            Optional<ProfileInformation> existingProfileByUser = profileInformationUseCase.getProfileInformationByUserId(currentUser.getId());
+            if (existingProfileByUser.isPresent()) {
+                logger.warn("Profile already exists for user ID: {}", currentUser.getId());
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(createErrorResponse("پروفایل برای این کاربر قبلاً ثبت شده است"));
+            }
 
-            // Check for duplicate phone number
-            ProfileInformation existingProfile = profileInformationUseCase.getInformationByPhoneNumber(profileInformation.getPhoneNumber());
-            if (existingProfile != null) {
+            profileInformation.setUser(currentUser);
+            logger.info("Creating profile for user: {}", currentUser.getId());
+
+            // بررسی شماره تلفن
+            ProfileInformation existingProfileByPhone = profileInformationUseCase.getInformationByPhoneNumber(profileInformation.getPhoneNumber());
+            if (existingProfileByPhone != null) {
+                logger.warn("Phone number already exists: {}", profileInformation.getPhoneNumber());
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(createErrorResponse("این شماره تلفن قبلاً ثبت شده است"));
             }
 
-            // Create profile
             ProfileInformation createdProfile = profileInformationUseCase.createProfileInformation(profileInformation);
+            logger.info("Profile created successfully for user: {}", currentUser.getId());
             return ResponseEntity.ok(createdProfile);
         } catch (Exception e) {
-            logger.error("❌ خطا در ایجاد پروفایل: {}", e.getMessage());
+            logger.error("❌ Error creating profile: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(createErrorResponse("خطا در ثبت اطلاعات پروفایل: " + e.getMessage()));
         }
     }
-
     @PutMapping("/ProfileInformation/{id}")
     public ResponseEntity<?> updateProfileInformation(@PathVariable Long id, @RequestBody ProfileInformation profileInformation) {
         try {

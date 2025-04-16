@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +31,6 @@ public class ProjectUCImpl implements ProjectUC {
     private final CategoryJpaRepo categoryRepo;
     private final UserRepository userRepo;
 
-    // نسخه صفحه‌بندی متد دریافت پروژه‌ها
     @Override
     public Page<ProjectDTO> getAllProjects(Pageable pageable) {
         return projectRepo.findAll(pageable);
@@ -40,6 +40,34 @@ public class ProjectUCImpl implements ProjectUC {
     @Override
     public ProjectDTO getProjectById(Long id) {
         return projectRepo.findById(id);
+    }
+    @Override
+    public ProjectDTO addSuggestion(Long projectId, Long freelancerId) {
+        // Fetch the existing project
+        ProjectDTO existingProject = projectRepo.findById(projectId);
+        if (existingProject == null) {
+            throw new IllegalArgumentException("Project not found with ID: " + projectId);
+        }
+
+        // Fetch the freelancer
+        UserDTO freelancer = userRepo.findById(freelancerId)
+                .orElseThrow(() -> new IllegalArgumentException("Freelancer not found with ID: " + freelancerId));
+
+        // Ensure suggestions list is initialized
+        List<UserDTO> suggestions = existingProject.getSuggestions();
+        if (suggestions == null) {
+            suggestions = new ArrayList<>();
+            existingProject.setSuggestions(suggestions);
+        }
+
+        // Add freelancer to suggestions if not already present
+        if (!suggestions.contains(freelancer)) {
+            suggestions.add(freelancer);
+            existingProject.setSuggested(existingProject.getSuggested() + 1); // Increment suggested count
+        }
+
+        // Save the updated project
+        return projectRepo.update(existingProject);
     }
 
     @Override
@@ -103,17 +131,56 @@ public class ProjectUCImpl implements ProjectUC {
 
     @Override
     public ProjectDTO updateProject(ProjectDTO projectDTO) {
+        // Fetch the existing project
+        ProjectDTO existingProject = projectRepo.findById(projectDTO.getId());
+        if (existingProject == null) {
+            throw new IllegalArgumentException("Project not found with ID: " + projectDTO.getId());
+        }
+
+        // Update skills if provided
         if (projectDTO.getSkills() != null && !projectDTO.getSkills().isEmpty()) {
             List<Long> skillIds = projectDTO.getSkills()
                     .stream()
                     .map(SkillDTO::getId)
                     .collect(Collectors.toList());
             List<SkillDTO> dbSkills = skillUC.findByIds(skillIds);
-            projectDTO.setSkills(dbSkills);
+            existingProject.setSkills(dbSkills);
         }
-        return projectRepo.update(projectDTO);
-    }
 
+        // Update other fields only if provided
+        if (projectDTO.getSubject() != null) {
+            existingProject.setSubject(projectDTO.getSubject());
+        }
+        if (projectDTO.getDescription() != null) {
+            existingProject.setDescription(projectDTO.getDescription());
+        }
+        if (projectDTO.getPriceStarted() != null) {
+            existingProject.setPriceStarted(projectDTO.getPriceStarted());
+        }
+        if (projectDTO.getPriceEnded() != null) {
+            existingProject.setPriceEnded(projectDTO.getPriceEnded());
+        }
+        if (projectDTO.getDeadline() != null) {
+            existingProject.setDeadline(projectDTO.getDeadline());
+        }
+        if (projectDTO.getType() != null) {
+            existingProject.setType(projectDTO.getType());
+        }
+        if (projectDTO.getStatus() != null) {
+            existingProject.setStatus(projectDTO.getStatus());
+        }
+        if (projectDTO.getSuggested() != 0) {
+            existingProject.setSuggested(projectDTO.getSuggested());
+        }
+        existingProject.setActive(projectDTO.isActive());
+        if (projectDTO.getCategory() != null) {
+            existingProject.setCategory(projectDTO.getCategory());
+        }
+        if (projectDTO.getSuggestions() != null && !projectDTO.getSuggestions().isEmpty()) {
+            existingProject.setSuggestions(projectDTO.getSuggestions());
+        }
+        return projectRepo.update(existingProject);
+    }
     @Override
     public void deleteProject(Long id) {
         projectRepo.deleteById(id);

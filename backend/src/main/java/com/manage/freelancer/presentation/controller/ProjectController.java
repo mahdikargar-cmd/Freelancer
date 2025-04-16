@@ -1,7 +1,9 @@
+
 package com.manage.freelancer.presentation.controller;
 
 import com.manage.freelancer.application.usecaseimpl.ProjectUCImpl;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -60,9 +62,23 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-
+    @PutMapping("/projects/{projectId}/addSuggestion")
+    public ResponseEntity<ProjectDTO> addSuggestion(
+            @PathVariable Long projectId,
+            @RequestBody Map<String, Long> request) {
+        Long freelancerId = request.get("freelancerId");
+        if (freelancerId == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            ProjectDTO updatedProject = projectUC.addSuggestion(projectId, freelancerId);
+            return ResponseEntity.ok(updatedProject);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
     @PutMapping("/updateProject/{id}")
-    public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
+    public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id, @Valid @RequestBody ProjectDTO projectDTO) {
         projectDTO.setId(id);
         try {
             ProjectDTO updatedProject = projectUC.updateProject(projectDTO);

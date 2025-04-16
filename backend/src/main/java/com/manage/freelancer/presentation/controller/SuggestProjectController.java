@@ -29,12 +29,13 @@ public class SuggestProjectController {
     }
 
     @GetMapping("/IdSuggest/{id}")
-    public SuggestProjectDTO getById(@RequestParam Long id) {
-        return suggestProjectUC.findById(id).orElse(null);
+    public List<SuggestProjectDTO> getById(@PathVariable Long id) {
+        return suggestProjectUC.getByid(id);
     }
 
     @DeleteMapping("/delSuggestP/{id}")
-    public void deleteById(@RequestParam Long id) {
+    public void deleteById(@PathVariable Long id) {
         suggestProjectUC.deleteSuggestProject(id);
     }
+
 }

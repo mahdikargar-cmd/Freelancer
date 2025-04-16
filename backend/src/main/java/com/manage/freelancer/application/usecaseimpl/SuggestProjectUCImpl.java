@@ -1,3 +1,4 @@
+
 package com.manage.freelancer.application.usecaseimpl;
 
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
@@ -66,6 +67,11 @@ public class SuggestProjectUCImpl implements SuggestProjectUC {
     @Override
     public void deleteSuggestProject(Long id) {
         suggestProjectRepo.deleteById(id);
+    }
+
+    @Override
+    public List<SuggestProjectDTO> getByid(Long id) {
+        return suggestProjectRepo.findByProjectId(id);
     }
 
     @Override

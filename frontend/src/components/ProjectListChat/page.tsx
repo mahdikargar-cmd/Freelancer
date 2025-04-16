@@ -1,8 +1,10 @@
 "use client";
-import {useEffect, useState, useCallback} from "react";
-import {useAuth} from "@/components/lib/useAuth";
+import { useEffect, useState, useCallback } from "react";
+import { useAuth } from "@/components/lib/useAuth";
 import axios from "axios";
 import Cookies from "js-cookie";
+import ClientProjects from "./ClientProjectList";
+import FreelancerProjects from "./FreelancerProjectList";
 
 interface Project {
     id: number;
@@ -32,14 +34,14 @@ interface ProjectListChatProps {
     onViewProposals?: (projectId: number) => void;
 }
 
-const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
+const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
     const [activeTab, setActiveTab] = useState<"client" | "freelancer">("client");
     const [showProposalsModal, setShowProposalsModal] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [clientProjects, setClientProjects] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null); // Added error state
-    const {userId} = useAuth();
+    const [error, setError] = useState<string | null>(null);
+    const { userId } = useAuth();
 
     // Fetch projects with useCallback to prevent unnecessary re-renders
     const getClientProjects = useCallback(async () => {
@@ -75,47 +77,7 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
         }
     }, [userId, getClientProjects]);
 
-    // Sample data for freelancer projects (unchanged)
-    const freelancerProjects = [
-        {
-            id: 1,
-            title: "طراحی رابط کاربری اپلیکیشن",
-            client: "شرکت تک‌نوین",
-            budget: "۴,۸۰۰,۰۰۰ تومان",
-            deadline: "۱۰ روز",
-            status: "در حال انجام",
-            progress: 60,
-        },
-        {
-            id: 2,
-            title: "توسعه پلاگین وردپرس",
-            client: "فروشگاه مگا",
-            budget: "۲,۵۰۰,۰۰۰ تومان",
-            deadline: "۵ روز",
-            status: "در انتظار تأیید",
-            progress: 100,
-        },
-        {
-            id: 3,
-            title: "پیاده‌سازی وب‌سرویس",
-            client: "استارتاپ روبیکا",
-            budget: "۶,۷۰۰,۰۰۰ تومان",
-            deadline: "۲۰ روز",
-            status: "در حال مذاکره",
-            progress: 0,
-        },
-        {
-            id: 4,
-            title: "طراحی لوگو و هویت بصری",
-            client: "مشاور املاک آنلاین",
-            budget: "۱,۸۰۰,۰۰۰ تومان",
-            deadline: "۳ روز",
-            status: "تکمیل شده",
-            progress: 100,
-        },
-    ];
-
-    // Sample data for proposals (unchanged)
+    // Sample data for proposals
     const proposalsList: Proposal[] = [
         {
             id: 1,
@@ -162,33 +124,9 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
             deliveryTime: "۱۴ روز",
             rating: 4.7,
             completedProjects: 41,
-            description:
-                "تخصص من طراحی رابط کاربری جذاب و کاربرپسند است.",
+            description: "تخصص من طراحی رابط کاربری جذاب و کاربرپسند است.",
         },
     ];
-    const statusToPersian: Record<Project["status"], string> = {
-        PENDING: "در انتظار",
-        OPEN: "باز",
-        IN_PROGRESS: "در حال اجرا",
-        COMPLETED: "تکمیل شده",
-        CANCELLED: "لغو شده",
-    };
-    const getStatusColor = (status: Project["status"]) => {
-        switch (status) {
-            case "PENDING":
-                return "bg-blue-500"; // 在等待
-            case "OPEN":
-                return "bg-yellow-500"; // 开放
-            case "IN_PROGRESS":
-                return "bg-light-color4 dark:bg-color4"; // 进行中
-            case "COMPLETED":
-                return "bg-green-600"; // 已完成
-            case "CANCELLED":
-                return "bg-red-500"; // 已取消
-            default:
-                return "bg-gray-500"; // 未知状态
-        }
-    };
 
     const handleViewProposals = (projectId: number) => {
         setSelectedProjectId(projectId);
@@ -203,14 +141,6 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
         setShowProposalsModal(false);
     };
 
-    const formatPriceRange = (start: number, end: number) => {
-        return `${start.toLocaleString()} - ${end.toLocaleString()} تومان`;
-    };
-
-    const formatDeadline = (days: number) => {
-        return `${days} روز`;
-    };
-
     if (isLoading) {
         return <div className="text-center">در حال بارگذاری...</div>;
     }
@@ -219,8 +149,7 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
         <div className="max-w-4xl mx-auto my-8 px-4">
             {/* Error Display */}
             {error && (
-                <div
-                    className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-6 text-center">
+                <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-6 text-center">
                     {error}
                 </div>
             )}
@@ -274,18 +203,14 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
                         </svg>
                     </div>
                     <div className="flex gap-2">
-                        <select
-                            className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 focus:outline-none focus:ring-2 focus:ring-light-color4 dark:focus:ring-color4 text-light-color2 dark:text-color2"
-                        >
+                        <select className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 focus:outline-none focus:ring-2 focus:ring-light-color4 dark:focus:ring-color4 text-light-color2 dark:text-color2">
                             <option value="">همه وضعیت‌ها</option>
                             <option value="در حال مذاکره">در حال مذاکره</option>
                             <option value="در حال انجام">در حال انجام</option>
                             <option value="در انتظار تأیید">در انتظار تأیید</option>
                             <option value="تکمیل شده">تکمیل شده</option>
                         </select>
-                        <button
-                            className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 hover:bg-light-color6 dark:hover:bg-color5 transition-colors focus:outline-none"
-                        >
+                        <button className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 hover:bg-light-color6 dark:hover:bg-color5 transition-colors focus:outline-none">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-5 w-5"
@@ -305,197 +230,20 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
                 </div>
             </div>
 
-            {/* Projects List */}
-            <div className="space-y-4">
-                {activeTab === "client" ? (
-                    clientProjects.length > 0 ? (
-                        clientProjects.map((project) => (
-                            <div
-                                key={project.id}
-                                className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4 hover:shadow-xl transition-shadow cursor-pointer"
-                            >
-                                <div className="flex justify-between items-start mb-3">
-                                    <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2">
-                                        {project.subject}
-                                    </h3>
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-xs text-light-color2 dark:text-color1 ${getStatusColor(
-                                            project.status
-                                        )}`}
-                                    >
-                        {statusToPersian[project.status]}
-                    </span>
-                                </div>
-                                <p className="text-light-color7 dark:text-color7 text-sm mb-4">
-                                    {project.description}
-                                </p>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                                    <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                        <p className="text-light-color7 dark:text-color7 text-xs mb-1">
-                                            بودجه
-                                        </p>
-                                        <p className="text-light-color4 dark:text-color4 font-primaryMedium">
-                                            {formatPriceRange(project.priceStarted, project.priceEnded)}
-                                        </p>
-                                    </div>
-                                    <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                        <p className="text-light-color7 dark:text-color7 text-xs mb-1">
-                                            مهلت
-                                        </p>
-                                        <p className="text-light-color2 dark:text-color2">
-                                            {formatDeadline(project.deadLine || 14)}
-                                        </p>
-                                    </div>
-                                    <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                        <p className="text-light-color7 dark:text-color7 text-xs mb-1">
-                                            پیشنهادها
-                                        </p>
-                                        <p className="text-light-color2 dark:text-color2">
-                                            {project.proposals || 0} پیشنهاد
-                                        </p>
-                                    </div>
-                                    <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                        <p className="text-light-color7 dark:text-color7 text-xs mb-1">
-                                            پیام‌ها
-                                        </p>
-                                        <div className="flex items-center">
-                                            <p className="text-light-color2 dark:text-color2 ml-2">
-                                                {(project.unreadMessages || 0) > 0
-                                                    ? `${project.unreadMessages} پیام جدید`
-                                                    : "بدون پیام جدید"}
-                                            </p>
-                                            {(project.unreadMessages || 0) > 0 && (
-                                                <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex justify-end gap-2 mt-2">
-                                    <button
-                                        onClick={() => handleViewProposals(project.id)}
-                                        className="px-4 py-2 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
-                                    >
-                                        مشاهده پیشنهادها
-                                    </button>
-                                    <button
-                                        className="px-4 py-2 bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors"
-                                    >
-                                        گفتگو
-                                    </button>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-8 text-center">
-                            <p className="text-light-color7 dark:text-color7">
-                                هیچ پروژه‌ای یافت نشد.
-                            </p>
-                        </div>
-                    )
-                ) : freelancerProjects.length > 0 ? (
-                    freelancerProjects.map((project) => (
-                        <div
-                            key={project.id}
-                            className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4 hover:shadow-xl transition-shadow cursor-pointer"
-                        >
-                            <div className="flex justify-between items-start mb-3">
-                                <div>
-                                    <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2">
-                                        {project.title}
-                                    </h3>
-                                    <p className="text-light-color7 dark:text-color7 text-sm">
-                                        کارفرما: {project.client}
-                                    </p>
-                                </div>
-                                <span
-                                    className={`px-3 py-1 rounded-full text-xs text-light-color2 dark:text-color1 ${getStatusColor(
-                                        project.status
-                                    )}`}
-                                >
-                  {project.status}
-                </span>
-                            </div>
-                            {project.status === "در حال انجام" && (
-                                <div className="mb-4">
-                                    <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-light-color7 dark:text-color7">
-                      میزان پیشرفت
-                    </span>
-                                        <span className="text-xs font-primaryMedium text-light-color4 dark:text-color4">
-                      {project.progress}%
-                    </span>
-                                    </div>
-                                    <div className="w-full bg-light-color6 dark:bg-color1 rounded-full h-2">
-                                        <div
-                                            className="bg-light-color4 dark:bg-color4 h-2 rounded-full"
-                                            style={{width: `${project.progress}%`}}
-                                        ></div>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                                <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                    <p className="text-light-color7 dark:text-color7 text-xs mb-1">
-                                        مبلغ قرارداد
-                                    </p>
-                                    <p className="text-light-color4 dark:text-color4 font-primaryMedium">
-                                        {project.budget}
-                                    </p>
-                                </div>
-                                <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                    <p className="text-light-color7 dark:text-color7 text-xs mb-1">
-                                        مهلت
-                                    </p>
-                                    <p className="text-light-color2 dark:text-color2">
-                                        {project.deadline}
-                                    </p>
-                                </div>
-                                <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                    <p className="text-light-color7 dark:text-color7 text-xs mb-1">
-                                        وضعیت
-                                    </p>
-                                    <p className="text-light-color2 dark:text-color2">
-                                        {project.status}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex justify-end gap-2 mt-2">
-                                {project.status === "در حال مذاکره" && (
-                                    <button
-                                        className="px-4 py-2 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
-                                    >
-                                        ویرایش پیشنهاد
-                                    </button>
-                                )}
-                                {project.status === "در حال انجام" && (
-                                    <button
-                                        className="px-4 py-2 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
-                                    >
-                                        بارگذاری فایل
-                                    </button>
-                                )}
-                                <button
-                                    className="px-4 py-2 bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors"
-                                >
-                                    گفتگو
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-8 text-center">
-                        <p className="text-light-color7 dark:text-color7">
-                            هیچ پروژه‌ای یافت نشد.
-                        </p>
-                    </div>
-                )}
-            </div>
+            {/* Projects List - Using separated components */}
+            {activeTab === "client" ? (
+                <ClientProjects
+                    projects={clientProjects}
+                    onViewProposals={handleViewProposals}
+                />
+            ) : (
+                <FreelancerProjects />
+            )}
 
             {/* Proposals Modal */}
             {showProposalsModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div
-                        className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+                    <div className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-primaryMedium text-light-color2 dark:text-color2">
                                 پیشنهادهای دریافتی
@@ -548,16 +296,12 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
                                                             fill="currentColor"
                                                             viewBox="0 0 24 24"
                                                         >
-                                                            <path
-                                                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-                                                            />
+                                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                                                         </svg>
-                                                        <span
-                                                            className="text-sm text-light-color7 dark:text-color7 mr-1">
+                                                        <span className="text-sm text-light-color7 dark:text-color7 mr-1">
                               {proposal.rating}
                             </span>
-                                                        <span
-                                                            className="text-xs text-light-color7 dark:text-color7 mr-2">
+                                                        <span className="text-xs text-light-color7 dark:text-color7 mr-2">
                               ({proposal.completedProjects} پروژه تکمیل شده)
                             </span>
                                                     </div>
@@ -576,9 +320,7 @@ const ProjectListChat = ({onViewProposals}: ProjectListChatProps) => {
                                             {proposal.description}
                                         </p>
                                         <div className="flex justify-end gap-2">
-                                            <button
-                                                className="px-4 py-2 bg-light-color5 dark:bg-color5 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color6 transition-colors"
-                                            >
+                                            <button className="px-4 py-2 bg-light-color5 dark:bg-color5 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color6 transition-colors">
                                                 گفتگو
                                             </button>
                                             <button

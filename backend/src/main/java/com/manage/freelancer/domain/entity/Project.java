@@ -1,6 +1,7 @@
 package com.manage.freelancer.domain.entity;
 
 import com.manage.freelancer.AAA.domain.model.User;
+import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,15 +20,15 @@ public class Project {
     private String description;
     private double priceStarted;
     private double priceEnded;
-    private List<Skills> skills; // Change to List<Skills> (domain entity)
-    private Category category; // This should also be a domain entity, not DTO
+    private List<Skills> skills;
+    private Category category;
     private long suggested;
     private int deadline;
     private boolean active = false;
     private ProjectType type;
-    private List<String> suggestions;
+    private List<User> suggestions;
     private LocalDate createdDate;
     private LocalDate endDate;
     private ProjectStatus status;
-    private User employerId; // This should also be a domain entity, not DTO
+    private User employerId;
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -48,5 +49,10 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (NoResultException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<UserDTO> findFreelancersByProjectId(Long projectId) {
+        return List.of();
     }
 }

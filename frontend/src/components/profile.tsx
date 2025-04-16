@@ -70,8 +70,6 @@ const Profile = () => {
 
     useEffect(() => {
         const fetchProfile = async () => {
-
-
             setLoading(true);
             try {
                 console.log('🔍 Fetching profile for userId:', userId);
@@ -98,7 +96,7 @@ const Profile = () => {
                 console.error('❌ Error fetching profile:', error.response?.data || error.message);
                 if (error.response?.status === 401) {
                     setError('لطفاً دوباره وارد شوید.');
-                } else if (error.response?.status === 404) {
+                } else if (error.response?.status === 404 || response.data.status === 'new_user') {
                     setProfileExists(false);
                     setProfileData({ ...profileData, user: { id: userId } });
                     setError(null);
@@ -110,7 +108,9 @@ const Profile = () => {
             }
         };
 
-        fetchProfile();
+        if (userId) {
+            fetchProfile();
+        }
     }, [userId]);
 
     const handleSaveProfile = async () => {
@@ -151,10 +151,15 @@ const Profile = () => {
             handleShowToast(profileExists ? 'پروفایل به‌روزرسانی شد' : 'پروفایل با موفقیت ایجاد شد');
         } catch (error: any) {
             console.error('❌ Error saving profile:', error);
-            handleShowToast(`خطا: ${error.response?.data?.error || error.message}`);
+            if (error.response?.status === 409) {
+                handleShowToast('پروفایل برای این کاربر قبلاً ثبت شده است. لطفاً اطلاعات موجود را ویرایش کنید.');
+                setProfileExists(true);
+                setIsEditing(true); // هدایت کاربر به حالت ویرایش
+            } else {
+                handleShowToast(`خطا: ${error.response?.data?.error || error.message}`);
+            }
         }
     };
-
     const handleUploadImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
