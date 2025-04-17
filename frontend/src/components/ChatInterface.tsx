@@ -1,13 +1,24 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 interface Message {
     id: number;
     sender: "freelancer" | "client";
     content: string;
     time: string;
+}
+
+interface Project {
+    id: number;
+    subject: string;
+    priceStarted: number;
+    priceEnded: number;
+    deadline: number;
+    status: string;
 }
 
 interface ChatInterfaceProps {
@@ -23,95 +34,119 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
     const [newMessage, setNewMessage] = useState("");
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [project, setProject] = useState<Project | null>(null);
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
 
-    // اتصال به WebSocket
+    // دریافت اطلاعات پروژه
     useEffect(() => {
-        if (!userId || !token) {
-            setError("لطفاً وارد حساب کاربری خود شوید.");
-            return;
-        }
-
-        const websocket = new WebSocket(`ws://localhost:8080/ws/chat?userId=${userId}&token=${token}`);
-
-        websocket.onopen = () => {
-            console.log("WebSocket connected");
-            setError(null);
-        };
-
-        websocket.onmessage = (event) => {
+        const fetchProject = async () => {
             try {
-                const data = JSON.parse(event.data);
-                console.log("Received message:", data);
-
-                if (data.type === "message" || data.type === "sent") {
-                    const receivedMessage = data.data;
-                    if (!receivedMessage || !receivedMessage.sender || !receivedMessage.sender.id) {
-                        console.warn("Invalid message structure:", receivedMessage);
-                        return;
-                    }
-                    setMessages((prevMessages) => [
-                        ...prevMessages,
-                        {
-                            id: receivedMessage.id,
-                            sender: receivedMessage.sender.id === userId ? "freelancer" : "client",
-                            content: receivedMessage.content,
-                            time: new Date(receivedMessage.time).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            }),
-                        },
-                    ]);
-                } else if (data.type === "error") {
-                    console.error("WebSocket error:", data.message);
-                    setError(data.message || "خطایی در ارتباط رخ داد.");
-                } else if (data.type === "pong" || data.type === "heartbeat") {
-                    websocket.send(JSON.stringify({ type: "ping" }));
-                }
+                const response = await axios.get(`http://localhost:8080/app/${projectId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setProject(response.data);
+                setError(null);
             } catch (err) {
-                console.error("Error parsing WebSocket message:", err);
-                setError("خطا در پردازش پیام.");
+                console.error("Error fetching project:", err);
+                setError("خطا در دریافت اطلاعات پروژه.");
             }
         };
 
-        websocket.onclose = () => {
-            console.log("WebSocket disconnected");
-            setError("اتصال WebSocket قطع شد.");
-        };
-
-        websocket.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            setError("خطا در اتصال WebSocket.");
-        };
-
-        setWs(websocket);
-
-        return () => {
-            websocket.close();
-        };
-    }, [userId, token]);
-
-    // بارگذاری پیام‌های قبلی
-    useEffect(() => {
-        if (!projectId || !token) {
+        if (projectId && token) {
+            fetchProject();
+        } else {
             setError("اطلاعات پروژه یا توکن نامعتبر است.");
+        }
+    }, [projectId, token]);
+
+    // مدیریت WebSocket
+    useEffect(() => {
+        if (!userId || !token || !projectId || !receiverId) {
+            setError("لطفاً وارد حساب کاربری شوید یا پروژه را انتخاب کنید.");
             return;
         }
 
+        const connectWebSocket = () => {
+            const websocket = new WebSocket(
+                `ws://localhost:8080/ws/chat?userId=${userId}&token=${token}`
+            );
+
+            websocket.onopen = () => {
+                console.log("WebSocket connected");
+                setError(null);
+            };
+
+            websocket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    console.log("Received message:", data);
+
+                    if (data.type === "message" || data.type === "sent") {
+                        const receivedMessage = data.data;
+                        if (!receivedMessage || !receivedMessage.sender || !receivedMessage.sender.id) {
+                            console.warn("Invalid message structure:", receivedMessage);
+                            return;
+                        }
+                        setMessages((prevMessages) => [
+                            ...prevMessages,
+                            {
+                                id: receivedMessage.id,
+                                sender: receivedMessage.sender.id === userId ? "freelancer" : "client",
+                                content: receivedMessage.content,
+                                time: new Date(receivedMessage.time).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }),
+                            },
+                        ]);
+                    } else if (data.type === "error") {
+                        console.error("WebSocket error:", data.message);
+                        setError(data.message || "خطایی در ارتباط رخ داد.");
+                    } else if (data.type === "pong" || data.type === "heartbeat") {
+                        websocket.send(JSON.stringify({ type: "ping" }));
+                    }
+                } catch (err) {
+                    console.error("Error parsing WebSocket message:", err);
+                    setError("خطا در پردازش پیام.");
+                }
+            };
+
+            websocket.onclose = () => {
+                console.log("WebSocket disconnected");
+                setError("اتصال WebSocket قطع شد. در حال تلاش برای اتصال مجدد...");
+                setTimeout(connectWebSocket, 3000); // تلاش برای اتصال مجدد
+            };
+
+            websocket.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                setError("خطا در اتصال WebSocket.");
+            };
+
+            setWs(websocket);
+        };
+
+        connectWebSocket();
+
+        return () => {
+            ws?.close();
+        };
+    }, [userId, token, projectId, receiverId]);
+
+    // بارگذاری پیام‌های قبلی
+    useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/app/messages?projectId=${projectId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) throw new Error("Failed to fetch messages");
-                const data = await response.json();
+                const response = await axios.get(
+                    `http://localhost:8080/app/messages?projectId=${projectId}`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
                 setMessages(
-                    data.map((msg: any) => ({
+                    response.data.map((msg: any) => ({
                         id: msg.id,
                         sender: msg.sender.id === userId ? "freelancer" : "client",
                         content: msg.content,
@@ -121,13 +156,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                         }),
                     }))
                 );
+                setError(null);
             } catch (error) {
                 console.error("Error fetching messages:", error);
                 setError("خطا در بارگذاری پیام‌ها.");
             }
         };
 
-        fetchMessages();
+        if (projectId && token) {
+            fetchMessages();
+        }
     }, [projectId, userId, token]);
 
     // اسکرول به پایین چت
@@ -149,40 +187,54 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
     }, []);
 
     // ارسال پیام
-    const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (newMessage.trim() === "" || !ws || ws.readyState !== WebSocket.OPEN) {
-            setError("لطفاً پیام را وارد کنید یا اتصال را بررسی کنید.");
-            return;
-        }
+    const handleSendMessage = useCallback(
+        (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            if (newMessage.trim() === "" || !ws || ws.readyState !== WebSocket.OPEN) {
+                setError("لطفاً پیام را وارد کنید یا اتصال را بررسی کنید.");
+                return;
+            }
 
-        const messagePayload = {
-            type: "message",
-            content: newMessage,
-            projectId: projectId,
-            receiverId: receiverId,
-            senderId: userId,
-        };
+            const messagePayload = {
+                type: "message",
+                content: newMessage,
+                projectId,
+                receiverId,
+                senderId: userId,
+            };
 
-        ws.send(JSON.stringify(messagePayload));
-        setNewMessage("");
-        setError(null);
-    };
+            ws.send(JSON.stringify(messagePayload));
+            setNewMessage("");
+            setError(null);
+        },
+        [newMessage, ws, projectId, receiverId, userId]
+    );
 
-    const handleBlockUser = () => {
+    const handleBlockUser = useCallback(() => {
         alert("کاربر با موفقیت مسدود شد.");
         setShowUserMenu(false);
-    };
+    }, []);
 
-    const handlePaymentClick = () => {
+    const handlePaymentClick = useCallback(() => {
         setShowPaymentModal(true);
-    };
+    }, []);
 
-    const handlePaymentSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handlePaymentSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         alert("پرداخت با موفقیت انجام شد.");
         setShowPaymentModal(false);
-    };
+    }, []);
+
+    if (!project) {
+        return (
+            <div className="max-w-4xl mx-auto my-8 px-4">
+                {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+                <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-6 text-center">
+                    <p className="text-light-color7 dark:text-color7">در حال بارگذاری اطلاعات پروژه...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto my-8 px-4">
@@ -192,7 +244,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                 <div className="bg-light-color1 dark:bg-color1 p-4 border-b border-light-color6 dark:border-color5 flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                         <div className="flex w-10 h-10 rounded-full bg-light-color4 dark:bg-color4 items-center justify-center overflow-hidden">
-                            <img src="/api/placeholder/100/100" alt="کاربر" className="w-full h-full object-cover" />
+                            <img
+                                src="/api/placeholder/100/100"
+                                alt="کاربر"
+                                className="w-full h-full object-cover"
+                                onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
+                            />
                         </div>
                         <div className="mr-3">
                             <h3 className="font-primaryMedium dark:text-color2 text-light-color2">محمد رضایی</h3>
@@ -203,6 +260,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                         <button
                             onClick={() => setShowUserMenu(!showUserMenu)}
                             className="p-2 rounded-full hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
+                            aria-label="منوی کاربر"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -249,31 +307,37 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     ref={chatContainerRef}
                     className="p-4 h-96 overflow-y-auto flex flex-col space-y-4 bg-light-color5 dark:bg-color6"
                 >
-                    {messages.map((message) => (
-                        <div
-                            key={message.id}
-                            className={`flex ${message.sender === "freelancer" ? "justify-end" : "justify-start"}`}
-                        >
+                    {messages.length === 0 ? (
+                        <p className="text-center text-light-color7 dark:text-color7">
+                            هنوز پیامی وجود ندارد. شروع به چت کنید!
+                        </p>
+                    ) : (
+                        messages.map((message) => (
                             <div
-                                className={`max-w-xs md:max-w-md rounded-2xl p-3 ${
-                                    message.sender === "freelancer"
-                                        ? "bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1"
-                                        : "bg-light-color1 dark:bg-color5 text-light-color2 dark:text-color2"
-                                }`}
+                                key={message.id}
+                                className={`flex ${message.sender === "freelancer" ? "justify-end" : "justify-start"}`}
                             >
-                                <p className="text-sm">{message.content}</p>
-                                <span
-                                    className={`text-xs mt-1 block text-right ${
+                                <div
+                                    className={`max-w-xs md:max-w-md rounded-2xl p-3 ${
                                         message.sender === "freelancer"
-                                            ? "text-light-color2 dark:text-color1"
-                                            : "text-light-color7 dark:text-color7"
+                                            ? "bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1"
+                                            : "bg-light-color1 dark:bg-color5 text-light-color2 dark:text-color2"
                                     }`}
                                 >
-                  {message.time}
-                </span>
+                                    <p className="text-sm">{message.content}</p>
+                                    <span
+                                        className={`text-xs mt-1 block text-right ${
+                                            message.sender === "freelancer"
+                                                ? "text-light-color2 dark:text-color1"
+                                                : "text-light-color7 dark:text-color7"
+                                        }`}
+                                    >
+                    {message.time}
+                  </span>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
 
                 {/* Chat input */}
@@ -282,6 +346,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                         <button
                             type="button"
                             className="p-2 rounded-full hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
+                            aria-label="پیوست فایل"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -301,6 +366,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                         <button
                             type="button"
                             className="p-2 rounded-full hover:bg-light-color6 dark:hover:bg-color5 transition-colors mx-1"
+                            aria-label="پیوست تصویر"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -323,10 +389,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="پیام خود را بنویسید..."
                             className="flex-1 p-2 rounded-lg border border-light-color6 dark:border-color5 bg-light-color5 dark:bg-color5 mx-2 focus:outline-none focus:ring-2 focus:ring-light-color4 dark:focus:ring-color4 text-light-color2 dark:text-color2"
+                            aria-label="ورودی پیام"
                         />
                         <button
                             type="submit"
                             className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 p-2 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors"
+                            aria-label="ارسال پیام"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -349,24 +417,36 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
 
             {/* Project info card with payment option */}
             <div className="mt-6 bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4">
-                <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2 mb-3">اطلاعات پروژه</h3>
+                <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2 mb-3">
+                    اطلاعات پروژه
+                </h3>
                 <div className="space-y-3">
                     <div className="flex justify-between items-center">
                         <span className="text-light-color7 dark:text-color7">عنوان:</span>
-                        <span className="text-light-color2 dark:text-color2">طراحی وب‌سایت فروشگاهی</span>
+                        <span className="text-light-color2 dark:text-color2">{project.subject}</span>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-light-color7 dark:text-color7">بودجه:</span>
-                        <span className="text-light-color4 dark:text-color4 font-primaryMedium">۵,۵۰۰,۰۰۰ تومان</span>
+                        <span className="text-light-color4 dark:text-color4 font-primaryMedium">
+              {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
+            </span>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-light-color7 dark:text-color7">مهلت تحویل:</span>
-                        <span className="text-light-color2 dark:text-color2">۱۴ روز</span>
+                        <span className="text-light-color2 dark:text-color2">{project.deadline} روز</span>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-light-color7 dark:text-color7">وضعیت:</span>
                         <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
-              در حال مذاکره
+              {project.status === "OPEN"
+                  ? "باز"
+                  : project.status === "IN_PROGRESS"
+                      ? "در حال انجام"
+                      : project.status === "COMPLETED"
+                          ? "تکمیل شده"
+                          : project.status === "CANCELLED"
+                              ? "لغو شده"
+                              : "در حال مذاکره"}
             </span>
                     </div>
                 </div>
@@ -374,6 +454,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     <button
                         onClick={handlePaymentClick}
                         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                        aria-label="پرداخت پروژه"
                     >
                         پرداخت پروژه
                     </button>
@@ -384,20 +465,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
             {showPaymentModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-md">
-                        <h3 className="text-xl font-primaryMedium text-light-color2 dark:text-color2 mb-4">پرداخت پروژه</h3>
+                        <h3 className="text-xl font-primaryMedium text-light-color2 dark:text-color2 mb-4">
+                            پرداخت پروژه
+                        </h3>
                         <form onSubmit={handlePaymentSubmit}>
                             <div className="mb-4">
-                                <label className="block text-light-color7 dark:text-color7 mb-2">مبلغ پرداختی (تومان)</label>
+                                <label className="block text-light-color7 dark:text-color7 mb-2">
+                                    مبلغ پرداختی (تومان)
+                                </label>
                                 <input
                                     type="text"
-                                    defaultValue="۵,۵۰۰,۰۰۰"
+                                    defaultValue={`${project.priceStarted.toLocaleString()}`}
                                     readOnly
                                     className="w-full p-3 rounded-lg border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color2 dark:text-color2"
                                 />
                             </div>
                             <div className="mb-4">
                                 <label className="block text-light-color7 dark:text-color7 mb-2">روش پرداخت</label>
-                                <select className="w-full p-3 rounded-lg border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color2 dark:text-color2">
+                                <select
+                                    className="w-full p-3 rounded-lg border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color2 dark:text-color2"
+                                    aria-label="روش پرداخت"
+                                >
                                     <option>درگاه پرداخت آنلاین</option>
                                     <option>کیف پول</option>
                                     <option>کارت به کارت</option>
@@ -408,12 +496,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                                     type="button"
                                     onClick={() => setShowPaymentModal(false)}
                                     className="px-4 py-2 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
+                                    aria-label="انصراف از پرداخت"
                                 >
                                     انصراف
                                 </button>
                                 <button
                                     type="submit"
                                     className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                    aria-label="تایید و پرداخت"
                                 >
                                     تایید و پرداخت
                                 </button>

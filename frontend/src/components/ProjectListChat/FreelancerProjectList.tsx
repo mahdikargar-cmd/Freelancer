@@ -1,196 +1,117 @@
 "use client";
-import axios from "axios";
-import { useAuth } from "@/components/lib/useAuth";
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 
-interface FreelancerProject {
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useAuth } from "@/components/lib/useAuth";
+
+interface Project {
     id: number;
-    title: string;
-    client: string;
-    budget: string;
-    deadline: string;
-    status: string;
-    progress: number;
+    subject: string;
+    description: string;
+    priceStarted: number;
+    priceEnded: number;
+    deadline: number;
+    status: "PENDING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 }
 
-const FreelancerProjectList = () => {
-    const { userId } = useAuth();
-    const [projects, setProjects] = useState<FreelancerProject[]>([]);
-    const [loading, setLoading] = useState(true);
+const FreelancerProjects = () => {
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { userId } = useAuth();
+
+    const getFreelancerProjects = useCallback(async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/app/IdSuggest/${userId}`,
+                {
+                    headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                    withCredentials: true,
+                }
+            );
+            setError(null);
+            console.log("FreelancerProjects response", response.data);
+            return response.data || [];
+        } catch (err) {
+            console.error("Error fetching freelancer projects:", err);
+            setError("خطا در دریافت پروژه‌های فریلنسر.");
+            return [];
+        }
+    }, [userId]);
 
     useEffect(() => {
-        console.log("FreelancerProjectList mounted, userId:", userId);
-        let isMounted = true;
-
-        const getSuggest = async () => {
-            console.log("getSuggest called, userId:", userId);
-            if (!userId) {
-                console.warn("No userId provided");
-                if (isMounted) {
-                    setError("شناسه کاربر یافت نشد");
-                    setLoading(false);
-                }
-                return;
-            }
-
-            const token = Cookies.get("token");
-            console.log("Token:", token ? token.substring(0, 20) + "..." : "No token");
-
-            try {
-                console.log("Sending request to /app/IdSuggest/", userId);
-                const response = await axios.get(`http://localhost:8080/app/IdSuggest/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                console.log("getSuggest response:", response.data);
-
-                const fetchedProjects: FreelancerProject[] = Array.isArray(response.data)
-                    ? response.data.map((item: any) => ({
-                        id: item.id,
-                        title: item.title,
-                        client: item.projectId?.employerId?.email || "نامشخص",
-                        budget: `${item.proposedBudget?.toLocaleString("fa-IR") || 0} تومان`,
-                        deadline: `${item.estimatedDuration || 0} روز`,
-                        status: mapStatus(item.status),
-                        progress: calculateProgress(item.status, item.milestones),
-                    }))
-                    : response.data.id
-                        ? [{
-                            id: response.data.id,
-                            title: response.data.title,
-                            client: response.data.projectId?.employerId?.email || "نامشخص",
-                            budget: `${response.data.proposedBudget?.toLocaleString("fa-IR") || 0} تومان`,
-                            deadline: `${response.data.estimatedDuration || 0} روز`,
-                            status: mapStatus(response.data.status),
-                            progress: calculateProgress(response.data.status, response.data.milestones),
-                        }]
-                        : [];
-
-                if (isMounted) {
-                    setProjects(fetchedProjects);
-                    setError(null);
-                }
-            } catch (err: any) {
-                console.error("Error fetching suggestions:", err.response?.data || err.message);
-                if (isMounted) {
-                    setError("دریافت پروژه‌ها با خطا مواجه شد: " + (err.response?.data?.message || err.message));
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        getSuggest();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [userId]);
-    const mapStatus = (status: string) => {
-        switch (status) {
-            case "PENDING":
-                return "در انتظار تأیید";
-            case "ACCEPTED":
-                return "تکمیل شده";
-            case "REJECTED":
-                return "رد شده";
-            default:
-                return "نامشخص";
+        setIsLoading(true);
+        if (userId) {
+            getFreelancerProjects().then((projects) => {
+                setProjects(projects);
+                setIsLoading(false);
+            });
+        } else {
+            setIsLoading(false);
+            setError("لطفاً وارد حساب کاربری شوید.");
         }
-    };
+    }, [userId, getFreelancerProjects]);
 
-    const calculateProgress = (status: string, milestones: any[]) => {
-        if (status === "ACCEPTED") return 100;
-        if (status === "PENDING" && milestones?.length > 0) {
-            const completedMilestones = milestones.filter((m) => m.status === "ACCEPTED").length;
-            return Math.round((completedMilestones / milestones.length) * 100);
-        }
-        return 0;
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "در انتظار تأیید":
-                return "bg-blue-500";
-            case "تکمیل شده":
-                return "bg-green-600";
-            case "رد شده":
-                return "bg-red-500";
-            default:
-                return "bg-gray-500";
-        }
-    };
-
-    if (loading) {
+    if (isLoading) {
         return (
-            <div className="text-center p-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-8 text-center">
-                <p className="text-light-color7 dark:text-color7">{error}</p>
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-4">
-            {projects.length > 0 ? (
-                projects.map((project) => (
-                    <div
-                        key={project.id}
-                        className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4 hover:shadow-xl transition-shadow cursor-pointer"
-                    >
-                        <div className="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2">
-                                    {project.title}
-                                </h3>
-                                <p className="text-light-color7 dark:text-color7 text-sm">کارفرما: {project.client}</p>
-                            </div>
-                            <span
-                                className={`px-3 py-1 rounded-full text-xs text-light-color2 dark:text-color1 ${getStatusColor(project.status)}`}
-                            >
-                                {project.status}
-                            </span>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                            <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                <p className="text-light-color7 dark:text-color7 text-xs mb-1">مبلغ قرارداد</p>
-                                <p className="text-light-color4 dark:text-color4 font-primaryMedium">{project.budget}</p>
-                            </div>
-                            <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                <p className="text-light-color7 dark:text-color7 text-xs mb-1">مهلت</p>
-                                <p className="text-light-color2 dark:text-color2">{project.deadline}</p>
-                            </div>
-                            <div className="bg-light-color1 dark:bg-color1 p-3 rounded-xl">
-                                <p className="text-light-color7 dark:text-color7 text-xs mb-1">وضعیت</p>
-                                <p className="text-light-color2 dark:text-color2">{project.status}</p>
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-2 mt-2">
-                            <button className="px-4 py-2 bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors">
-                                گفتگو
-                            </button>
-                        </div>
-                    </div>
-                ))
+        <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4">
+            <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2 mb-4">
+                پروژه‌های فریلنسر
+            </h3>
+            {error && (
+                <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-6 text-center">
+                    {error}
+                </div>
+            )}
+            {projects.length === 0 ? (
+                <p className="text-center text-light-color7 dark:text-color7">
+                    هیچ پروژه‌ای یافت نشد.
+                </p>
             ) : (
-                <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-8 text-center">
-                    <p className="text-light-color7 dark:text-color7">هیچ پروژه‌ای یافت نشد.</p>
+                <div className="space-y-4">
+                    {projects.map((project) => (
+                        <div
+                            key={project.id}
+                            className="bg-light-color1 dark:bg-color1 p-4 rounded-xl"
+                        >
+                            <div className="flex justify-between items-center mb-2">
+                                <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
+                                    {project.subject}
+                                </h4>
+                                <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                  {project.status === "OPEN"
+                      ? "باز"
+                      : project.status === "IN_PROGRESS"
+                          ? "در حال انجام"
+                          : project.status === "COMPLETED"
+                              ? "تکمیل شده"
+                              : project.status === "CANCELLED"
+                                  ? "لغو شده"
+                                  : "در حال مذاکره"}
+                </span>
+                            </div>
+                            <p className="text-sm text-light-color7 dark:text-color7 mb-2">
+                                {project.description}
+                            </p>
+                            <div className="flex justify-between items-center">
+                <span className="text-light-color4 dark:text-color4 font-primaryMedium">
+                  {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
+                </span>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
     );
 };
 
-export default FreelancerProjectList;
+export default FreelancerProjects;

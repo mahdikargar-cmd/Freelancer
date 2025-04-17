@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/components/lib/useAuth";
 import axios from "axios";
@@ -12,10 +13,11 @@ interface Project {
     description: string;
     priceStarted: number;
     priceEnded: number;
-    deadLine: number;
+    deadline: number;
     status: "PENDING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
     proposals?: number;
     unreadMessages?: number;
+    employerId: { id: number };
 }
 
 interface Proposal {
@@ -31,7 +33,7 @@ interface Proposal {
 }
 
 interface ProjectListChatProps {
-    onViewProposals?: (projectId: number) => void;
+    onViewProposals?: (projectId: number, employerId: number) => void;
 }
 
 const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
@@ -39,21 +41,21 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
     const [showProposalsModal, setShowProposalsModal] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [clientProjects, setClientProjects] = useState<Project[]>([]);
+    const [proposals, setProposals] = useState<Proposal[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filterStatus, setFilterStatus] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { userId } = useAuth();
 
     const getClientProjects = useCallback(async () => {
         try {
-            const response = await axios.get(`/app/getEmployer?id=${userId}`, {
-                headers: {
-                    Authorization: `Bearer ${Cookies.get("token")}`,
-                },
+            const response = await axios.get(`http://localhost:8080/app/getEmployer?id=${userId}`, {
+                headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                 withCredentials: true,
             });
             setError(null);
             console.log("Projects fetched:", response.data);
-            console.log("User ID:", userId);
             return response.data || [];
         } catch (err) {
             console.error("Error fetching projects:", err);
@@ -61,6 +63,23 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
             return [];
         }
     }, [userId]);
+
+    const getProposals = useCallback(async (projectId: number) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/app/proposals?projectId=${projectId}`,
+                {
+                    headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                }
+            );
+            setError(null);
+            return response.data || [];
+        } catch (err) {
+            console.error("Error fetching proposals:", err);
+            setError("خطا در دریافت پیشنهادات.");
+            return [];
+        }
+    }, []);
 
     useEffect(() => {
         setIsLoading(true);
@@ -75,72 +94,42 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
         }
     }, [userId, getClientProjects]);
 
-    // Sample data for proposals
-    const proposalsList: Proposal[] = [
-        {
-            id: 1,
-            projectId: 1,
-            freelancerName: "علی محمدی",
-            avatar: "./file.svg",
-            price: "۵,۲۰۰,۰۰۰ تومان",
-            deliveryTime: "۱۲ روز",
-            rating: 4.8,
-            completedProjects: 37,
-            description:
-                "من تجربه زیادی در طراحی وب‌سایت‌های فروشگاهی دارم و می‌توانم این پروژه را با کیفیت بالا و در زمان مناسب تحویل دهم.",
-        },
-        {
-            id: 2,
-            projectId: 1,
-            freelancerName: "مریم حیدری",
-            avatar: "./file.svg",
-            price: "۵,۸۰۰,۰۰۰ تومان",
-            deliveryTime: "۱۰ روز",
-            rating: 4.9,
-            completedProjects: 52,
-            description:
-                "متخصص در طراحی و توسعه فروشگاه‌های آنلاین با استفاده از فناوری‌های مدرن.",
-        },
-        {
-            id: 3,
-            projectId: 1,
-            freelancerName: "رضا کریمی",
-            avatar: "./file.svg",
-            price: "۴,۹۰۰,۰۰۰ تومان",
-            deliveryTime: "۱۵ روز",
-            rating: 4.5,
-            completedProjects: 23,
-            description:
-                "طراح و برنامه‌نویس وب با ۵ سال تجربه در زمینه فروشگاه‌های آنلاین.",
-        },
-        {
-            id: 4,
-            projectId: 1,
-            freelancerName: "سارا احمدی",
-            avatar: "./file.svg",
-            price: "۵,۵۰۰,۰۰۰ تومان",
-            deliveryTime: "۱۴ روز",
-            rating: 4.7,
-            completedProjects: 41,
-            description: "تخصص من طراحی رابط کاربری جذاب و کاربرپسند است.",
-        },
-    ];
-
-    const handleViewProposals = (projectId: number) => {
-        setSelectedProjectId(projectId);
-        setShowProposalsModal(true);
-        if (onViewProposals) {
-            onViewProposals(projectId);
+    useEffect(() => {
+        if (selectedProjectId) {
+            getProposals(selectedProjectId).then((data) => {
+                setProposals(data);
+            });
         }
-    };
+    }, [selectedProjectId, getProposals]);
 
-    const handleAcceptProposal = (proposalId: number) => {
+    const handleViewProposals = useCallback(
+        (projectId: number, employerId: number) => {
+            setSelectedProjectId(projectId);
+            setShowProposalsModal(true);
+            if (onViewProposals) {
+                onViewProposals(projectId, employerId);
+            }
+        },
+        [onViewProposals]
+    );
+
+    const handleAcceptProposal = useCallback((proposalId: number) => {
         alert(`پیشنهاد فریلنسر با شناسه ${proposalId} پذیرفته شد. می‌توانید قرارداد را تنظیم کنید.`);
         setShowProposalsModal(false);
-    };
+    }, []);
+
+    const filteredProjects = clientProjects.filter(
+        (project) =>
+            project.subject.toLowerCase().includes(searchQuery.toLowerCase()) &&
+            (!filterStatus || project.status === filterStatus)
+    );
 
     if (isLoading) {
-        return <div className="text-center">در حال بارگذاری...</div>;
+        return (
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+            </div>
+        );
     }
 
     return (
@@ -161,6 +150,7 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                             ? "bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1"
                             : "bg-transparent text-light-color7 dark:text-color7 hover:bg-light-color6 dark:hover:bg-color1"
                     }`}
+                    aria-label="نمایش پروژه‌های کارفرما"
                 >
                     پروژه‌های کارفرما
                 </button>
@@ -171,6 +161,7 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                             ? "bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1"
                             : "bg-transparent text-light-color7 dark:text-color7 hover:bg-light-color6 dark:hover:bg-color1"
                     }`}
+                    aria-label="نمایش پروژه‌های فریلنسر"
                 >
                     پروژه‌های فریلنسر
                 </button>
@@ -182,8 +173,11 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                     <div className="flex-1 relative">
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="جستجو در پروژه‌ها..."
                             className="w-full p-3 pr-10 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 focus:outline-none focus:ring-2 focus:ring-light-color4 dark:focus:ring-color4 text-light-color2 dark:text-color2"
+                            aria-label="جستجو در پروژه‌ها"
                         />
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -201,14 +195,23 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                         </svg>
                     </div>
                     <div className="flex gap-2">
-                        <select className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 focus:outline-none focus:ring-2 focus:ring-light-color4 dark:focus:ring-color4 text-light-color2 dark:text-color2">
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 focus:outline-none focus:ring-2 focus:ring-light-color4 dark:focus:ring-color4 text-light-color2 dark:text-color2"
+                            aria-label="فیلتر بر اساس وضعیت"
+                        >
                             <option value="">همه وضعیت‌ها</option>
-                            <option value="در حال مذاکره">در حال مذاکره</option>
-                            <option value="در حال انجام">در حال انجام</option>
-                            <option value="در انتظار تأیید">در انتظار تأیید</option>
-                            <option value="تکمیل شده">تکمیل شده</option>
+                            <option value="PENDING">در انتظار تأیید</option>
+                            <option value="OPEN">باز</option>
+                            <option value="IN_PROGRESS">در حال انجام</option>
+                            <option value="COMPLETED">تکمیل شده</option>
+                            <option value="CANCELLED">لغو شده</option>
                         </select>
-                        <button className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 hover:bg-light-color6 dark:hover:bg-color5 transition-colors focus:outline-none">
+                        <button
+                            className="p-3 rounded-xl border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 hover:bg-light-color6 dark:hover:bg-color5 transition-colors focus:outline-none"
+                            aria-label="فیلتر پروژه‌ها"
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-5 w-5"
@@ -228,10 +231,10 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                 </div>
             </div>
 
-            {/* Projects List - Using separated components */}
+            {/* Projects List */}
             {activeTab === "client" ? (
                 <ClientProjects
-                    projects={clientProjects}
+                    projects={filteredProjects}
                     onViewProposals={handleViewProposals}
                 />
             ) : (
@@ -249,6 +252,7 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                             <button
                                 onClick={() => setShowProposalsModal(false)}
                                 className="p-2 rounded-full hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
+                                aria-label="بستن مودال پیشنهادات"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -267,69 +271,76 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
                             </button>
                         </div>
                         <div className="space-y-4">
-                            {proposalsList
-                                .filter((proposal) => proposal.projectId === selectedProjectId)
-                                .map((proposal) => (
-                                    <div key={proposal.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex items-center">
-                                                <div className="w-12 h-12 rounded-full overflow-hidden">
-                                                    <img
-                                                        src={proposal.avatar}
-                                                        alt={proposal.freelancerName}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            e.currentTarget.src = "/default-avatar.png"; // Fallback image
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="mr-3">
-                                                    <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
-                                                        {proposal.freelancerName}
-                                                    </h4>
-                                                    <div className="flex items-center mt-1">
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-4 w-4 text-yellow-500"
-                                                            fill="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                                                        </svg>
-                                                        <span className="text-sm text-light-color7 dark:text-color7 mr-1">
-                              {proposal.rating}
-                            </span>
-                                                        <span className="text-xs text-light-color7 dark:text-color7 mr-2">
-                              ({proposal.completedProjects} پروژه تکمیل شده)
-                            </span>
+                            {proposals.length === 0 ? (
+                                <p className="text-center text-light-color7 dark:text-color7">
+                                    هنوز پیشنهادی برای این پروژه وجود ندارد.
+                                </p>
+                            ) : (
+                                proposals
+                                    .filter((proposal) => proposal.projectId === selectedProjectId)
+                                    .map((proposal) => (
+                                        <div key={proposal.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex items-center">
+                                                    <div className="w-12 h-12 rounded-full overflow-hidden">
+                                                        <img
+                                                            src={proposal.avatar}
+                                                            alt={proposal.freelancerName}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                e.currentTarget.src = "/default-avatar.png";
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="mr-3">
+                                                        <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
+                                                            {proposal.freelancerName}
+                                                        </h4>
+                                                        <div className="flex items-center mt-1">
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="h-4 w-4 text-yellow-500"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                                            </svg>
+                                                            <span className="text-sm text-light-color7 dark:text-color7 mr-1">
+                                {proposal.rating}
+                              </span>
+                                                            <span className="text-xs text-light-color7 dark:text-color7 mr-2">
+                                ({proposal.completedProjects} پروژه تکمیل شده)
+                              </span>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div className="flex flex-col items-end">
+                          <span className="text-light-color4 dark:text-color4 font-primaryMedium">
+                            {proposal.price}
+                          </span>
+                                                    <span className="text-sm text-light-color7 dark:text-color7 mt-1">
+                            زمان تحویل: {proposal.deliveryTime}
+                          </span>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-col items-end">
-                        <span className="text-light-color4 dark:text-color4 font-primaryMedium">
-                          {proposal.price}
-                        </span>
-                                                <span className="text-sm text-light-color7 dark:text-color7 mt-1">
-                          زمان تحویل: {proposal.deliveryTime}
-                        </span>
+                                            <p className="text-light-color2 dark:text-color2 text-sm mb-4">
+                                                {proposal.description}
+                                            </p>
+                                            <div className="flex justify-end gap-2">
+                                                <button className="px-4 py-2 bg-light-color5 dark:bg-color5 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color6 transition-colors">
+                                                    گفتگو
+                                                </button>
+                                                <button
+                                                    onClick={() => handleAcceptProposal(proposal.id)}
+                                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                                    aria-label={`پذیرفتن پیشنهاد ${proposal.freelancerName}`}
+                                                >
+                                                    پذیرفتن پیشنهاد
+                                                </button>
                                             </div>
                                         </div>
-                                        <p className="text-light-color2 dark:text-color2 text-sm mb-4">
-                                            {proposal.description}
-                                        </p>
-                                        <div className="flex justify-end gap-2">
-                                            <button className="px-4 py-2 bg-light-color5 dark:bg-color5 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color6 transition-colors">
-                                                گفتگو
-                                            </button>
-                                            <button
-                                                onClick={() => handleAcceptProposal(proposal.id)}
-                                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                                            >
-                                                پذیرفتن پیشنهاد
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))
+                            )}
                         </div>
                     </div>
                 </div>

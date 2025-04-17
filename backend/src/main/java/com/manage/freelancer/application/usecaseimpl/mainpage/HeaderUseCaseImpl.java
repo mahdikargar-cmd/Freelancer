@@ -49,14 +49,14 @@ public class HeaderUseCaseImpl implements HeaderUseCase {
         headerLinkRepository.delete(headerLink);
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public HeaderLink getHeaderLinkById(Long id) {
         return headerLinkRepository.findById(id);
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public HeaderLink getHeaderLinkByName(String headerName) {
         return headerLinkRepository.findAll()
                 .stream()
