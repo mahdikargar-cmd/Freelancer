@@ -1,6 +1,5 @@
 package com.manage.freelancer.infrastructure.persistence.entityDTO;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import jakarta.persistence.*;
@@ -22,12 +21,17 @@ public class MessageDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private UserDTO sender;
+
     private String content;
+
+    @Column(name = "time")
+    private LocalDateTime time;
+
     @ManyToOne
     @JoinColumn(name = "project_id")
     private ProjectDTO projectId;
-    private LocalDateTime createTime;
 }

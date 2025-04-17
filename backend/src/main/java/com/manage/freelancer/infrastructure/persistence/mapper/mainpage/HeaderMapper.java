@@ -12,19 +12,18 @@ public class HeaderMapper {
         return HeaderLink.builder()
                 .id(headerLinkEntity.getId())
                 .title(headerLinkEntity.getTitle())
-                .titleId(Long.valueOf(headerLinkEntity.getTitleId()))
+                .titleId(headerLinkEntity.getTitleId())
+                .link(headerLinkEntity.getLink())
                 .build();
-
     }
+
     public HeaderLinkEntity toEntity(HeaderLink headerLink) {
         if (headerLink == null) return null;
-
         return HeaderLinkEntity.builder()
                 .id(headerLink.getId())
                 .title(headerLink.getTitle())
-                .titleId(String.valueOf(headerLink.getTitleId()))
+                .titleId(headerLink.getTitleId())
+                .link(headerLink.getLink())
                 .build();
-
     }
-
 }

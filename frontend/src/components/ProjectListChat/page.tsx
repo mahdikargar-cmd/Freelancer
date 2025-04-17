@@ -43,7 +43,6 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
     const [error, setError] = useState<string | null>(null);
     const { userId } = useAuth();
 
-    // Fetch projects with useCallback to prevent unnecessary re-renders
     const getClientProjects = useCallback(async () => {
         try {
             const response = await axios.get(`/app/getEmployer?id=${userId}`, {
@@ -63,7 +62,6 @@ const ProjectListChat = ({ onViewProposals }: ProjectListChatProps) => {
         }
     }, [userId]);
 
-    // Load projects on mount or when userId changes
     useEffect(() => {
         setIsLoading(true);
         if (userId) {

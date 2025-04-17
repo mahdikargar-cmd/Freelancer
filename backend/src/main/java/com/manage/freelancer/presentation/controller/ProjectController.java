@@ -65,7 +65,7 @@ public class ProjectController {
     @PutMapping("/projects/{projectId}/addSuggestion")
     public ResponseEntity<ProjectDTO> addSuggestion(
             @PathVariable Long projectId,
-            @RequestBody Map<String, Long> request) {
+            @RequestBody Map<String, Long> request){
         Long freelancerId = request.get("freelancerId");
         if (freelancerId == null) {
             return ResponseEntity.badRequest().build();

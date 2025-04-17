@@ -1,45 +1,38 @@
 package com.manage.freelancer.infrastructure.persistence.mapper;
 
 import com.manage.freelancer.AAA.infrastructure.UserMapper;
-import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import com.manage.freelancer.domain.entity.Message;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.MessageDTO;
-import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class MessageMapper {
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final UserMapper userMapper;
+    private final ProjectMapper projectMapper;
 
     public Message toDomain(MessageDTO dto) {
+        if (dto == null) return null;
+
         return Message.builder()
                 .id(dto.getId())
                 .content(dto.getContent())
-                .createTime(dto.getCreateTime())
-                .sender(userMapper.toDomain(dto.getSender()))
-                .projectId(projectMapper.toDomain(dto.getProjectId()))
+                .time(dto.getTime())
+                .sender(dto.getSender() != null ? userMapper.toDomain(dto.getSender()) : null)
+                .projectId(dto.getProjectId() != null ? projectMapper.toDomain(dto.getProjectId()) : null)
                 .build();
     }
 
     public MessageDTO toDTO(Message domain) {
-        UserDTO senderDTO = new UserDTO();
-        senderDTO.setId(domain.getSender().getId());
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setId(domain.getProjectId().getId());
+        if (domain == null) return null;
+
         return MessageDTO.builder()
                 .id(domain.getId())
                 .content(domain.getContent())
-                .createTime(domain.getCreateTime())
-                .sender(senderDTO)
-                .projectId(projectDTO)
+                .time(domain.getTime())
+                .sender(domain.getSender() != null ? userMapper.toDTO(domain.getSender()) : null)
+                .projectId(domain.getProjectId() != null ? projectMapper.toDTO(domain.getProjectId()) : null)
                 .build();
     }
-
-
 }

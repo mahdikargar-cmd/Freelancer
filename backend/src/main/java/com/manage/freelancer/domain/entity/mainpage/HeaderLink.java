@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class HeaderLink {
-    private   Long id;
-    private   String title;
-    private   Long  titleId;
+    private Long id;
+    private String title;
+    private Long titleId;
+    private String link;
 
 }

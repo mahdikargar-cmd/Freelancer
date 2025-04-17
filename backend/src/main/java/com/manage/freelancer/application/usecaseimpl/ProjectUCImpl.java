@@ -36,11 +36,11 @@ public class ProjectUCImpl implements ProjectUC {
         return projectRepo.findAll(pageable);
     }
 
-
     @Override
     public ProjectDTO getProjectById(Long id) {
         return projectRepo.findById(id);
     }
+
     @Override
     public ProjectDTO addSuggestion(Long projectId, Long freelancerId) {
         // Fetch the existing project
@@ -147,6 +147,28 @@ public class ProjectUCImpl implements ProjectUC {
             existingProject.setSkills(dbSkills);
         }
 
+        // Update suggestions if provided
+        if (projectDTO.getSuggestions() != null && !projectDTO.getSuggestions().isEmpty()) {
+            List<UserDTO> updatedSuggestions = new ArrayList<>();
+            for (UserDTO userDTO : projectDTO.getSuggestions()) {
+                // Load full user details from database using user ID
+                UserDTO fullUser = userRepo.findById(userDTO.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("کاربر با شناسه " + userDTO.getId() + " یافت نشد"));
+                updatedSuggestions.add(fullUser);
+            }
+            // Initialize suggestions list if null
+            if (existingProject.getSuggestions() == null) {
+                existingProject.setSuggestions(new ArrayList<>());
+            }
+            // Add new suggestions if not already present
+            for (UserDTO user : updatedSuggestions) {
+                if (!existingProject.getSuggestions().contains(user)) {
+                    existingProject.getSuggestions().add(user);
+                    existingProject.setSuggested(existingProject.getSuggested() + 1);
+                }
+            }
+        }
+
         // Update other fields only if provided
         if (projectDTO.getSubject() != null) {
             existingProject.setSubject(projectDTO.getSubject());
@@ -169,18 +191,14 @@ public class ProjectUCImpl implements ProjectUC {
         if (projectDTO.getStatus() != null) {
             existingProject.setStatus(projectDTO.getStatus());
         }
-        if (projectDTO.getSuggested() != 0) {
-            existingProject.setSuggested(projectDTO.getSuggested());
-        }
         existingProject.setActive(projectDTO.isActive());
         if (projectDTO.getCategory() != null) {
             existingProject.setCategory(projectDTO.getCategory());
         }
-        if (projectDTO.getSuggestions() != null && !projectDTO.getSuggestions().isEmpty()) {
-            existingProject.setSuggestions(projectDTO.getSuggestions());
-        }
+
         return projectRepo.update(existingProject);
     }
+
     @Override
     public void deleteProject(Long id) {
         projectRepo.deleteById(id);

@@ -1,6 +1,5 @@
 package com.manage.freelancer.infrastructure.persistence.entityDTO.mainpage;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +21,8 @@ public class HeaderLinkEntity {
     private String title;
 
     @Column(nullable = false)
-    private String titleId;
+    private Long titleId; // تغییر به Long
+
+    @Column(nullable = false)
+    private String link;
 }

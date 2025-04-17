@@ -1,17 +1,25 @@
+"use client";
+
+import { useState } from "react";
+import { FaBars } from "react-icons/fa";
+
 const Humberger = () => {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-            <button data-collapse-toggle="navbar-sticky" type="button"
-                className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 bg-color4"
-                aria-controls="navbar-sticky" aria-expanded="false">
-                <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 17 14">
-                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                        d="M1 1h15M1 7h15M1 13h15" />
-                </svg>
+        <div className="md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} aria-label="باز کردن منو">
+                <FaBars className="text-2xl" />
             </button>
+            {isOpen && (
+                <div className="absolute top-full left-0 w-full bg-light-color6 dark:bg-color1">
+                    <ul className="flex flex-col p-4">
+                        {/* لینک‌ها اینجا اضافه شوند */}
+                    </ul>
+                </div>
+            )}
         </div>
-    )
-}
+    );
+};
 
 export default Humberger;

@@ -16,6 +16,6 @@ public class Message {
     private Long id;
     private User sender;
     private String content;
+    private LocalDateTime time;
     private Project projectId;
-    private LocalDateTime createTime;
 }

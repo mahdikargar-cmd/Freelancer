@@ -1,6 +1,5 @@
-// src/app/projects/[id]/page.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -14,7 +13,7 @@ import DetailsTab from '@/components/TabsInprojectId/DetailsTabProps';
 import ProposalTab from '@/components/TabsInprojectId/ProposalTabProps';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
 });
 
 interface Skill {
@@ -26,6 +25,11 @@ interface Milestone {
     name: string;
     amount: number;
     durationDays: number;
+}
+
+interface Suggest {
+    suggested: number;
+    suggestions: { id: string }[]; // اصلاح نوع suggestions به آرایه‌ای از اشیاء
 }
 
 interface Project {
@@ -42,10 +46,10 @@ interface Project {
     createdDate: [number, number, number] | null | undefined;
     active?: boolean;
     type?: string;
-    suggestions?: any;
+    suggestions?: { id: string }[];
     endDate?: string | null;
     employerId: {
-        id: string;
+        id: string | number;
         email: string;
         role: string;
     };
@@ -55,6 +59,7 @@ const ProjectId = () => {
     const router = useRouter();
     const params = useParams();
     const { userId } = useAuth();
+    const [suggest, setSuggest] = useState<Suggest | null>(null);
     const [proposal, setProposal] = useState<{
         title: string;
         content: string;
@@ -71,56 +76,98 @@ const ProjectId = () => {
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
     const projectId = Array.isArray(params.id) ? params.id[0] : params.id;
 
-    useEffect(() => {
-        const fetchProject = async () => {
-            try {
-                setLoading(true);
-
-                if (!projectId) {
-                    throw new Error('شناسه پروژه نامعتبر است');
-                }
-
-                const { data } = await api.get<Project>(`app/${projectId}`, {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get('token')}`,
-                    },
-                });
-
-                console.log('داده پروژه:', data);
-
-                // اعتبارسنجی داده‌ها
-                if (!data.skills) {
-                    data.skills = [];
-                }
-                if (!data.category) {
-                    data.category = { id: '', name: 'نامشخص' };
-                }
-                if (!data.createdDate) {
-                    const today = new Date();
-                    data.createdDate = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
-                }
-
-                setProject(data);
-                setError(null);
-            } catch (err: any) {
-                console.error('خطا در دریافت پروژه:', err);
-                setError('پروژه مورد نظر یافت نشد');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProject();
-    }, [projectId, router]);
-
-    const handleSubmitProposal = async () => {
+    const fetchProject = useCallback(async () => {
         try {
-            if (!userId) {
-                throw new Error('شناسه کاربر یافت نشد');
+            setLoading(true);
+            if (!projectId) {
+                throw new Error('شناسه پروژه نامعتبر است');
             }
+            if (!Cookies.get('token')) {
+                throw new Error('لطفاً وارد حساب کاربری خود شوید.');
+            }
+
+            const { data } = await api.get<Project>(`app/${projectId}`, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('token')}`,
+                },
+            });
+
+            // اعتبارسنجی داده‌ها
+            if (!data.skills) data.skills = [];
+            if (!data.category) data.category = { id: '', name: 'نامشخص' };
+            if (!data.createdDate) {
+                const today = new Date();
+                data.createdDate = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
+            }
+
+            setProject(data);
+            setSuggest({
+                suggested: data.suggested,
+                suggestions: data.suggestions || [],
+            });
+            setError(null);
+        } catch (err: any) {
+            console.error('خطا در دریافت پروژه:', err);
+            setError(err.response?.data?.message || 'پروژه مورد نظر یافت نشد');
+        } finally {
+            setLoading(false);
+        }
+    }, [projectId]);
+
+    const updateSuggest = useCallback(async () => {
+        try {
+            if (!suggest || !project || !userId) {
+                throw new Error('اطلاعات پیشنهاد، پروژه یا کاربر در دسترس نیست');
+            }
+
+            const updatedSuggested = suggest.suggested + 1;
+            const updatedSuggestions = [...suggest.suggestions, { id: userId }];
+
+            const updatePayload = {
+                id: project.id,
+                subject: project.subject,
+                description: project.description,
+                priceStarted: project.priceStarted,
+                priceEnded: project.priceEnded,
+                skills: project.skills || [],
+                category: project.category || { id: '', name: 'نامشخص' },
+                suggested: updatedSuggested,
+                suggestions: updatedSuggestions,
+                deadline: project.deadline,
+                status: project.status,
+                createdDate: project.createdDate,
+                employerId: { id: project.employerId.id, email: project.employerId.email, role: project.employerId.role },
+                active: project.active,
+                type: project.type,
+                endDate: project.endDate,
+            };
+
+            const { data } = await api.put(`app/updateProject/${projectId}`, updatePayload, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('token')}`,
+                },
+            });
+
+            // به‌روزرسانی محلی
+            setSuggest((prev) => (prev ? { ...prev, suggested: updatedSuggested, suggestions: updatedSuggestions } : null));
+            setProject((prev) => (prev ? { ...prev, suggested: updatedSuggested, suggestions: updatedSuggestions } : null));
+
+            console.log('به‌روزرسانی پیشنهادها:', data);
+        } catch (err: any) {
+            console.error('خطا در به‌روزرسانی پیشنهادها:', err);
+            alert(`خطا در به‌روزرسانی تعداد پیشنهادها: ${err.response?.data?.message || err.message}`);
+        }
+    }, [suggest, project, projectId, userId]);
+
+    useEffect(() => {
+        fetchProject();
+    }, [fetchProject]);
+
+    const handleSubmitProposal = useCallback(async () => {
+        try {
+            if (!userId) throw new Error('شناسه کاربر یافت نشد');
             if (!proposal.title || !proposal.content || !proposal.proposedBudget || !proposal.estimatedDuration) {
                 alert('لطفاً تمام فیلدهای اجباری را پر کنید');
                 return;
@@ -145,15 +192,14 @@ const ProjectId = () => {
                 })),
             };
 
-            console.log('ارسال payload:', payload);
-
             const { data } = await api.post('/app/createSuggest', payload, {
                 headers: {
                     Authorization: `Bearer ${Cookies.get('token')}`,
                 },
             });
 
-            console.log('پیشنهاد ثبت شد:', data);
+            await updateSuggest();
+
             alert('پیشنهاد با موفقیت ارسال شد!');
             setProposal({
                 title: '',
@@ -166,29 +212,39 @@ const ProjectId = () => {
             console.error('خطا در ارسال پیشنهاد:', err);
             alert(`خطا در ارسال پیشنهاد: ${err.response?.data?.message || err.message}`);
         }
-    };
+    }, [proposal, projectId, userId, updateSuggest]);
+
+    const handleGoToChat = useCallback(() => {
+        router.push(`/chatPanel?projectId=${projectId}`);
+    }, [projectId, router]);
 
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-light-color1 dark:bg-color1">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-light-color4 dark:border-color4"></div>
+                <div
+                    className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-light-color4 dark:border-color4"></div>
             </div>
         );
     }
 
     if (error || !project) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-light-color1 dark:bg-color1 text-light-color9 dark:text-color9">
+            <div
+                className="min-h-screen flex flex-col items-center justify-center bg-light-color1 dark:bg-color1 text-light-color9 dark:text-color9">
                 <h1 className="text-2xl mb-4">{error}</h1>
                 <button
                     onClick={() => router.push('/projects')}
                     className="px-4 py-2 bg-light-color4 dark:bg-color4 text-light-color1 dark:text-color1 rounded hover:bg-light-color8 dark:hover:bg-color8 transition-colors"
+                    aria-label="بازگشت به لیست پروژه‌ها"
                 >
                     بازگشت به لیست پروژه‌ها
                 </button>
             </div>
         );
     }
+
+    const isEmployer = String(userId) === String(project.employerId.id);
+    console.log('userId:', userId, 'employerId:', project.employerId.id, 'isEmployer:', isEmployer);
 
     const tabs = [
         {
@@ -212,13 +268,15 @@ const ProjectId = () => {
         },
         {
             id: 'proposal' as const,
-            label: 'ارسال پیشنهاد',
+            label: isEmployer ? 'مدیریت پیشنهادات' : 'ارسال پیشنهاد',
             icon: <FaShieldAlt />,
             content: (
                 <ProposalTab
                     proposal={proposal}
                     setProposal={setProposal}
                     onSubmit={handleSubmitProposal}
+                    isEmployer={isEmployer}
+                    onGoToChat={handleGoToChat}
                 />
             ),
         },
@@ -229,7 +287,8 @@ const ProjectId = () => {
             <div className="bg-light-color5 dark:bg-color5 rounded-xl shadow-lg p-4 sm:p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8">
                     <div className="mb-4 md:mb-0 w-full md:w-auto">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-light-color5 dark:bg-color6 text-light-color4 dark:text-color4 text-sm">
+                        <span
+                            className="inline-flex items-center px-3 py-1 rounded-full bg-light-color5 dark:bg-color6 text-light-color4 dark:text-color4 text-sm">
                             <MdOutlineMoreTime className="mr-2" />
                             {project.status === 'OPEN' && 'باز'}
                             {project.status === 'COMPLETED' && 'تکمیل شده'}
@@ -271,7 +330,8 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode; title: string
         animate={{ opacity: 1, y: 0 }}
         className="bg-light-color5 dark:bg-color6 p-3 sm:p-4 rounded-lg flex items-center gap-3 sm:gap-4"
     >
-        <div className="bg-light-color4 bg-opacity-10 dark:bg-color4 dark:bg-opacity-10 p-2 rounded-full text-light-color4 dark:text-color4">
+        <div
+            className="bg-light-color4 bg-opacity-10 dark:bg-color4 dark:bg-opacity-10 p-2 rounded-full text-light-color4 dark:text-color4">
             {icon}
         </div>
         <div>

@@ -15,10 +15,14 @@ const SignHead = () => {
         setShowDropdown((prev) => !prev);
     }, []);
 
-    const handleLogout = useCallback(() => {
-        logout();
-        setShowDropdown(false);
-        router.push("/login"); // هدایت به صفحه ورود بدون رفرش
+    const handleLogout = useCallback(async () => {
+        try {
+            await logout();
+            setShowDropdown(false);
+            router.push("/login");
+        } catch (err) {
+            console.error("خطا در خروج:", err);
+        }
     }, [logout, router]);
 
     return (
@@ -26,6 +30,7 @@ const SignHead = () => {
             <button
                 onClick={toggleDropdown}
                 className="flex items-center dark:text-color4 text-light-color4 hover:text-color8 transition-colors"
+                aria-label="منوی کاربر"
             >
                 <FaUser className="text-xl" />
             </button>
@@ -39,6 +44,7 @@ const SignHead = () => {
                                         href="/dashboard"
                                         className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
                                         onClick={toggleDropdown}
+                                        aria-label="رفتن به داشبورد"
                                     >
                                         داشبورد
                                     </Link>
@@ -47,6 +53,7 @@ const SignHead = () => {
                                     <button
                                         onClick={handleLogout}
                                         className="block w-full text-left px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
+                                        aria-label="خروج از حساب"
                                     >
                                         خروج
                                     </button>
@@ -59,6 +66,7 @@ const SignHead = () => {
                                         href="/login"
                                         className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
                                         onClick={toggleDropdown}
+                                        aria-label="ورود به حساب"
                                     >
                                         ورود
                                     </Link>
@@ -68,6 +76,7 @@ const SignHead = () => {
                                         href="/signUp"
                                         className="block px-4 py-2 text-sm dark:text-color3 text-light-color3 hover:bg-color8 dark:hover:bg-color8"
                                         onClick={toggleDropdown}
+                                        aria-label="ثبت‌نام"
                                     >
                                         ثبت‌نام
                                     </Link>

@@ -5,6 +5,7 @@ import com.manage.freelancer.AAA.domain.model.User;
 import com.manage.freelancer.application.usecaseimpl.MessageUcImpl;
 import com.manage.freelancer.domain.entity.Message;
 import com.manage.freelancer.domain.entity.Project;
+import com.manage.freelancer.presentation.response.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,14 +40,39 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     private static final long ONLINE_TTL_SECONDS = 30;
     private static final long HEARTBEAT_INTERVAL_SECONDS = 20;
 
-    // Track active user sessions
-    private static final ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    // Track active user sessions - using non-static maps for better instance isolation
+    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     // Map to track session tokens
-    private static final ConcurrentHashMap<String, String> sessionTokens = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionTokens = new ConcurrentHashMap<>();
     // Map to track user IDs by session ID
-    private static final ConcurrentHashMap<String, String> sessionUserIds = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionUserIds = new ConcurrentHashMap<>();
 
     private final ScheduledExecutorService heartbeatScheduler = Executors.newScheduledThreadPool(1);
+
+    @PreDestroy
+    public void cleanup() {
+        // Properly shutdown executor service
+        heartbeatScheduler.shutdown();
+        try {
+            if (!heartbeatScheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                heartbeatScheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            heartbeatScheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        // Close any open sessions
+        for (WebSocketSession session : sessions.values()) {
+            try {
+                if (session.isOpen()) {
+                    session.close(CloseStatus.GOING_AWAY);
+                }
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Error closing session on shutdown", e);
+            }
+        }
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -64,7 +92,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             redisTemplate.opsForValue().set("online:user:" + userId, "true", ONLINE_TTL_SECONDS, TimeUnit.SECONDS);
 
             // Send acknowledgment message to the client
-            sendMessage(session, new ResponseMessage("connected", "اتصال موفقیت‌آمیز بود", null));
+            sendMessage(session, new ResponseMessage("connected", "اتصال موفقیت‌آمیز بود", Collections.singletonMap("userId", userId)));
 
             // Setup heartbeat for this session
             setupHeartbeat(session);
@@ -76,6 +104,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             // Send error message and close the connection
             try {
                 sendMessage(session, new ResponseMessage("error", e.getMessage(), null));
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "Failed to send error message", ex);
             } finally {
                 session.close(CloseStatus.BAD_DATA.withReason(e.getMessage()));
             }
@@ -122,27 +152,42 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
                 return;
             }
 
+            // Validate message content
+            if (payload.getContent() == null || payload.getContent().trim().isEmpty()) {
+                throw new RuntimeException("متن پیام نمی‌تواند خالی باشد");
+            }
+
+            if (payload.getProjectId() == null || payload.getProjectId().trim().isEmpty()) {
+                throw new RuntimeException("شناسه پروژه نمی‌تواند خالی باشد");
+            }
+
             // Create and save message
             Message msg = Message.builder()
                     .sender(User.builder().id(Long.valueOf(userId)).build())
                     .content(payload.getContent())
                     .projectId(Project.builder().id(Long.valueOf(payload.getProjectId())).build())
-                    .createTime(LocalDateTime.now())
+                    .time(LocalDateTime.now())
                     .build();
 
             Message saved = messageUc.sendMessage(msg);
 
             // Send to receiver if online
-            if (payload.getReceiverId() != null) {
+            boolean deliveredToReceiver = false;
+            if (payload.getReceiverId() != null && !payload.getReceiverId().trim().isEmpty()) {
                 String receiverId = payload.getReceiverId();
                 WebSocketSession receiverSession = sessions.get(receiverId);
                 if (receiverSession != null && receiverSession.isOpen()) {
                     sendMessage(receiverSession, new ResponseMessage("message", "پیام جدید", saved));
+                    deliveredToReceiver = true;
                 }
             }
 
             // Confirm to sender
-            sendMessage(session, new ResponseMessage("sent", "پیام با موفقیت ارسال شد", saved));
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("message", saved);
+            responseData.put("delivered", deliveredToReceiver);
+
+            sendMessage(session, new ResponseMessage("sent", "پیام با موفقیت ارسال شد", responseData));
 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error handling message: " + e.getMessage(), e);
@@ -248,13 +293,14 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     private void sendMessage(WebSocketSession session, ResponseMessage message) throws IOException {
         if (session.isOpen()) {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage.getBytes(StandardCharsets.UTF_8)));
         }
     }
 
     // Get online status of users
     public boolean isUserOnline(Long userId) {
-        return redisTemplate.hasKey("online:user:" + userId);
+        return Boolean.TRUE.equals(redisTemplate.hasKey("online:user:" + userId));
     }
 
     // Get list of online users
@@ -281,85 +327,4 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             }
         });
     }
-
-    // Inner classes for message handling
-
-    public static class MessagePayload {
-        private String type; // message, ping, etc.
-        private String content;
-        private String projectId;
-        private String receiverId;
-        private String senderId; // Added senderId field
-
-        // Getters and setters
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public String getProjectId() {
-            return projectId;
-        }
-
-        public void setProjectId(String projectId) {
-            this.projectId = projectId;
-        }
-
-        public String getReceiverId() {
-            return receiverId;
-        }
-
-        public void setReceiverId(String receiverId) {
-            this.receiverId = receiverId;
-        }
-
-        public String getSenderId() {
-            return senderId;
-        }
-
-        public void setSenderId(String senderId) {
-            this.senderId = senderId;
-        }
     }
-
-    private static class ResponseMessage {
-        private String type;
-        private String message;
-        private Object data;
-        private long timestamp;
-
-        public ResponseMessage(String type, String message, Object data) {
-            this.type = type;
-            this.message = message;
-            this.data = data;
-            this.timestamp = System.currentTimeMillis();
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public Object getData() {
-            return data;
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
-    }
-}
