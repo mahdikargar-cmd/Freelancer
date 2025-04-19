@@ -244,12 +244,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                 <div className="bg-light-color1 dark:bg-color1 p-4 border-b border-light-color6 dark:border-color5 flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                         <div className="flex w-10 h-10 rounded-full bg-light-color4 dark:bg-color4 items-center justify-center overflow-hidden">
-                            <img
-                                src="/api/placeholder/100/100"
-                                alt="کاربر"
-                                className="w-full h-full object-cover"
-                                onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
-                            />
+                            {/* از تصویر پیش‌فرض استفاده می‌کنیم به جای مسیر API ناموجود */}
+                            <div className="w-full h-full flex items-center justify-center text-light-color2 dark:text-color2 bg-light-color6 dark:bg-color6">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
                         </div>
                         <div className="mr-3">
                             <h3 className="font-primaryMedium dark:text-color2 text-light-color2">محمد رضایی</h3>
@@ -332,8 +332,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                                                 : "text-light-color7 dark:text-color7"
                                         }`}
                                     >
-                    {message.time}
-                  </span>
+                                        {message.time}
+                                    </span>
                                 </div>
                             </div>
                         ))
@@ -428,8 +428,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     <div className="flex justify-between items-center">
                         <span className="text-light-color7 dark:text-color7">بودجه:</span>
                         <span className="text-light-color4 dark:text-color4 font-primaryMedium">
-              {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
-            </span>
+                            {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
+                        </span>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-light-color7 dark:text-color7">مهلت تحویل:</span>
@@ -438,16 +438,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     <div className="flex justify-between items-center">
                         <span className="text-light-color7 dark:text-color7">وضعیت:</span>
                         <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
-              {project.status === "OPEN"
-                  ? "باز"
-                  : project.status === "IN_PROGRESS"
-                      ? "در حال انجام"
-                      : project.status === "COMPLETED"
-                          ? "تکمیل شده"
-                          : project.status === "CANCELLED"
-                              ? "لغو شده"
-                              : "در حال مذاکره"}
-            </span>
+                            {project.status === "OPEN"
+                                ? "باز"
+                                : project.status === "IN_PROGRESS"
+                                    ? "در حال انجام"
+                                    : project.status === "COMPLETED"
+                                        ? "تکمیل شده"
+                                        : project.status === "CANCELLED"
+                                            ? "لغو شده"
+                                            : "در حال مذاکره"}
+                        </span>
                     </div>
                 </div>
                 <div className="mt-4 flex justify-end">
@@ -456,7 +456,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                         aria-label="پرداخت پروژه"
                     >
-                        پرداخت پروژه
+                        پرداخت هزینه
                     </button>
                 </div>
             </div>

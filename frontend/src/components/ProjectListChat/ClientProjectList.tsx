@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import { useAuth } from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
+import { api } from "@/components/lib/api";
 
 interface Employer {
     id: number;
@@ -36,28 +36,63 @@ interface Project {
     active: boolean;
     suggested: number;
     employerId: Employer;
-    category: Category;
-    skills: Skill[];
+    category: Category | null;
+    skills: Skill[] | null;
     suggestions: any[] | null;
+}
+
+interface Proposal {
+    id: number;
+    projectId: {
+        id: number;
+        subject: string;
+        description: string;
+        priceStarted: number;
+        priceEnded: number;
+        deadline: number;
+        createdDate: number[];
+        endDate: number[];
+        type: string;
+        status: string;
+        active: boolean;
+        suggested: number;
+        employerId: Employer | null;
+        category: Category | null;
+        skills: Skill[] | null;
+        suggestions: any[] | null;
+    };
+    freelancerId: {
+        id: number;
+        email: string;
+        role: string;
+    };
+    title: string;
+    content: string;
+    proposedBudget: number;
+    estimatedDuration: number;
+    submittedAt: number[];
+    status: string;
+    milestones: any[] | null;
 }
 
 interface ClientProjectsProps {
     projects?: Project[];
-    onViewProposals: (projectId: number, employerId: number) => void;
+    onViewProposals?: (projectId: number, employerId: number) => void;
+    onStartChat?: (projectId: number, freelancerId: number) => void;
 }
 
-const api = axios.create({
-    baseURL: "http://localhost:8080",
-});
-
-const ClientProjects: React.FC<ClientProjectsProps> = ({ projects = [], onViewProposals }) => {
+const ClientProjects: React.FC<ClientProjectsProps> = ({
+                                                           projects = [],
+                                                           onViewProposals,
+                                                           onStartChat,
+                                                       }) => {
     const { userId } = useAuth();
     const [fetchedProjects, setFetchedProjects] = useState<Project[]>(Array.isArray(projects) ? projects : []);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    console.log("Initial projects:", projects);
-    console.log("userId:", userId);
+    const [proposals, setProposals] = useState<Proposal[]>([]);
+    const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+    const [viewingProposals, setViewingProposals] = useState(false);
 
     const getClientProjects = useCallback(async () => {
         if (!userId) {
@@ -67,16 +102,12 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({ projects = [], onViewPr
 
         try {
             setIsLoading(true);
-            const response = await api.get(`/app/${userId}`, {
+            const response = await api.get(`/app/getEmployer?id=${userId}`, {
                 headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                 withCredentials: true,
             });
 
-            console.log("Raw API response:", response.data);
-
-            // اگر پاسخ یک شیء است، آن را به آرایه تبدیل کنید
-            const data = response.data ? [response.data] : [];
-            console.log("Parsed projects:", data);
+            const data = Array.isArray(response.data) ? response.data : [];
             setFetchedProjects(data);
             setError(null);
         } catch (err: any) {
@@ -92,7 +123,6 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({ projects = [], onViewPr
     }, [userId]);
 
     useEffect(() => {
-        console.log("useEffect triggered with projects:", projects, "userId:", userId);
         if (userId && (!Array.isArray(projects) || projects.length === 0)) {
             getClientProjects();
         } else {
@@ -100,74 +130,211 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({ projects = [], onViewPr
         }
     }, [projects, userId, getClientProjects]);
 
-    useEffect(() => {
-        console.log("fetchedProjects updated:", fetchedProjects);
-    }, [fetchedProjects]);
+    const handleViewProposals = async (projectId: number, employerId: number) => {
+        try {
+            setIsLoading(true);
+            setSelectedProjectId(projectId);
 
-    console.log("fetchedProjects before render:", fetchedProjects);
+            const response = await api.get(`/app/IdSuggest/${projectId}`, {
+                headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                withCredentials: true,
+            });
+
+            setProposals(Array.isArray(response.data) ? response.data : []);
+            setViewingProposals(true);
+
+            if (onViewProposals) {
+                onViewProposals(projectId, employerId);
+            }
+        } catch (err) {
+            console.error("Error fetching proposals:", err);
+            setError("خطا در دریافت پیشنهادات. لطفاً دوباره تلاش کنید.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleStartChat = (projectId: number, freelancerId: number) => {
+        if (onStartChat) {
+            onStartChat(projectId, freelancerId);
+        }
+        setViewingProposals(false);
+        setSelectedProjectId(null);
+    };
+
+    const handleBackToProjects = () => {
+        setViewingProposals(false);
+        setSelectedProjectId(null);
+    };
+
+    const selectedProject = selectedProjectId
+        ? fetchedProjects.find((project) => project.id === selectedProjectId)
+        : null;
 
     return (
         <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4">
-            <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2 mb-4">
-                پروژه‌های کارفرما
-            </h3>
-            {isLoading && (
-                <div className="text-center">
-                    <div
-                        className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"
-                    ></div>
-                </div>
-            )}
-            {error && (
-                <div
-                    aria-live="polite"
-                    className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-4 text-center"
-                >
-                    {error}
-                </div>
-            )}
-            {!isLoading && fetchedProjects.length === 0 ? (
-                <p className="text-center text-light-color7 dark:text-color7">
-                    هیچ پروژه‌ای یافت نشد.
-                </p>
-            ) : (
-                <div className="space-y-4">
-                    {fetchedProjects.map((project) => (
-                        <div key={project.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
-                            <div className="flex justify-between items-center mb-2">
-                                <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
-                                    {project.subject}
-                                </h4>
-                                <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
-                                    {project.status === "OPEN"
-                                        ? "باز"
-                                        : project.status === "IN_PROGRESS"
-                                            ? "در حال انجام"
-                                            : project.status === "COMPLETED"
-                                                ? "تکمیل شده"
-                                                : project.status === "CANCELLED"
-                                                    ? "لغو شده"
-                                                    : "در حال مذاکره"}
-                                </span>
-                            </div>
-                            <p className="text-sm text-light-color7 dark:text-color7 mb-2">
-                                {project.description}
-                            </p>
-                            <div className="flex justify-between items-center">
-                                <span className="text-light-color4 dark:text-color4 font-primaryMedium">
-                                    {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
-                                </span>
-                                <button
-                                    onClick={() => onViewProposals(project.id, project.employerId.id)}
-                                    className="px-4 py-2 bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors"
-                                    aria-label={`مشاهده پیشنهادات برای ${project.subject}`}
-                                >
-                                    مشاهده پیشنهادات
-                                </button>
-                            </div>
+            {viewingProposals && selectedProject ? (
+                <>
+                    <div className="mb-4 flex justify-between items-center">
+                        <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2">
+                            پیشنهادات برای پروژه: {selectedProject.subject}
+                        </h3>
+                        <button
+                            onClick={handleBackToProjects}
+                            className="px-3 py-1 bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 rounded-lg text-sm"
+                        >
+                            بازگشت به لیست پروژه‌ها
+                        </button>
+                    </div>
+
+                    {isLoading && (
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
                         </div>
-                    ))}
-                </div>
+                    )}
+
+                    {error && (
+                        <div
+                            aria-live="polite"
+                            className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-4 text-center"
+                        >
+                            {error}
+                        </div>
+                    )}
+
+                    {!isLoading && proposals.length === 0 ? (
+                        <p className="text-center text-light-color7 dark:text-color7 py-4">
+                            هیچ پیشنهادی برای این پروژه یافت نشد.
+                        </p>
+                    ) : (
+                        <div className="space-y-4">
+                            {proposals.map((proposal) => (
+                                <div key={proposal.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
+                                    <div className="flex justify-between mb-2">
+                                        <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
+                                            {proposal.title} (فریلنسر: {proposal.freelancerId.email})
+                                        </h4>
+                                        <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                      {proposal.status === "PENDING"
+                          ? "در انتظار"
+                          : proposal.status === "ACCEPTED"
+                              ? "پذیرفته شده"
+                              : proposal.status === "REJECTED"
+                                  ? "رد شده"
+                                  : proposal.status}
+                    </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                        <div>
+                                            <p className="text-sm text-light-color7 dark:text-color7">قیمت پیشنهادی:</p>
+                                            <p className="font-primaryMedium text-light-color4 dark:text-color4">
+                                                {proposal.proposedBudget.toLocaleString()} تومان
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-light-color7 dark:text-color7">زمان تحویل:</p>
+                                            <p className="font-primaryMedium text-light-color4 dark:text-color4">
+                                                {proposal.estimatedDuration} روز
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <p className="text-sm text-light-color7 dark:text-color7 mb-1">توضیحات:</p>
+                                        <p className="text-light-color2 dark:text-color2">{proposal.content}</p>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ ارسال:</p>
+                                        <p className="text-light-color2 dark:text-color2">
+                                            {new Date(
+                                                proposal.submittedAt[0],
+                                                proposal.submittedAt[1] - 1,
+                                                proposal.submittedAt[2],
+                                                proposal.submittedAt[3],
+                                                proposal.submittedAt[4],
+                                                proposal.submittedAt[5]
+                                            ).toLocaleDateString("fa-IR")}
+                                        </p>
+                                    </div>
+
+                                    {proposal.status === "PENDING" && (
+                                        <div className="flex justify-end">
+                                            <button
+                                                onClick={() => handleStartChat(proposal.projectId.id, proposal.freelancerId.id)}
+                                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                            >
+                                                شروع گفتگو
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </>
+            ) : (
+                <>
+                    <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2 mb-4">
+                        پروژه‌های کارفرما
+                    </h3>
+
+                    {isLoading && (
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                        </div>
+                    )}
+
+                    {error && (
+                        <div
+                            aria-live="polite"
+                            className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-xl p-4 mb-4 text-center"
+                        >
+                            {error}
+                        </div>
+                    )}
+
+                    {!isLoading && fetchedProjects.length === 0 ? (
+                        <p className="text-center text-light-color7 dark:text-color7">هیچ پروژه‌ای یافت نشد.</p>
+                    ) : (
+                        <div className="space-y-4">
+                            {fetchedProjects.map((project) => (
+                                <div key={project.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h4 className="font-primaryMedium text-light-color2 dark:text-color2">{project.subject}</h4>
+                                        <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                      {project.status === "OPEN"
+                          ? "باز"
+                          : project.status === "IN_PROGRESS"
+                              ? "در حال انجام"
+                              : project.status === "COMPLETED"
+                                  ? "تکمیل شده"
+                                  : project.status === "CANCELLED"
+                                      ? "لغو شده"
+                                      : "در حال مذاکره"}
+                    </span>
+                                    </div>
+
+                                    <p className="text-sm text-light-color7 dark:text-color7 mb-2">{project.description}</p>
+
+                                    <div className="flex justify-between items-center">
+                    <span className="text-light-color4 dark:text-color4 font-primaryMedium">
+                      {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
+                    </span>
+                                        <button
+                                            onClick={() => handleViewProposals(project.id, project.employerId.id)}
+                                            className="px-4 py-2 bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors"
+                                            aria-label={`مشاهده پیشنهادات برای ${project.subject}`}
+                                        >
+                                            مشاهده پیشنهادات ({project.suggested})
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
