@@ -33,6 +33,11 @@ public class SuggestProjectController {
         return suggestProjectUC.getByid(id);
     }
 
+    @GetMapping("/freelancer/{id}")
+    public List<SuggestProjectDTO> getByFreelancerId(@PathVariable Long id) {
+        return suggestProjectUC.findByFreelancerId(id);
+    }
+
     @DeleteMapping("/delSuggestP/{id}")
     public void deleteById(@PathVariable Long id) {
         suggestProjectUC.deleteSuggestProject(id);

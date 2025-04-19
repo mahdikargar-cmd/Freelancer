@@ -1,5 +1,6 @@
 package com.manage.freelancer.infrastructure.persistence.entityDTO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import jakarta.persistence.*;
@@ -29,6 +30,7 @@ public class MessageDTO {
     private String content;
 
     @Column(name = "time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime time;
 
     @ManyToOne

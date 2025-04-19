@@ -17,4 +17,6 @@ public interface SuggestProjectUC {
     List<SuggestProjectDTO> getByid(Long id);
 
     Optional<SuggestProjectDTO> findById(Long id);
+
+    List<SuggestProjectDTO> findByFreelancerId(Long id);
 }

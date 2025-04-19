@@ -78,4 +78,11 @@ public class SuggestProjectUCImpl implements SuggestProjectUC {
     public Optional<SuggestProjectDTO> findById(Long id) {
         return suggestProjectRepo.findById(id);
     }
+
+    @Override
+    public List<SuggestProjectDTO> findByFreelancerId(Long id) {
+        return suggestProjectRepo.findByFreelancerId(id);
+    }
+
+
 }

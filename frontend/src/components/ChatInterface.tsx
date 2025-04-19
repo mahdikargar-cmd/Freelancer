@@ -19,6 +19,7 @@ interface Project {
     priceEnded: number;
     deadline: number;
     status: string;
+    freelancerId?: number; // اضافه شده
 }
 
 interface ChatInterfaceProps {
@@ -47,7 +48,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                 const response = await axios.get(`http://localhost:8080/app/${projectId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setProject(response.data);
+                console.log("Project API Response:", response.data);
+                let projectData = response.data;
+
+                // دریافت freelancerId از پیشنهادات اگر در پروژه موجود نیست
+                if (!projectData.freelancerId) {
+                    const suggestionResponse = await axios.get(`http://localhost:8080/app/IdSuggest/${projectId}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    console.log("Suggestions API Response:", suggestionResponse.data);
+                    const acceptedSuggestion = suggestionResponse.data.find((s: any) => s.status === "ACCEPTED");
+                    if (acceptedSuggestion && acceptedSuggestion.freelancerId) {
+                        projectData = { ...projectData, freelancerId: acceptedSuggestion.freelancerId };
+                    }
+                }
+
+                setProject(projectData);
                 setError(null);
             } catch (err) {
                 console.error("Error fetching project:", err);
@@ -62,7 +78,57 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
         }
     }, [projectId, token]);
 
-    // مدیریت WebSocket
+// بارگذاری پیام‌های قبلی
+// بارگذاری پیام‌های قبلی
+    useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:8080/app/messages?projectId=${projectId}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                console.log("Messages API Response:", JSON.stringify(response.data, null, 2)); // لاگ دقیق
+                setMessages(
+                    response.data.map((msg: any) => {
+                        let time: Date;
+                        if (Array.isArray(msg.time) && msg.time.length === 7) {
+                            // فرض: [year, month, day, hour, minute, second, nanosecond]
+                            const [year, month, day, hour, minute, second] = msg.time;
+                            time = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+                        } else {
+                            time = msg.time ? new Date(msg.time) : new Date();
+                        }
+                        if (isNaN(time.getTime())) {
+                            console.error("Invalid time format:", msg.time);
+                            return {
+                                id: msg.id,
+                                sender: project?.freelancerId === msg.sender.id ,
+                                content: msg.content,
+                                time: "نامعتبر",
+                            };
+                        }
+                        return {
+                            id: msg.id,
+                            sender: project?.freelancerId === msg.sender.id ? "freelancer" : "client",
+                            content: msg.content,
+                            time: time.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            }),
+                        };
+                    })
+                );
+                setError(null);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+                setError("خطا در بارگذاری پیام‌ها.");
+            }
+        };
+
+        if (projectId && token && project) {
+            fetchMessages();
+        }
+    }, [projectId, token, project]);    // مدیریت WebSocket
     useEffect(() => {
         if (!userId || !token || !projectId || !receiverId) {
             setError("لطفاً وارد حساب کاربری شوید یا پروژه را انتخاب کنید.");
@@ -77,47 +143,37 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
             websocket.onopen = () => {
                 console.log("WebSocket connected");
                 setError(null);
+                // شروع ارسال ping در فواصل زمانی
+                const pingInterval = setInterval(() => {
+                    if (websocket.readyState === WebSocket.OPEN) {
+                        websocket.send(JSON.stringify({ type: "ping" }));
+                    }
+                }, 30000); // هر 30 ثانیه
             };
 
             websocket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    console.log("Received message:", data);
 
                     if (data.type === "message" || data.type === "sent") {
+                        console.log("Received message:", data); // فقط برای پیام‌های چت
                         const receivedMessage = data.data;
-                        if (!receivedMessage || !receivedMessage.sender || !receivedMessage.sender.id) {
-                            console.warn("Invalid message structure:", receivedMessage);
-                            return;
-                        }
-                        setMessages((prevMessages) => [
-                            ...prevMessages,
-                            {
-                                id: receivedMessage.id,
-                                sender: receivedMessage.sender.id === userId ? "freelancer" : "client",
-                                content: receivedMessage.content,
-                                time: new Date(receivedMessage.time).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                }),
-                            },
-                        ]);
+                        // ... پردازش پیام
                     } else if (data.type === "error") {
                         console.error("WebSocket error:", data.message);
                         setError(data.message || "خطایی در ارتباط رخ داد.");
                     } else if (data.type === "pong" || data.type === "heartbeat") {
-                        websocket.send(JSON.stringify({ type: "ping" }));
+                        // فقط بررسی زنده بودن اتصال
                     }
                 } catch (err) {
                     console.error("Error parsing WebSocket message:", err);
                     setError("خطا در پردازش پیام.");
                 }
             };
-
             websocket.onclose = () => {
                 console.log("WebSocket disconnected");
                 setError("اتصال WebSocket قطع شد. در حال تلاش برای اتصال مجدد...");
-                setTimeout(connectWebSocket, 3000); // تلاش برای اتصال مجدد
+                setTimeout(connectWebSocket, 3000);
             };
 
             websocket.onerror = (error) => {
@@ -126,6 +182,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
             };
 
             setWs(websocket);
+
+            return () => {
+                clearInterval(pingInterval); // پاکسازی تایمر
+                websocket.close();
+            };
         };
 
         connectWebSocket();
@@ -141,20 +202,31 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
             try {
                 const response = await axios.get(
                     `http://localhost:8080/app/messages?projectId=${projectId}`,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
+                    { headers: { Authorization: `Bearer ${token}` } }
                 );
+                console.log("Messages API Response:", response.data); // لاگ پاسخ API
                 setMessages(
-                    response.data.map((msg: any) => ({
-                        id: msg.id,
-                        sender: msg.sender.id === userId ? "freelancer" : "client",
-                        content: msg.content,
-                        time: new Date(msg.time).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        }),
-                    }))
+                    response.data.map((msg: any) => {
+                        const time = msg.time ? new Date(msg.time) : new Date(); // مقدار پیش‌فرض
+                        if (isNaN(time.getTime())) {
+                            console.error("Invalid time format:", msg.time);
+                            return {
+                                id: msg.id,
+                                sender: project?.freelancerId === msg.sender.id ? "freelancer" : "client",
+                                content: msg.content,
+                                time: "نامعتبر",
+                            };
+                        }
+                        return {
+                            id: msg.id,
+                            sender: project?.freelancerId === msg.sender.id ? "freelancer" : "client",
+                            content: msg.content,
+                            time: time.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            }),
+                        };
+                    })
                 );
                 setError(null);
             } catch (error) {
@@ -163,12 +235,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
             }
         };
 
-        if (projectId && token) {
+        if (projectId && token && project) {
             fetchMessages();
         }
-    }, [projectId, userId, token]);
-
-    // اسکرول به پایین چت
+    }, [projectId, token, project]);    // اسکرول به پایین چت
     useEffect(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;

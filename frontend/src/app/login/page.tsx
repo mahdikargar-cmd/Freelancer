@@ -10,6 +10,7 @@ import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
 import Link from 'next/link';
 import r_c from '../../img/right-corner.png';
 import {useAuth} from "@/components/lib/useAuth";
+import API from "@/components/utils/api";
 
 const Login = () => {
     const router = useRouter();
@@ -40,7 +41,7 @@ const Login = () => {
 
         setIsLoading(true);
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(`${API}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(info),
