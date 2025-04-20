@@ -5,6 +5,7 @@ import Finger from "@/components/SVG/Finger";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import API from "@/components/utils/api";
 
 interface FormData {
   username: string;
@@ -35,7 +36,7 @@ const AdminLogin = () => {
     setError(null);
 
     try {
-      const response = await fetch("/api/admin/auth/login", {
+      const response = await fetch(`${API}/admin/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

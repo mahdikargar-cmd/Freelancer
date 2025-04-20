@@ -34,8 +34,8 @@ interface ProjectListChatProps {
 const ProjectListChat = ({ onViewProposals, onStartChat }: ProjectListChatProps) => {
     const [activeTab, setActiveTab] = useState<"client" | "freelancer">("client");
     const [clientProjects, setClientProjects] = useState<Project[]>([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [filterStatus, setFilterStatus] = useState("");
+ /*   const [searchQuery, setSearchQuery] = useState("");
+    const [filterStatus, setFilterStatus] = useState("");*/
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { userId } = useAuth();
@@ -47,6 +47,7 @@ const ProjectListChat = ({ onViewProposals, onStartChat }: ProjectListChatProps)
                 headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                 withCredentials: true,
             });
+            console.log("employer in projectListChat", response.data);
             setClientProjects(Array.isArray(response.data) ? response.data : []);
             setError(null);
         } catch (err) {
@@ -84,16 +85,16 @@ const ProjectListChat = ({ onViewProposals, onStartChat }: ProjectListChatProps)
         [onStartChat]
     );
 
-    const filteredProjects = clientProjects.filter(
+/*    const filteredProjects = clientProjects.filter(
         (project) =>
             project.subject.toLowerCase().includes(searchQuery.toLowerCase()) &&
             (!filterStatus || project.status === filterStatus)
-    );
+    );*/
 
     if (isLoading) {
         return (
             <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto">  </div>
             </div>
         );
     }
@@ -131,6 +132,7 @@ const ProjectListChat = ({ onViewProposals, onStartChat }: ProjectListChatProps)
                 </button>
             </div>
 
+{/*
             <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4 mb-6">
                 <div className="flex flex-col md:flex-row gap-3">
                     <div className="flex-1 relative">
@@ -188,10 +190,13 @@ const ProjectListChat = ({ onViewProposals, onStartChat }: ProjectListChatProps)
                     </div>
                 </div>
             </div>
+*/}
 
             {activeTab === "client" ? (
                 <ClientProjects
+/*
                     projects={filteredProjects}
+*/
                     onViewProposals={handleViewProposals}
                     onStartChat={handleStartChat}
                 />

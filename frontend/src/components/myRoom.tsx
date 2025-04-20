@@ -7,6 +7,7 @@ import HeaderProject from './headerProject';
 import ProgressBarProject from './ProgressBarProject';
 import NavigationButtons from './NavigationButton';
 import MultiStepForm from './MultiStepForm';
+import API from "@/components/utils/api";
 type Category = {
     id: number
     name: string
@@ -39,7 +40,7 @@ type ProjectPayload = {
     suggestions: any[]
     createdDate: string
     endDate: string
-    status: 'OPEN'
+    status: 'PENDING'
 }
 
 interface Data {
@@ -61,7 +62,7 @@ const Room = () => {
     })
     const [step, setStep] = useState(1);
     const [categories, setCategories] = useState<Category[]>([])
-    const [skills, setSkills] = useState<Data[]>([]) // آرایه‌ای برای ذخیره مهارت‌ها
+    const [skills, setSkills] = useState<Data[]>([])
     const [allSkills, setAllSkills] = useState<Data[]>([]) // لیست تمام مهارت‌های سیستم
     const [filteredSkills, setFilteredSkills] = useState<string[]>([]) // مهارت‌های فیلتر شده براساس متن ورودی
     const [showSuggestions, setShowSuggestions] = useState(false) // نمایش پنل پیشنهادها
@@ -70,11 +71,11 @@ const Room = () => {
     const [message, setMessage] = useState('')
     const [disable, setDisable] = useState<boolean>(false)
 
-    // دریافت دسته‌بندی‌ها از API
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch('/api/app/getCategories', {
+                const res = await fetch(`${API}/app/getCategories`, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -107,7 +108,7 @@ const Room = () => {
 
     // دریافت تمام مهارت‌ها از API
     useEffect(() => {
-        fetch("/api/app/skills", {
+        fetch(`${API}/app/skills`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -191,11 +192,11 @@ const Room = () => {
             )
                 .toISOString()
                 .split('T')[0],
-            status: 'OPEN',
+            status: 'PENDING',
         }
 
         try {
-            const res = await fetch('/api/app/createProject', {
+            const res = await fetch(`${API}/app/createProject`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@/components/lib/useAuth";
+import React, {useState, useEffect, useCallback} from "react";
+import {useAuth} from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
-import { api } from "@/components/lib/api";
+import {api} from "@/components/lib/api";
 
 interface Employer {
     id: number;
     email?: string;
-    role?: string;
 }
 
 interface Skill {
@@ -86,7 +85,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                                            onViewProposals,
                                                            onStartChat,
                                                        }) => {
-    const { userId } = useAuth();
+    const {userId} = useAuth();
     const [fetchedProjects, setFetchedProjects] = useState<Project[]>(Array.isArray(projects) ? projects : []);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -103,7 +102,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
         try {
             setIsLoading(true);
             const response = await api.get(`/app/getEmployer?id=${userId}`, {
-                headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                headers: {Authorization: `Bearer ${Cookies.get("token")}`},
                 withCredentials: true,
             });
 
@@ -115,7 +114,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
             if (err.response?.status === 204) {
                 setFetchedProjects([]);
             } else {
-                setError("خطا در دریافت پروژه‌ها. لطفاً دوباره تلاش کنید.");
+                setError("خطا در دریافت پروژه‌های clientprojectlist. لطفاً دوباره تلاش کنید.");
             }
         } finally {
             setIsLoading(false);
@@ -136,16 +135,17 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
             setSelectedProjectId(projectId);
 
             const response = await api.get(`/app/IdSuggest/${projectId}`, {
-                headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                headers: {Authorization: `Bearer ${Cookies.get("token")}`},
                 withCredentials: true,
             });
-
+            console.log(response.data);
             setProposals(Array.isArray(response.data) ? response.data : []);
             setViewingProposals(true);
-
             if (onViewProposals) {
                 onViewProposals(projectId, employerId);
             }
+
+
         } catch (err) {
             console.error("Error fetching proposals:", err);
             setError("خطا در دریافت پیشنهادات. لطفاً دوباره تلاش کنید.");
@@ -171,6 +171,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
         ? fetchedProjects.find((project) => project.id === selectedProjectId)
         : null;
 
+
     return (
         <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4">
             {viewingProposals && selectedProject ? (
@@ -189,7 +190,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
 
                     {isLoading && (
                         <div className="text-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                            <div
+                                className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
                         </div>
                     )}
 
@@ -214,7 +216,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                         <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
                                             {proposal.title} (فریلنسر: {proposal.freelancerId.email})
                                         </h4>
-                                        <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                                        <span
+                                            className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
                       {proposal.status === "PENDING"
                           ? "در انتظار"
                           : proposal.status === "ACCEPTED"
@@ -229,7 +232,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                         <div>
                                             <p className="text-sm text-light-color7 dark:text-color7">قیمت پیشنهادی:</p>
                                             <p className="font-primaryMedium text-light-color4 dark:text-color4">
-                                                {proposal.proposedBudget.toLocaleString()} تومان
+                                                {proposal.proposedBudget} تومان
                                             </p>
                                         </div>
                                         <div>
@@ -248,14 +251,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                     <div className="mb-3">
                                         <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ ارسال:</p>
                                         <p className="text-light-color2 dark:text-color2">
-                                            {new Date(
-                                                proposal.submittedAt[0],
-                                                proposal.submittedAt[1] - 1,
-                                                proposal.submittedAt[2],
-                                                proposal.submittedAt[3],
-                                                proposal.submittedAt[4],
-                                                proposal.submittedAt[5]
-                                            ).toLocaleDateString("fa-IR")}
+                                            {new Date(proposal.submittedAt).toLocaleDateString("fa-IR")}
                                         </p>
                                     </div>
 
@@ -282,7 +278,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
 
                     {isLoading && (
                         <div className="text-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                            <div
+                                className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
                         </div>
                     )}
 
@@ -303,16 +300,19 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                 <div key={project.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
                                     <div className="flex justify-between items-center mb-2">
                                         <h4 className="font-primaryMedium text-light-color2 dark:text-color2">{project.subject}</h4>
-                                        <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                                        <span
+                                            className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
                       {project.status === "OPEN"
                           ? "باز"
-                          : project.status === "IN_PROGRESS"
-                              ? "در حال انجام"
-                              : project.status === "COMPLETED"
-                                  ? "تکمیل شده"
-                                  : project.status === "CANCELLED"
-                                      ? "لغو شده"
-                                      : "در حال مذاکره"}
+                          : project.status === "PENDING" ?
+                              "درحال بررسی"
+                              : project.status === "IN_PROGRESS"
+                                  ? "در حال انجام"
+                                  : project.status === "COMPLETED"
+                                      ? "تکمیل شده"
+                                      : project.status === "CANCELLED"
+                                          ? "لغو شده"
+                                          : "نامشخص  "}
                     </span>
                                     </div>
 
@@ -320,7 +320,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
 
                                     <div className="flex justify-between items-center">
                     <span className="text-light-color4 dark:text-color4 font-primaryMedium">
-                      {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
+                      {project.priceStarted} - {project.priceEnded} تومان
                     </span>
                                         <button
                                             onClick={() => handleViewProposals(project.id, project.employerId.id)}

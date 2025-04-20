@@ -3,6 +3,7 @@
 import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaCheck } from "react-icons/fa";
+import API from "@/components/utils/api";
 
 interface Data {
     id: number;
@@ -43,7 +44,7 @@ const Skill = () => {
     const handleSubmit = async () => {
         if (!Input.trim()) return alert("لطفاً مهارت را وارد کنید.");
         try {
-            const res = await fetch("/api/app/skills", {
+            const res = await fetch(`${API}/app/skills`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',

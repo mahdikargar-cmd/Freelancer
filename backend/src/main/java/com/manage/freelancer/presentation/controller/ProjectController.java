@@ -2,6 +2,7 @@
 package com.manage.freelancer.presentation.controller;
 
 import com.manage.freelancer.application.usecaseimpl.ProjectUCImpl;
+import com.manage.freelancer.domain.entity.ProjectStatus;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -77,17 +78,6 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-    @PutMapping("/updateProject/{id}")
-    public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long id, @Valid @RequestBody ProjectDTO projectDTO) {
-        projectDTO.setId(id);
-        try {
-            ProjectDTO updatedProject = projectUC.updateProject(projectDTO);
-            return ResponseEntity.ok(updatedProject);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @PutMapping("/updateProjectStatus/{id}")
     public ResponseEntity<String> updateProjectStatus(@PathVariable Long id, @RequestBody ProjectStatusUpdate statusUpdate) {
         ProjectDTO existingProject = projectUC.getProjectById(id);
@@ -95,6 +85,9 @@ public class ProjectController {
             return ResponseEntity.status(404).body("Project not found");
         }
         existingProject.setActive(statusUpdate.isActive());
+        if (statusUpdate.isActive() && "PENDING".equals(existingProject.getStatus())) {
+            existingProject.setStatus("OPEN"); // خودکار به OPEN تغییر می‌کند
+        }
         projectUC.updateProject(existingProject);
         return ResponseEntity.ok("Project status updated successfully");
     }
