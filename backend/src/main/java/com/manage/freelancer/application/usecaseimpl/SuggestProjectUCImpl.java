@@ -61,7 +61,42 @@ public class SuggestProjectUCImpl implements SuggestProjectUC {
 
     @Override
     public SuggestProjectDTO updateSuggestProject(SuggestProjectDTO suggestProjectDTO) {
-        return suggestProjectRepo.save(suggestProjectDTO);
+        // اطمینان از وجود id
+        if (suggestProjectDTO.getId() == null) {
+            throw new IllegalArgumentException("ایدی کاربر یافت نشد");
+        }
+
+        // لود رکورد موجود از دیتابیس
+        Optional<SuggestProjectDTO> existingSuggestOpt = suggestProjectRepo.findById(suggestProjectDTO.getId());
+        if (!existingSuggestOpt.isPresent()) {
+            throw new IllegalArgumentException("SuggestProject with ID " + suggestProjectDTO.getId() + " not found");
+        }
+
+        SuggestProjectDTO existingSuggest = existingSuggestOpt.get();
+
+        // اعمال تغییرات روی رکورد موجود
+        existingSuggest.setTitle(suggestProjectDTO.getTitle());
+        existingSuggest.setContent(suggestProjectDTO.getContent());
+        existingSuggest.setProposedBudget(suggestProjectDTO.getProposedBudget());
+        existingSuggest.setEstimatedDuration(suggestProjectDTO.getEstimatedDuration());
+        existingSuggest.setStatus(suggestProjectDTO.getStatus());
+        existingSuggest.setMilestones(suggestProjectDTO.getMilestones());
+        existingSuggest.setAssigned(suggestProjectDTO.getAssigned());
+        existingSuggest.setStartChat(suggestProjectDTO.getStartChat());
+
+        // آپدیت روابط (در صورت نیاز)
+        if (suggestProjectDTO.getFreelancerId() != null && suggestProjectDTO.getFreelancerId().getId() > 0) {
+            UserDTO fullUser = userRepo.findById(suggestProjectDTO.getFreelancerId().getId())
+                    .orElse(suggestProjectDTO.getFreelancerId());
+            existingSuggest.setFreelancerId(fullUser);
+        }
+        if (suggestProjectDTO.getProjectId() != null && suggestProjectDTO.getProjectId().getId() > 0) {
+            ProjectDTO project = projectRepo.findById(suggestProjectDTO.getProjectId().getId());
+            existingSuggest.setProjectId(project);
+        }
+
+        // ذخیره تغییرات
+        return suggestProjectRepo.save(existingSuggest);
     }
 
     @Override

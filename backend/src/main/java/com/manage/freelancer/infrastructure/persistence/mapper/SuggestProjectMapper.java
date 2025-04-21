@@ -49,6 +49,8 @@ public class SuggestProjectMapper {
                 .submittedAt(suggestProjectDTO.getSubmittedAt())
                 .status(suggestProjectDTO.getStatus())
                 .milestones(suggestProjectDTO.getMilestones())
+                .assigned(suggestProjectDTO.getAssigned())
+                .startChat(suggestProjectDTO.getStartChat())
                 .build();
     }
 
@@ -85,6 +87,8 @@ public class SuggestProjectMapper {
                 .submittedAt(suggestProject.getSubmittedAt())
                 .status(suggestProject.getStatus())
                 .milestones(suggestProject.getMilestones())
+                .assigned(suggestProject.getAssigned())
+                .startChat(suggestProject.getStartChat())
                 .build();
     }
 }

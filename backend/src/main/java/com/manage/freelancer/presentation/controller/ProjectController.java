@@ -78,6 +78,7 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
     @PutMapping("/updateProjectStatus/{id}")
     public ResponseEntity<String> updateProjectStatus(@PathVariable Long id, @RequestBody ProjectStatusUpdate statusUpdate) {
         ProjectDTO existingProject = projectUC.getProjectById(id);
@@ -86,7 +87,7 @@ public class ProjectController {
         }
         existingProject.setActive(statusUpdate.isActive());
         if (statusUpdate.isActive() && "PENDING".equals(existingProject.getStatus())) {
-            existingProject.setStatus("OPEN"); // خودکار به OPEN تغییر می‌کند
+            existingProject.setStatus("OPEN");
         }
         projectUC.updateProject(existingProject);
         return ResponseEntity.ok("Project status updated successfully");

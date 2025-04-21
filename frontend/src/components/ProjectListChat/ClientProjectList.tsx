@@ -1,9 +1,9 @@
 "use client";
 
-import React, {useState, useEffect, useCallback} from "react";
-import {useAuth} from "@/components/lib/useAuth";
+import React, { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
-import {api} from "@/components/lib/api";
+import { api } from "@/components/lib/api";
 
 interface Employer {
     id: number;
@@ -49,8 +49,8 @@ interface Proposal {
         priceStarted: number;
         priceEnded: number;
         deadline: number;
-        createdDate: number[];
-        endDate: number[];
+        createdDate: string;
+        endDate: string;
         type: string;
         status: string;
         active: boolean;
@@ -69,15 +69,17 @@ interface Proposal {
     content: string;
     proposedBudget: number;
     estimatedDuration: number;
-    submittedAt: number[];
+    submittedAt: string;
     status: string;
+    assigned: boolean;
     milestones: any[] | null;
+    startChat: boolean; // اجباری کردن startChat
 }
 
 interface ClientProjectsProps {
     projects?: Project[];
-    onViewProposals?: (projectId: number, employerId: number) => void;
-    onStartChat?: (projectId: number, freelancerId: number) => void;
+    onViewProposals?: (proposal: Proposal) => void;
+    onStartChat?: (projectId: number, freelancerId: number, proposal: Proposal) => void;
 }
 
 const ClientProjects: React.FC<ClientProjectsProps> = ({
@@ -85,13 +87,15 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                                            onViewProposals,
                                                            onStartChat,
                                                        }) => {
-    const {userId} = useAuth();
+    const { userId } = useAuth();
     const [fetchedProjects, setFetchedProjects] = useState<Project[]>(Array.isArray(projects) ? projects : []);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [proposals, setProposals] = useState<Proposal[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [viewingProposals, setViewingProposals] = useState(false);
+    const [showChatConfirmModal, setShowChatConfirmModal] = useState(false);
+    const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
 
     const getClientProjects = useCallback(async () => {
         if (!userId) {
@@ -102,10 +106,10 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
         try {
             setIsLoading(true);
             const response = await api.get(`/app/getEmployer?id=${userId}`, {
-                headers: {Authorization: `Bearer ${Cookies.get("token")}`},
+                headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                 withCredentials: true,
             });
-
+            console.log("resss", response.data);
             const data = Array.isArray(response.data) ? response.data : [];
             setFetchedProjects(data);
             setError(null);
@@ -122,55 +126,104 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
     }, [userId]);
 
     useEffect(() => {
-        if (userId && (!Array.isArray(projects) || projects.length === 0)) {
+        if (userId && fetchedProjects.length === 0) {
             getClientProjects();
-        } else {
-            setFetchedProjects(Array.isArray(projects) ? projects : []);
         }
-    }, [projects, userId, getClientProjects]);
+    }, [userId, getClientProjects]);
 
-    const handleViewProposals = async (projectId: number, employerId: number) => {
+    const handleViewProposals = useCallback(async (projectId: number) => {
         try {
             setIsLoading(true);
             setSelectedProjectId(projectId);
-
             const response = await api.get(`/app/IdSuggest/${projectId}`, {
-                headers: {Authorization: `Bearer ${Cookies.get("token")}`},
+                headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                 withCredentials: true,
             });
-            console.log(response.data);
-            setProposals(Array.isArray(response.data) ? response.data : []);
+            // اطمینان از اینکه startChat در پیشنهادات تنظیم شده است
+            const proposalsWithStartChat = (Array.isArray(response.data) ? response.data : []).map((p: Proposal) => ({
+                ...p,
+                startChat: p.startChat ?? false, // تنظیم مقدار پیش‌فرض
+            }));
+            setProposals(proposalsWithStartChat);
             setViewingProposals(true);
-            if (onViewProposals) {
-                onViewProposals(projectId, employerId);
-            }
-
-
         } catch (err) {
             console.error("Error fetching proposals:", err);
             setError("خطا در دریافت پیشنهادات. لطفاً دوباره تلاش کنید.");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
-    const handleStartChat = (projectId: number, freelancerId: number) => {
-        if (onStartChat) {
-            onStartChat(projectId, freelancerId);
+    const upChatStart = async (proposalId: number, proposal: Proposal) => {
+        try {
+            const updatedProposal = { ...proposal, startChat: true };
+            const updateStartChat = await api.put(
+                `/app/updateSuggest/${proposalId}`,
+                updatedProposal,
+                {
+                    headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                }
+            );
+            console.log("update start chat response:", updateStartChat.data);
+            return true;
+        } catch (error) {
+            console.log("error in startChat: ", error);
+            setError("خطا در فعال‌سازی چت.");
+            return false;
         }
-        setViewingProposals(false);
-        setSelectedProjectId(null);
     };
 
-    const handleBackToProjects = () => {
+    const handleOpenChatConfirmModal = useCallback((proposal: Proposal) => {
+        setSelectedProposal(proposal);
+        setShowChatConfirmModal(true);
+    }, []);
+
+    const handleConfirmChat = useCallback(async () => {
+        if (!selectedProposal) return;
+
+        const projectId = selectedProposal.projectId.id;
+        const freelancerId = selectedProposal.freelancerId.id;
+
+        const updated = await upChatStart(selectedProposal.id, selectedProposal);
+
+        if (updated) {
+            setProposals((prevProposals) =>
+                prevProposals.map((p) =>
+                    p.id === selectedProposal.id ? { ...p, startChat: true } : p
+                )
+            );
+
+            if (onStartChat) {
+                onStartChat(projectId, freelancerId, { ...selectedProposal, startChat: true });
+            }
+
+            setShowChatConfirmModal(false);
+            setViewingProposals(false);
+            setSelectedProjectId(null);
+        }
+    }, [selectedProposal, onStartChat]);
+
+    const handleCancelChat = useCallback(() => {
+        setShowChatConfirmModal(false);
+    }, []);
+
+    const handleViewProposalDetails = useCallback(
+        (proposal: Proposal) => {
+            if (onViewProposals) {
+                onViewProposals(proposal);
+            }
+        },
+        [onViewProposals]
+    );
+
+    const handleBackToProjects = useCallback(() => {
         setViewingProposals(false);
         setSelectedProjectId(null);
-    };
+    }, []);
 
     const selectedProject = selectedProjectId
         ? fetchedProjects.find((project) => project.id === selectedProjectId)
         : null;
-
 
     return (
         <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4">
@@ -190,8 +243,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
 
                     {isLoading && (
                         <div className="text-center">
-                            <div
-                                className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
                         </div>
                     )}
 
@@ -216,16 +268,15 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                         <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
                                             {proposal.title} (فریلنسر: {proposal.freelancerId.email})
                                         </h4>
-                                        <span
-                                            className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
-                      {proposal.status === "PENDING"
-                          ? "در انتظار"
-                          : proposal.status === "ACCEPTED"
-                              ? "پذیرفته شده"
-                              : proposal.status === "REJECTED"
-                                  ? "رد شده"
-                                  : proposal.status}
-                    </span>
+                                        <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                                            {proposal.status === "PENDING"
+                                                ? "در انتظار"
+                                                : proposal.status === "ACCEPTED"
+                                                    ? "پذیرفته شده"
+                                                    : proposal.status === "REJECTED"
+                                                        ? "رد شده"
+                                                        : proposal.status}
+                                        </span>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
@@ -256,12 +307,18 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                     </div>
 
                                     {proposal.status === "PENDING" && (
-                                        <div className="flex justify-end">
+                                        <div className="flex justify-end gap-2">
                                             <button
-                                                onClick={() => handleStartChat(proposal.projectId.id, proposal.freelancerId.id)}
+                                                onClick={() => handleOpenChatConfirmModal(proposal)}
                                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                                             >
                                                 شروع گفتگو
+                                            </button>
+                                            <button
+                                                onClick={() => handleViewProposalDetails(proposal)}
+                                                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-amber-300 transition-colors hover:text-black"
+                                            >
+                                                مشاهده جزئیات
                                             </button>
                                         </div>
                                     )}
@@ -278,8 +335,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
 
                     {isLoading && (
                         <div className="text-center">
-                            <div
-                                className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 europei-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
                         </div>
                     )}
 
@@ -300,30 +356,29 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                                 <div key={project.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
                                     <div className="flex justify-between items-center mb-2">
                                         <h4 className="font-primaryMedium text-light-color2 dark:text-color2">{project.subject}</h4>
-                                        <span
-                                            className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
-                      {project.status === "OPEN"
-                          ? "باز"
-                          : project.status === "PENDING" ?
-                              "درحال بررسی"
-                              : project.status === "IN_PROGRESS"
-                                  ? "در حال انجام"
-                                  : project.status === "COMPLETED"
-                                      ? "تکمیل شده"
-                                      : project.status === "CANCELLED"
-                                          ? "لغو شده"
-                                          : "نامشخص  "}
-                    </span>
+                                        <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                                            {project.status === "OPEN"
+                                                ? "باز"
+                                                : project.status === "PENDING"
+                                                    ? "درحال بررسی"
+                                                    : project.status === "IN_PROGRESS"
+                                                        ? "در حال انجام"
+                                                        : project.status === "COMPLETED"
+                                                            ? "تکمیل شده"
+                                                            : project.status === "CANCELLED"
+                                                                ? "لغو شده"
+                                                                : "نامشخص"}
+                                        </span>
                                     </div>
 
                                     <p className="text-sm text-light-color7 dark:text-color7 mb-2">{project.description}</p>
 
                                     <div className="flex justify-between items-center">
-                    <span className="text-light-color4 dark:text-color4 font-primaryMedium">
-                      {project.priceStarted} - {project.priceEnded} تومان
-                    </span>
+                                        <span className="text-light-color4 dark:text-color4 font-primaryMedium">
+                                            {project.priceStarted} - {project.priceEnded} تومان
+                                        </span>
                                         <button
-                                            onClick={() => handleViewProposals(project.id, project.employerId.id)}
+                                            onClick={() => handleViewProposals(project.id)}
                                             className="px-4 py-2 bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors"
                                             aria-label={`مشاهده پیشنهادات برای ${project.subject}`}
                                         >
@@ -335,6 +390,33 @@ const ClientProjects: React.FC<ClientProjectsProps> = ({
                         </div>
                     )}
                 </>
+            )}
+
+            {showChatConfirmModal && selectedProposal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-md">
+                        <h3 className="text-xl font-primaryMedium text-light-color2 dark:text-color2 mb-4">
+                            تایید شروع گفتگو
+                        </h3>
+                        <p className="text-light-color7 dark:text-color7 mb-6">
+                            آیا مطمئن هستید که می‌خواهید با فریلنسر {selectedProposal.freelancerId.email} برای پروژه "{selectedProposal.projectId.subject}" گفتگو را شروع کنید؟
+                        </p>
+                        <div className="flex justify-between">
+                            <button
+                                onClick={handleCancelChat}
+                                className="px-4 py-2 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
+                            >
+                                انصراف
+                            </button>
+                            <button
+                                onClick={handleConfirmChat}
+                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                            >
+                                تایید و شروع گفتگو
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

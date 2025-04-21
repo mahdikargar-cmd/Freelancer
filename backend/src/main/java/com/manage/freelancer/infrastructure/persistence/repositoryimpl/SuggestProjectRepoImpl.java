@@ -46,7 +46,7 @@ class SuggestProjectRepoImpl implements SuggestProjectRepo {
 
     @Override
     public List<SuggestProjectDTO> findByProjectId(Long projectId) {
-        return suggestsProjectJPARepo.findByProjectId_Id(projectId);
+        return suggestsProjectJPARepo.findByProjectId(projectId);
     }
 
     @Override

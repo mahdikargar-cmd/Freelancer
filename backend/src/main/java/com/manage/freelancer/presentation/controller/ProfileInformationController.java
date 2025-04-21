@@ -183,6 +183,7 @@ public class ProfileInformationController {
                     .body(createErrorResponse("خطا در ثبت اطلاعات پروفایل: " + e.getMessage()));
         }
     }
+
     @PutMapping("/ProfileInformation/{id}")
     public ResponseEntity<?> updateProfileInformation(@PathVariable Long id, @RequestBody ProfileInformation profileInformation) {
         try {
@@ -403,5 +404,28 @@ public class ProfileInformationController {
             case "gif" -> MediaType.IMAGE_GIF;
             default -> MediaType.IMAGE_JPEG;
         };
+    }
+
+    @GetMapping("/profileByUserId/{userId}")
+    public ResponseEntity<?> getProfileByUserId(@PathVariable Long userId) {
+        try {
+            Optional<ProfileInformation> profileOpt = profileInformationUseCase.getProfileInformationByUserId(userId);
+            logger.info("Profile lookup for user ID {}: Found={}", userId, profileOpt.isPresent());
+
+            if (profileOpt.isPresent()) {
+                ProfileInformation profile = profileOpt.get();
+                return ResponseEntity.ok(new ProfileInformationResponse(profile));
+            } else {
+                logger.info("No profile found for user ID: {}", userId);
+                Map<String, Object> responseMap = new HashMap<>();
+                responseMap.put("status", "not_found");
+                responseMap.put("message", "پروفایل برای این کاربر یافت نشد");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap);
+            }
+        } catch (Exception e) {
+            logger.error("❌ خطا در دریافت پروفایل برای userId {}: {}", userId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createErrorResponse("خطای سرور در دریافت اطلاعات پروفایل"));
+        }
     }
 }

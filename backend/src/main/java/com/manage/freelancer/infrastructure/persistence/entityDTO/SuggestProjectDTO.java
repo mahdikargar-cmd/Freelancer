@@ -4,6 +4,7 @@ import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import com.manage.freelancer.domain.entity.Milestone;
 import com.manage.freelancer.domain.entity.SuggestStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +33,8 @@ public class SuggestProjectDTO {
     private UserDTO freelancerId;
 
     private String title;
+
+    @Size(max = 4000, message = "محتوا نمی‌تواند بیشتر از 4000 کاراکتر باشد")
     private String content;
     private Double proposedBudget;
     private Integer estimatedDuration;
@@ -42,10 +45,18 @@ public class SuggestProjectDTO {
     @Enumerated(EnumType.STRING)
     private SuggestStatus status;
 
+
+
     @ElementCollection
     @CollectionTable(name = "suggest_project_milestones", joinColumns = @JoinColumn(name = "suggest_project_id"))
     @Column(nullable = false)
     private List<Milestone> milestones;
+
+    @Column(nullable = false)
+    private Boolean startChat = false;
+
+    @Column(nullable = false)
+    private Boolean assigned = false;
 
     @PrePersist
     public void prePersist() {

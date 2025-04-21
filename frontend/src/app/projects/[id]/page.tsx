@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
 import { FaClock, FaRegCommentDots, FaDollarSign, FaInfoCircle, FaProjectDiagram, FaShieldAlt } from 'react-icons/fa';
@@ -11,10 +10,7 @@ import DescriptionTab from '@/components/TabsInprojectId/DescriptionTab';
 import Tabs from '@/components/TabsInprojectId/Tabs';
 import DetailsTab from '@/components/TabsInprojectId/DetailsTabProps';
 import ProposalTab from '@/components/TabsInprojectId/ProposalTabProps';
-
-const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
-});
+import { api } from "@/components/lib/api";
 
 interface Skill {
     id: number;
@@ -29,7 +25,7 @@ interface Milestone {
 
 interface Suggest {
     suggested: number;
-    suggestions: { id: string }[]; // اصلاح نوع suggestions به آرایه‌ای از اشیاء
+    suggestions: { id: string }[];
 }
 
 interface Project {
@@ -94,7 +90,6 @@ const ProjectId = () => {
                 },
             });
 
-            // اعتبارسنجی داده‌ها
             if (!data.skills) data.skills = [];
             if (!data.category) data.category = { id: '', name: 'نامشخص' };
             if (!data.createdDate) {
@@ -126,37 +121,24 @@ const ProjectId = () => {
             const updatedSuggestions = [...suggest.suggestions, { id: userId }];
 
             const updatePayload = {
-                id: project.id,
-                subject: project.subject,
-                description: project.description,
-                priceStarted: project.priceStarted,
-                priceEnded: project.priceEnded,
-                skills: project.skills || [],
-                category: project.category || { id: '', name: 'نامشخص' },
-                suggested: updatedSuggested,
-                suggestions: updatedSuggestions,
-                deadline: project.deadline,
-                status: project.status,
-                createdDate: project.createdDate,
-                employerId: { id: project.employerId.id, email: project.employerId.email, role: project.employerId.role },
-                active: project.active,
-                type: project.type,
-                endDate: project.endDate,
+                freelancerId: Number(userId),
             };
 
-            const { data } = await api.put(`app/updateProject/${projectId}`, updatePayload, {
+            console.log('Sending update payload:', updatePayload);
+
+            const { data } = await api.put(`app/projects/${projectId}/addSuggestion`, updatePayload, {
                 headers: {
                     Authorization: `Bearer ${Cookies.get('token')}`,
                 },
             });
 
-            // به‌روزرسانی محلی
             setSuggest((prev) => (prev ? { ...prev, suggested: updatedSuggested, suggestions: updatedSuggestions } : null));
             setProject((prev) => (prev ? { ...prev, suggested: updatedSuggested, suggestions: updatedSuggestions } : null));
 
             console.log('به‌روزرسانی پیشنهادها:', data);
         } catch (err: any) {
             console.error('خطا در به‌روزرسانی پیشنهادها:', err);
+            console.log('جزئیات خطا:', err.response?.data, err.response?.status);
             alert(`خطا در به‌روزرسانی تعداد پیشنهادها: ${err.response?.data?.message || err.message}`);
         }
     }, [suggest, project, projectId, userId]);
@@ -210,6 +192,7 @@ const ProjectId = () => {
             });
         } catch (err: any) {
             console.error('خطا در ارسال پیشنهاد:', err);
+            console.log('جزئیات خطا:', err.response?.data, err.response?.status);
             alert(`خطا در ارسال پیشنهاد: ${err.response?.data?.message || err.message}`);
         }
     }, [proposal, projectId, userId, updateSuggest]);
@@ -221,16 +204,14 @@ const ProjectId = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-light-color1 dark:bg-color1">
-                <div
-                    className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-light-color4 dark:border-color4"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-light-color4 dark:border-color4"></div>
             </div>
         );
     }
 
     if (error || !project) {
         return (
-            <div
-                className="min-h-screen flex flex-col items-center justify-center bg-light-color1 dark:bg-color1 text-light-color9 dark:text-color9">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-light-color1 dark:bg-color1 text-light-color9 dark:text-color9">
                 <h1 className="text-2xl mb-4">{error}</h1>
                 <button
                     onClick={() => router.push('/projects')}
@@ -287,8 +268,7 @@ const ProjectId = () => {
             <div className="bg-light-color5 dark:bg-color5 rounded-xl shadow-lg p-4 sm:p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8">
                     <div className="mb-4 md:mb-0 w-full md:w-auto">
-                        <span
-                            className="inline-flex items-center px-3 py-1 rounded-full bg-light-color5 dark:bg-color6 text-light-color4 dark:text-color4 text-sm">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-light-color5 dark:bg-color6 text-light-color4 dark:text-color4 text-sm">
                             <MdOutlineMoreTime className="mr-2" />
                             {project.status === 'OPEN' && 'باز'}
                             {project.status === 'COMPLETED' && 'تکمیل شده'}
@@ -330,8 +310,7 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode; title: string
         animate={{ opacity: 1, y: 0 }}
         className="bg-light-color5 dark:bg-color6 p-3 sm:p-4 rounded-lg flex items-center gap-3 sm:gap-4"
     >
-        <div
-            className="bg-light-color4 bg-opacity-10 dark:bg-color4 dark:bg-opacity-10 p-2 rounded-full text-light-color4 dark:text-color4">
+        <div className="bg-light-color4 bg-opacity-10 dark:bg-color4 dark:bg-opacity-10 p-2 rounded-full text-light-color4 dark:text-color4">
             {icon}
         </div>
         <div>

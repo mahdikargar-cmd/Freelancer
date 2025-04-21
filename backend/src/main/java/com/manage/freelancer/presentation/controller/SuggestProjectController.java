@@ -23,8 +23,9 @@ public class SuggestProjectController {
         return suggestProjectUC.createSuggestProject(suggestProjectDTO);
     }
 
-    @PutMapping("/updateSuggest")
-    public SuggestProjectDTO updateSuggest(@RequestBody SuggestProjectDTO suggestProjectDTO) {
+    @PutMapping("/updateSuggest/{id}")
+    public SuggestProjectDTO updateSuggest(@PathVariable Long id, @RequestBody SuggestProjectDTO suggestProjectDTO) {
+        suggestProjectDTO.setId(id);
         return suggestProjectUC.updateSuggestProject(suggestProjectDTO);
     }
 

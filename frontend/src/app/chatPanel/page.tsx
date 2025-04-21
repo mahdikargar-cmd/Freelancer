@@ -1,43 +1,88 @@
 "use client";
 
 import { useState } from "react";
-import ChatInterface from "@/components/ChatInterface";
 import ProjectListChat from "@/components/ProjectListChat/page";
+import DetailSuggest from "@/app/detailSuggest/[id]/page";
+import { useRouter } from "next/navigation";
+import ChatInterface from "@/components/ChatInterface";
+
+interface Proposal {
+    id: number;
+    projectId: {
+        id: number;
+        subject: string;
+        description: string;
+        priceStarted: number;
+        priceEnded: number;
+        deadline: number;
+        createdDate: string;
+        endDate: string;
+        type: string;
+        status: string;
+        active: boolean;
+        suggested: number;
+        employerId: { id: number; email: string; role: string } | null;
+        category: { id: number; name: string; parentCategory: { id: number; name: string } | null } | null;
+        skills: { id: number; name: string }[] | null;
+        suggestions: any[] | null;
+    };
+    freelancerId: { id: number; email: string; role: string };
+    title: string;
+    content: string;
+    proposedBudget: number;
+    estimatedDuration: number;
+    submittedAt: string;
+    status: string;
+    assigned: boolean;
+    milestones: any[] | null;
+    startChat?: boolean;
+}
 
 const FreelanceDashboard = () => {
-    const [selectedProject, setSelectedProject] = useState<{
-        id: number;
-        receiverId: number;
-    } | null>(null);
+    const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
+    const [showChat, setShowChat] = useState<boolean>(false);
+    const [chatProjectId, setChatProjectId] = useState<number | null>(null);
+    const [chatFreelancerId, setChatFreelancerId] = useState<number | null>(null);
+    const router = useRouter();
 
-    const [chatKey, setChatKey] = useState(0);
-
-    const handleProjectSelect = (projectId: number, employerId: number) => {
-        setChatKey(prevKey => prevKey + 1);
-        setSelectedProject({ id: projectId, receiverId: employerId });
+    const handleViewProposal = (proposal: Proposal) => {
+        setSelectedProposal(proposal);
+        setShowChat(false);
     };
 
-    const handleStartChat = (projectId: number, freelancerId: number) => {
-        setChatKey(prevKey => prevKey + 1);
-        setSelectedProject({ id: projectId, receiverId: freelancerId });
+    const handleStartChat = (projectId: number, freelancerId: number, proposal: Proposal) => {
+        // تنظیم state برای نمایش ChatInterface
+        setChatProjectId(projectId);
+        setChatFreelancerId(freelancerId);
+        setSelectedProposal({ ...proposal, startChat: true });
+        setShowChat(true);
+        // یا هدایت به صفحه چت
+        // router.push(`/chat?projectId=${projectId}&receiverId=${freelancerId}`);
     };
 
     return (
-        <div className="container mx-auto px-4 ">
+        <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div className="lg:col-span-6 order-2 lg:order-1">
                     <ProjectListChat
-                        onViewProposals={handleProjectSelect}
+                        onViewProposals={handleViewProposal}
                         onStartChat={handleStartChat}
                     />
                 </div>
                 <div className="lg:col-span-6 order-1 lg:order-2">
-                    {selectedProject ? (
+                    {showChat && chatProjectId !== null && chatFreelancerId !== null ? (
                         <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg">
                             <ChatInterface
-                                key={chatKey}
-                                projectId={selectedProject.id}
-                                receiverId={selectedProject.receiverId}
+                                projectId={chatProjectId}
+                                receiverId={chatFreelancerId}
+                            />
+                        </div>
+                    ) : selectedProposal ? (
+                        <div className="bg-light-color5 mt-6 dark:bg-color5 rounded-2xl shadow-lg">
+                            <DetailSuggest
+                                key={selectedProposal.id}
+                                projectId={selectedProposal.projectId.id}
+                                proposal={selectedProposal}
                             />
                         </div>
                     ) : (
@@ -58,7 +103,7 @@ const FreelanceDashboard = () => {
                                     />
                                 </svg>
                                 <p className="text-light-color7 dark:text-color7 text-lg">
-                                    لطفاً یک پروژه را انتخاب کنید تا چت نمایش داده شود.
+                                    لطفاً یک پیشنهاد را انتخاب کنید تا جزئیات نمایش داده شود.
                                 </p>
                             </div>
                         </div>

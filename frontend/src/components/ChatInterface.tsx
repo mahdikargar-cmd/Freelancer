@@ -6,10 +6,11 @@ import axios from "axios";
 
 interface Message {
     id: number;
-    sender: number;
+    sender: string; // تغییر به string برای تطابق با "freelancer" یا "employer"
     content: string;
     time: string;
 }
+
 interface Project {
     id: number;
     subject: string;
@@ -19,6 +20,14 @@ interface Project {
     status: string;
     freelancerId?: number;
 }
+
+interface Profile {
+    firstName: string;
+    lastName: string;
+    profileImageUrl?: string;
+    phoneNumber?: string;
+}
+
 interface ChatInterfaceProps {
     projectId: number;
     receiverId: number;
@@ -33,11 +42,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
+    const [freelancerProfile, setFreelancerProfile] = useState<Profile | null>(null);
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
 
+    // دریافت اطلاعات پروژه
     useEffect(() => {
         const fetchProject = async () => {
             try {
@@ -54,7 +65,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     console.log("Suggestions API Response:", suggestionResponse.data);
                     const acceptedSuggestion = suggestionResponse.data.find((s: any) => s.status === "ACCEPTED");
                     if (acceptedSuggestion && acceptedSuggestion.freelancerId) {
-                        projectData = { ...projectData, freelancerId: acceptedSuggestion.freelancerId };
+                        projectData = { ...projectData, freelancerId: acceptedSuggestion.freelancerId.id };
                     }
                 }
 
@@ -73,6 +84,44 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
         }
     }, [projectId, token]);
 
+    // دریافت اطلاعات پروفایل فریلنسر
+    useEffect(() => {
+        const fetchFreelancerProfile = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/profileByUserId/${receiverId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                console.log("Freelancer Profile API Response:", response.data);
+                if (response.data.status === "not_found") {
+                    setFreelancerProfile({
+                        firstName: "نامشخص",
+                        lastName: "",
+                    });
+                } else {
+                    setFreelancerProfile({
+                        firstName: response.data.firstName || "نامشخص",
+                        lastName: response.data.lastName || "",
+                        profileImageUrl: response.data.profileImageUrl,
+                        phoneNumber: response.data.phoneNumber,
+                    });
+                }
+                setError(null);
+            } catch (err) {
+                console.error("Error fetching freelancer profile:", err);
+                setError("خطا در دریافت اطلاعات پروفایل فریلنسر.");
+                setFreelancerProfile({
+                    firstName: "نامشخص",
+                    lastName: "",
+                });
+            }
+        };
+
+        if (receiverId && token) {
+            fetchFreelancerProfile();
+        }
+    }, [receiverId, token]);
+
+    // دریافت پیام‌ها
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -80,28 +129,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     `http://localhost:8080/app/messages?projectId=${projectId}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                console.log("Messages API Response:", JSON.stringify(response.data, null, 2));
+                console.log("Messages API Response:", response.data);
                 setMessages(
                     response.data.map((msg: any) => {
-                        let time: Date;
-                        if (Array.isArray(msg.time) && msg.time.length === 7) {
-                            const [year, month, day, hour, minute, second] = msg.time;
-                            time = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-                        } else {
-                            time = msg.time ? new Date(msg.time) : new Date();
-                        }
+                        const time = msg.time ? new Date(msg.time) : new Date();
                         if (isNaN(time.getTime())) {
                             console.error("Invalid time format:", msg.time);
                             return {
                                 id: msg.id,
-                                sender: project?.freelancerId === msg.sender.id ,
+                                sender: project?.freelancerId === msg.sender.id ? "freelancer" : "employer",
                                 content: msg.content,
                                 time: "نامعتبر",
                             };
                         }
                         return {
                             id: msg.id,
-                            sender: project?.freelancerId === msg.sender.id ,
+                            sender: project?.freelancerId === msg.sender.id ? "freelancer" : "employer",
                             content: msg.content,
                             time: time.toLocaleTimeString([], {
                                 hour: "2-digit",
@@ -121,6 +164,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
             fetchMessages();
         }
     }, [projectId, token, project]);
+
+    // اتصال WebSocket
     useEffect(() => {
         if (!userId || !token || !projectId || !receiverId) {
             setError("لطفاً وارد حساب کاربری شوید یا پروژه را انتخاب کنید.");
@@ -140,6 +185,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                         websocket.send(JSON.stringify({ type: "ping" }));
                     }
                 }, 30000);
+                websocket.pingInterval = pingInterval; // ذخیره برای cleanup
             };
 
             websocket.onmessage = (event) => {
@@ -149,22 +195,35 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     if (data.type === "message" || data.type === "sent") {
                         console.log("Received message:", data);
                         const receivedMessage = data.data;
+                        const time = new Date(receivedMessage.time);
+                        setMessages((prevMessages) => [
+                            ...prevMessages,
+                            {
+                                id: receivedMessage.id,
+                                sender: project?.freelancerId === receivedMessage.senderId ? "freelancer" : "employer",
+                                content: receivedMessage.content,
+                                time: time.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }),
+                            },
+                        ]);
                     } else if (data.type === "error") {
                         console.error("WebSocket error:", data.message);
                         setError(data.message || "خطایی در ارتباط رخ داد.");
-                    } else if (data.type === "pong" || data.type === "heartbeat") {
-                        // فقط بررسی زنده بودن اتصال
                     }
                 } catch (err) {
                     console.error("Error parsing WebSocket message:", err);
                     setError("خطا در پردازش پیام.");
                 }
             };
+
             websocket.onclose = () => {
                 console.log("WebSocket disconnected");
                 setError("اتصال WebSocket قطع شد. در حال تلاش برای اتصال مجدد...");
                 setTimeout(connectWebSocket, 3000);
             };
+
             websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
                 setError("خطا در اتصال WebSocket.");
@@ -173,60 +232,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
             setWs(websocket);
 
             return () => {
-                clearInterval(pingInterval);
+                if (websocket.pingInterval) {
+                    clearInterval(websocket.pingInterval);
+                }
                 websocket.close();
             };
         };
 
-        connectWebSocket();
+        const cleanup = connectWebSocket();
 
         return () => {
+            cleanup();
             ws?.close();
         };
-    }, [userId, token, projectId, receiverId]);
+    }, [userId, token, projectId, receiverId, project]);
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:8080/app/messages?projectId=${projectId}`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                console.log("Messages API Response:", response.data);
-                setMessages(
-                    response.data.map((msg: any) => {
-                        const time = msg.time ? new Date(msg.time) : new Date();
-                        if (isNaN(time.getTime())) {
-                            console.error("Invalid time format:", msg.time);
-                            return {
-                                id: msg.id,
-                                sender: project?.freelancerId === msg.sender.id ,
-                                content: msg.content,
-                                time: "نامعتبر",
-                            };
-                        }
-                        return {
-                            id: msg.id,
-                            sender: project?.freelancerId === msg.sender.id ,
-                            content: msg.content,
-                            time: time.toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            }),
-                        };
-                    })
-                );
-                setError(null);
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-                setError("خطا در بارگذاری پیام‌ها.");
-            }
-        };
-
-        if (projectId && token && project) {
-            fetchMessages();
-        }
-    }, [projectId, token, project]);
     // اسکرول به پایین چت
     useEffect(() => {
         if (chatContainerRef.current) {
@@ -284,7 +304,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
         setShowPaymentModal(false);
     }, []);
 
-    if (!project) {
+    if (!project || !freelancerProfile) {
         return (
             <div className="max-w-4xl mx-auto my-8 px-4">
                 {error && <div className="text-red-500 text-center mb-4">{error}</div>}
@@ -303,14 +323,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                 <div className="bg-light-color1 dark:bg-color1 p-4 border-b border-light-color6 dark:border-color5 flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                         <div className="flex w-10 h-10 rounded-full bg-light-color4 dark:bg-color4 items-center justify-center overflow-hidden">
-                            <div className="w-full h-full flex items-center justify-center text-light-color2 dark:text-color2 bg-light-color6 dark:bg-color6">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
+                            {freelancerProfile.profileImageUrl ? (
+                                <img
+                                    src={`http://localhost:8080/api/profileImages/${freelancerProfile.profileImageUrl}`}
+                                    alt="تصویر پروفایل"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-light-color2 dark:text-color2 bg-light-color6 dark:bg-color6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                            )}
                         </div>
                         <div className="mr-3">
-                            <h3 className="font-primaryMedium dark:text-color2 text-light-color2">محمد رضایی</h3>
+                            <h3 className="font-primaryMedium dark:text-color2 text-light-color2">
+                                {freelancerProfile.firstName} {freelancerProfile.lastName}
+                            </h3>
                             <p className="text-xs text-light-color7 dark:text-color7">آنلاین</p>
                         </div>
                     </div>

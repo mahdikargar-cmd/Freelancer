@@ -20,5 +20,7 @@ public class SuggestProject {
     private LocalDateTime submittedAt;
     private SuggestStatus status;
     private List<Milestone> milestones; // لیست بخش‌های پروژه
+    private Boolean assigned = false;
+    private Boolean startChat = false;
 
 }
