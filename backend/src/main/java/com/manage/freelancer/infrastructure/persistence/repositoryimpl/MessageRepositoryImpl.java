@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         return jpaMessageRepository.findAllByProjectId_IdOrderByTimeAsc(projectId)
                 .stream()
                 .map(messageMapper::toDomain)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()).reversed();
     }
 
     @Override
@@ -35,6 +34,4 @@ public class MessageRepositoryImpl implements MessageRepository {
         MessageDTO saved = jpaMessageRepository.save(jpaEntity);
         return messageMapper.toDomain(saved);
     }
-
-
 }

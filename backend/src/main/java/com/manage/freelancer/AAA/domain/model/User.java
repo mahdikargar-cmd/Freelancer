@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,5 +18,9 @@ public class User {
     private String email;
     private String password;
     private Role role;
+    private Double rating; // امتیاز کاربر (مثلاً 0 تا 5)
+    private Integer ratingCount; // تعداد امتیازهای داده‌شده
+    private int phone;
+    private LocalDateTime createdAt; // زمان ثبت‌نام
 
 }

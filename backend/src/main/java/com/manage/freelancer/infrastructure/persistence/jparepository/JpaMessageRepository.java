@@ -12,4 +12,5 @@ import java.util.List;
 public interface JpaMessageRepository extends JpaRepository<MessageDTO, Long> {
     @Query("SELECT m FROM MessageDTO m WHERE m.projectId.id = :projectId ORDER BY m.time ASC")
     List<MessageDTO> findAllByProjectId_IdOrderByTimeAsc(@Param("projectId") Long projectId);
-}
+
+    }

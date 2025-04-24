@@ -1,10 +1,9 @@
 "use client";
-
 import { useState } from "react";
 import ProjectListChat from "@/components/ProjectListChat/page";
 import DetailSuggest from "@/app/detailSuggest/[id]/page";
-import { useRouter } from "next/navigation";
 import ChatInterface from "@/components/ChatInterface";
+import { useAuth } from "@/components/lib/useAuth";
 
 interface Proposal {
     id: number;
@@ -39,25 +38,28 @@ interface Proposal {
 }
 
 const FreelanceDashboard = () => {
+    const { userId, role } = useAuth(); // دریافت userId و role (کارفرما یا فریلنسر)
     const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
     const [showChat, setShowChat] = useState<boolean>(false);
     const [chatProjectId, setChatProjectId] = useState<number | null>(null);
-    const [chatFreelancerId, setChatFreelancerId] = useState<number | null>(null);
-    const router = useRouter();
+    const [chatReceiverId, setChatReceiverId] = useState<number | null>(null);
 
     const handleViewProposal = (proposal: Proposal) => {
+        console.log("Viewing proposal:", proposal);
         setSelectedProposal(proposal);
-        setShowChat(false);
+        setShowChat(false); // مخفی کردن چت هنگام نمایش جزئیات پیشنهاد
     };
 
-    const handleStartChat = (projectId: number, freelancerId: number, proposal: Proposal) => {
-        // تنظیم state برای نمایش ChatInterface
+    const handleStartChat = (projectId: number, receiverId: number, proposal?: Proposal) => {
+        console.log("Starting chat:", { projectId, receiverId, proposal });
         setChatProjectId(projectId);
-        setChatFreelancerId(freelancerId);
-        setSelectedProposal({ ...proposal, startChat: true });
+        setChatReceiverId(receiverId);
+        if (proposal) {
+            setSelectedProposal({ ...proposal, startChat: true });
+        } else {
+            setSelectedProposal(null); // برای جلوگیری از نمایش DetailSuggest
+        }
         setShowChat(true);
-        // یا هدایت به صفحه چت
-        // router.push(`/chat?projectId=${projectId}&receiverId=${freelancerId}`);
     };
 
     return (
@@ -70,11 +72,11 @@ const FreelanceDashboard = () => {
                     />
                 </div>
                 <div className="lg:col-span-6 order-1 lg:order-2">
-                    {showChat && chatProjectId !== null && chatFreelancerId !== null ? (
+                    {showChat && chatProjectId && chatReceiverId ? (
                         <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg">
                             <ChatInterface
                                 projectId={chatProjectId}
-                                receiverId={chatFreelancerId}
+                                receiverId={chatReceiverId}
                             />
                         </div>
                     ) : selectedProposal ? (
@@ -86,7 +88,7 @@ const FreelanceDashboard = () => {
                             />
                         </div>
                     ) : (
-                        <div className="bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-6 text-center">
+                        <div className="bg-light-color5 mt-8 dark:bg-color5 rounded-2xl shadow-lg p-6 text-center">
                             <div className="flex flex-col items-center justify-center py-12">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"

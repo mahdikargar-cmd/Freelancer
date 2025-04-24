@@ -39,8 +39,6 @@ public class SecurityConfig {
                         .requestMatchers("/admin/auth/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/register", "/auth/validate").permitAll()
                         .requestMatchers("/api/profileImages/**", "/api/getHeader", "/api/footer", "/api/notfound").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-
                         // Profile endpoints that need authentication
                         .requestMatchers("/api/getProfileInformation").authenticated()
                         .requestMatchers("/api/createProfileInformation").authenticated()
@@ -48,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/updateProfileImage/**").authenticated()
                         .requestMatchers("/api/getPInfoById/**").authenticated()
                         .requestMatchers("/app/**").authenticated()
+                        .requestMatchers("/ws/chat/**").authenticated() // Require authentication for WebSocket
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

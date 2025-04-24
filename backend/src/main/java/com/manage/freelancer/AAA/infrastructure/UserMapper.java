@@ -16,6 +16,10 @@ public class UserMapper {
                 .email(userDTO.getEmail() != null ? userDTO.getEmail() : "Unknown")
                 .password(userDTO.getPassword() != null ? userDTO.getPassword() : "Unknown")
                 .role(userDTO.getRole())
+                .rating(userDTO.getRating())
+                .ratingCount(userDTO.getRatingCount())
+                .phone(userDTO.getPhone())
+                .createdAt(userDTO.getCreatedAt())
                 .build();
 
     }
@@ -29,6 +33,10 @@ public class UserMapper {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .role(user.getRole())
+                .rating(user.getRating())
+                .ratingCount(user.getRatingCount())
+                .phone(user.getPhone())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 }

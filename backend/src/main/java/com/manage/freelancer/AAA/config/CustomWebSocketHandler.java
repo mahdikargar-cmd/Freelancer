@@ -171,6 +171,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
             Message saved = messageUc.sendMessage(msg);
 
+            // لاگ برای بررسی شیء ذخیره‌شده
+            logger.info("Saved message: id=" + saved.getId() + ", content=" + saved.getContent() + ", time=" + saved.getTime());
+
             // Send to receiver if online
             boolean deliveredToReceiver = false;
             if (payload.getReceiverId() != null && !payload.getReceiverId().trim().isEmpty()) {
@@ -186,6 +189,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("message", saved);
             responseData.put("delivered", deliveredToReceiver);
+
+            // لاگ برای بررسی پاسخ ارسالی
+            logger.info("Sending sent response: " + objectMapper.writeValueAsString(new ResponseMessage("sent", "پیام با موفقیت ارسال شد", responseData)));
 
             sendMessage(session, new ResponseMessage("sent", "پیام با موفقیت ارسال شد", responseData));
 
