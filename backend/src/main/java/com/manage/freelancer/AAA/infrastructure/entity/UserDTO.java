@@ -31,8 +31,11 @@ public class UserDTO {
 
     private Integer ratingCount; // تعداد امتیازهای داده‌شده
 
+    @Column(name = "phone")
     @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "شماره تلفن باید معتبر باشد")
-    private int phone;
+    private String phone;
+
+
     private LocalDateTime createdAt; // زمان ثبت‌نام
 
     @PrePersist

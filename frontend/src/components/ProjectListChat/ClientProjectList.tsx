@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@/components/lib/useAuth";
+import React, {useState, useEffect, useCallback} from "react";
+import {useAuth} from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
-import { api } from "@/components/lib/api";
+import {api} from "@/components/lib/api";
 
 interface Employer {
     id: number;
@@ -83,8 +83,9 @@ interface ClientProjectsProps {
 }
 
 const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
-    ({ projects = [], onViewProposals, onStartChat }) => {
-        const { userId } = useAuth();
+    ({projects = [], onViewProposals, onStartChat}) => {
+        const {userId} = useAuth();
+        const [showPaymentModal, setShowPaymentModal] = useState(false);
         const [fetchedProjects, setFetchedProjects] = useState<Project[]>(Array.isArray(projects) ? projects : []);
         const [isLoading, setIsLoading] = useState(false);
         const [error, setError] = useState<string | null>(null);
@@ -102,7 +103,14 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                 return "نامشخص";
             }
         };
-
+        const handlePaymentSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            alert("پرداخت با موفقیت انجام شد.");
+            setShowPaymentModal(false);
+        }, []);
+        const handlePaymentClick = useCallback(() => {
+            setShowPaymentModal(true);
+        }, []);
         const getClientProjects = useCallback(async () => {
             if (!userId || isLoading) {
                 setError("لطفاً وارد حساب کاربری خود شوید.");
@@ -112,7 +120,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
             try {
                 setIsLoading(true);
                 const response = await api.get(`/app/getEmployer?id=${userId}`, {
-                    headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                    headers: {Authorization: `Bearer ${Cookies.get("token")}`},
                     withCredentials: true,
                 });
                 console.log("resss", response.data);
@@ -129,7 +137,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                         const [year, month, day] = project.endDate;
                         endDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     }
-                    return { ...project, createdDate, endDate };
+                    return {...project, createdDate, endDate};
                 });
                 setFetchedProjects(formattedData);
                 setError(null);
@@ -156,7 +164,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                 setIsLoading(true);
                 setSelectedProjectId(projectId);
                 const response = await api.get(`/app/IdSuggest/${projectId}`, {
-                    headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                    headers: {Authorization: `Bearer ${Cookies.get("token")}`},
                     withCredentials: true,
                 });
 
@@ -179,7 +187,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                     }
                     return {
                         ...p,
-                        projectId: { ...p.projectId, createdDate, endDate },
+                        projectId: {...p.projectId, createdDate, endDate},
                         submittedAt,
                         startChat: p.startChat ?? false,
                     };
@@ -196,12 +204,12 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
 
         const upChatStart = async (proposalId: number, proposal: Proposal) => {
             try {
-                const updatedProposal = { ...proposal, startChat: true, status: "OPEN" };
+                const updatedProposal = {...proposal, startChat: true, status: "OPEN"};
                 const updateStartChat = await api.put(
                     `/app/updateSuggest/${proposalId}`,
                     updatedProposal,
                     {
-                        headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+                        headers: {Authorization: `Bearer ${Cookies.get("token")}`},
                     }
                 );
                 console.log("update start chat response:", updateStartChat.data);
@@ -229,12 +237,12 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
             if (updated) {
                 setProposals((prevProposals) =>
                     prevProposals.map((p) =>
-                        p.id === selectedProposal.id ? { ...p, startChat: true } : p
+                        p.id === selectedProposal.id ? {...p, startChat: true} : p
                     )
                 );
 
                 if (onStartChat) {
-                    onStartChat(projectId, freelancerId, { ...selectedProposal, startChat: true });
+                    onStartChat(projectId, freelancerId, {...selectedProposal, startChat: true});
                 }
 
                 setShowChatConfirmModal(false);
@@ -283,7 +291,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
 
                         {isLoading && (
                             <div className="text-center">
-                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                                <div
+                                    className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
                             </div>
                         )}
 
@@ -308,7 +317,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                                             <h4 className="font-primaryMedium text-light-color2 dark:text-color2">
                                                 {proposal.title || "بدون عنوان"} (فریلنسر: {proposal.freelancerId.email})
                                             </h4>
-                                            <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                                            <span
+                                                className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
                                                 {proposal.status === "PENDING"
                                                     ? "در انتظار"
                                                     : proposal.status === "ACCEPTED"
@@ -321,13 +331,15 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                                             <div>
-                                                <p className="text-sm text-light-color7 dark:text-color7">قیمت پیشنهادی:</p>
+                                                <p className="text-sm text-light-color7 dark:text-color7">قیمت
+                                                    پیشنهادی:</p>
                                                 <p className="font-primaryMedium text-light-color4 dark:text-color4">
                                                     {proposal.proposedBudget ? `${proposal.proposedBudget} تومان` : "نامشخص"}
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-sm text-light-color7 dark:text-color7">زمان تحویل:</p>
+                                                <p className="text-sm text-light-color7 dark:text-color7">زمان
+                                                    تحویل:</p>
                                                 <p className="font-primaryMedium text-light-color4 dark:text-color4">
                                                     {proposal.estimatedDuration ? `${proposal.estimatedDuration} روز` : "نامشخص"}
                                                 </p>
@@ -340,7 +352,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                                         </div>
 
                                         <div className="mb-3">
-                                            <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ ارسال:</p>
+                                            <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ
+                                                ارسال:</p>
                                             <p className="text-light-color2 dark:text-color2">{formatDate(proposal.submittedAt)}</p>
                                         </div>
 
@@ -362,6 +375,65 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                                                 >
                                                     مشاهده جزئیات
                                                 </button>
+                                                <button
+                                                    onClick={handlePaymentClick}
+                                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                                >
+                                                    پرداخت و سپردن پروژه
+                                                </button>
+                                                {/* Payment Modal */}
+                                                {showPaymentModal && selectedProject && (
+                                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                                        <div className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-md">
+                                                            <h3 className="text-xl font-primaryMedium text-light-color2 dark:text-color2 mb-4">
+                                                                پرداخت پروژه
+                                                            </h3>
+                                                            <form onSubmit={handlePaymentSubmit}>
+                                                                <div className="mb-4">
+                                                                    <label className="block text-light-color7 dark:text-color7 mb-2">
+                                                                        مبلغ پرداختی (تومان)
+                                                                    </label>
+                                                                    <input
+                                                                        type="text"
+                                                                        defaultValue={`${selectedProject.priceStarted.toLocaleString()}`}
+                                                                        readOnly
+                                                                        className="w-full p-3 rounded-lg border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color2 dark:text-color2"
+                                                                    />
+                                                                </div>
+                                                                <div className="mb-4">
+                                                                    <label className="block text-light-color7 dark:text-color7 mb-2">
+                                                                        روش پرداخت
+                                                                    </label>
+                                                                    <select
+                                                                        className="w-full p-3 rounded-lg border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color2 dark:text-color2"
+                                                                        aria-label="روش پرداخت"
+                                                                    >
+                                                                        <option>درگاه پرداخت آنلاین</option>
+                                                                        <option>کیف پول</option>
+                                                                        <option>کارت به کارت</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div className="flex justify-between mt-6">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setShowPaymentModal(false)}
+                                                                        className="px-4 py-2 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
+                                                                        aria-label="انصراف از پرداخت"
+                                                                    >
+                                                                        انصراف
+                                                                    </button>
+                                                                    <button
+                                                                        type="submit"
+                                                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                                                        aria-label="تایید و پرداخت"
+                                                                    >
+                                                                        تایید و پرداخت
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -377,7 +449,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
 
                         {isLoading && (
                             <div className="text-center">
-                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
+                                <div
+                                    className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4 mx-auto"></div>
                             </div>
                         )}
 
@@ -398,7 +471,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                                     <div key={project.id} className="bg-light-color1 dark:bg-color1 p-4 rounded-xl">
                                         <div className="flex justify-between items-center mb-2">
                                             <h4 className="font-primaryMedium text-light-color2 dark:text-color2">{project.subject}</h4>
-                                            <span className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
+                                            <span
+                                                className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs">
                                                 {project.status === "OPEN"
                                                     ? "باز"
                                                     : project.status === "PENDING"
@@ -429,9 +503,11 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                                         </div>
 
                                         <div className="mt-2">
-                                            <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ ایجاد:</p>
+                                            <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ
+                                                ایجاد:</p>
                                             <p className="text-light-color2 dark:text-color2">{formatDate(project.createdDate)}</p>
-                                            <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ پایان:</p>
+                                            <p className="text-sm text-light-color7 dark:text-color7 mb-1">تاریخ
+                                                پایان:</p>
                                             <p className="text-light-color2 dark:text-color2">{formatDate(project.endDate)}</p>
                                         </div>
                                     </div>
@@ -448,7 +524,8 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                                 تایید شروع گفتگو
                             </h3>
                             <p className="text-light-color7 dark:text-color7 mb-6">
-                                آیا مطمئن هستید که می‌خواهید با فریلنسر {selectedProposal.freelancerId.email} برای پروژه "{selectedProposal.projectId.subject}" گفتگو را شروع کنید؟
+                                آیا مطمئن هستید که می‌خواهید با فریلنسر {selectedProposal.freelancerId.email} برای پروژه
+                                "{selectedProposal.projectId.subject}" گفتگو را شروع کنید؟
                             </p>
                             <div className="flex justify-between">
                                 <button

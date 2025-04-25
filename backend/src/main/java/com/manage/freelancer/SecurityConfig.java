@@ -1,6 +1,7 @@
 package com.manage.freelancer;
 
 import com.manage.freelancer.AAA.config.JwtAuthenticationFilter;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,16 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
-
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.userDetailsService = userDetailsService;
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and()
@@ -37,7 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/admin/auth/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/register", "/auth/validate").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register/initiate", "/auth/validate","auth/register/verify").permitAll()
                         .requestMatchers("/api/profileImages/**", "/api/getHeader", "/api/footer", "/api/notfound").permitAll()
                         // Profile endpoints that need authentication
                         .requestMatchers("/api/getProfileInformation").authenticated()

@@ -38,7 +38,7 @@ interface Proposal {
 }
 
 const FreelanceDashboard = () => {
-    const { userId, role } = useAuth(); // دریافت userId و role (کارفرما یا فریلنسر)
+    const { userId } = useAuth(); // دریافت userId و role (کارفرما یا فریلنسر)
     const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
     const [showChat, setShowChat] = useState<boolean>(false);
     const [chatProjectId, setChatProjectId] = useState<number | null>(null);

@@ -39,8 +39,7 @@ export function middleware(request: NextRequest) {
     });
 
     // مسیرهای عمومی که نیازی به احراز هویت ندارند
-    const publicPaths = ['/login', '/register', '/', '/adminlog'];
-
+    const publicPaths = ['/login', '/signUp', '/', '/adminlog']; // اضافه کردن /signUp
     // اگر مسیر عمومی باشد
     if (publicPaths.includes(pathname)) {
         // اگر کاربر عمومی لاگین کرده و در /login, /register, یا / است، به داشبورد هدایت شود

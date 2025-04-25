@@ -18,9 +18,9 @@ public class User {
     private String email;
     private String password;
     private Role role;
-    private Double rating; // امتیاز کاربر (مثلاً 0 تا 5)
+    private Double rating ; // امتیاز کاربر (مثلاً 0 تا 5)
     private Integer ratingCount; // تعداد امتیازهای داده‌شده
-    private int phone;
+    private String phone;
     private LocalDateTime createdAt; // زمان ثبت‌نام
 
 }

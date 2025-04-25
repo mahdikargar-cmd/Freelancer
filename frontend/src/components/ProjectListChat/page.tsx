@@ -4,25 +4,6 @@ import { useAuth } from "@/components/lib/useAuth";
 import ClientProjects from "@/components/ProjectListChat/ClientProjectList";
 import FreelancerProjects from "@/components/ProjectListChat/FreelancerProjectList";
 
-interface Project {
-    id: number;
-    subject: string;
-    description: string;
-    priceStarted: number;
-    priceEnded: number;
-    deadline: number;
-    createdDate: string | null;
-    endDate: string | null;
-    type: "FIXED" | "HOURLY";
-    status: "PENDING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-    active: boolean;
-    suggested: number;
-    employerId: { id: number };
-    category: { id: number; name: string } | null;
-    skills: { id: number; name: string }[] | null;
-    suggestions: any[] | null;
-}
-
 interface Proposal {
     id: number;
     projectId: {

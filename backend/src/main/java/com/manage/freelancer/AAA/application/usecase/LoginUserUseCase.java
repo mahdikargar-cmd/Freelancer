@@ -4,24 +4,18 @@ import com.manage.freelancer.AAA.config.JwtService;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import com.manage.freelancer.domain.entity.Role;
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class LoginUserUseCase {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-
-    // Constructor
-    public LoginUserUseCase(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-    }
-
     public String login(String email, String password) {
         Optional<UserDTO> userOpt = userRepository.findByEmail(email);
 

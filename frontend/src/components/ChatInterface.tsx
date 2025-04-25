@@ -41,7 +41,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const [showUserMenu, setShowUserMenu] = useState(false);
-    const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
     const [freelancerProfile, setFreelancerProfile] = useState<Profile | null>(null);
     const [ws, setWs] = useState<WebSocket | null>(null);
@@ -58,7 +57,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 let projectData = response.data;
-                // تبدیل createdDate از آرایه به رشته
                 if (Array.isArray(projectData.createdDate)) {
                     const [year, month, day] = projectData.createdDate;
                     projectData.createdDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -406,15 +404,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
         setShowUserMenu(false);
     }, []);
 
-    const handlePaymentClick = useCallback(() => {
-        setShowPaymentModal(true);
-    }, []);
 
-    const handlePaymentSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        alert("پرداخت با موفقیت انجام شد.");
-        setShowPaymentModal(false);
-    }, []);
+
+
 
     if (!project || !freelancerProfile) {
         return (
@@ -638,105 +630,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
                 </div>
             </div>
 
-            {/* Project info card with payment option */}
-            <div className="mt-6 bg-light-color5 dark:bg-color5 rounded-2xl shadow-lg p-4">
-                <h3 className="font-primaryMedium text-lg text-light-color2 dark:text-color2 mb-3">
-                    اطلاعات پروژه
-                </h3>
-                <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                        <span className="text-light-color7 dark:text-color7">عنوان:</span>
-                        <span className="text-light-color2 dark:text-color2">{project.subject}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-light-color7 dark:text-color7">بودجه:</span>
-                        <span className="text-light-color4 dark:text-color4 font-primaryMedium">
-                            {project.priceStarted.toLocaleString()} - {project.priceEnded.toLocaleString()} تومان
-                        </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-light-color7 dark:text-color7">مهلت تحویل:</span>
-                        <span className="text-light-color2 dark:text-color2">{project.deadline} روز</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-light-color7 dark:text-color7">وضعیت:</span>
-                        <span
-                            className="bg-light-color4 dark:bg-color4 text-light-color2 dark:text-color1 px-2 py-1 rounded-md text-xs"
-                        >
-                            {project.status === "OPEN"
-                                ? "باز"
-                                : project.status === "IN_PROGRESS"
-                                    ? "در حال انجام"
-                                    : project.status === "COMPLETED"
-                                        ? "تکمیل شده"
-                                        : project.status === "CANCELLED"
-                                            ? "لغو شده"
-                                            : "در حال مذاکره"}
-                        </span>
-                    </div>
-                </div>
-                <div className="mt-4 flex justify-end">
-                    <button
-                        onClick={handlePaymentClick}
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-                        aria-label="پرداخت پروژه"
-                    >
-                        پرداخت هزینه
-                    </button>
-                </div>
-            </div>
 
-            {/* Payment Modal */}
-            {showPaymentModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-light-color5 dark:bg-color5 rounded-2xl p-6 w-full max-w-md">
-                        <h3 className="text-xl font-primaryMedium text-light-color2 dark:text-color2 mb-4">
-                            پرداخت پروژه
-                        </h3>
-                        <form onSubmit={handlePaymentSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-light-color7 dark:text-color7 mb-2">
-                                    مبلغ پرداختی (تومان)
-                                </label>
-                                <input
-                                    type="text"
-                                    defaultValue={`${project.priceStarted.toLocaleString()}`}
-                                    readOnly
-                                    className="w-full p-3 rounded-lg border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color2 dark:text-color2"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-light-color7 dark:text-color7 mb-2">روش پرداخت</label>
-                                <select
-                                    className="w-full p-3 rounded-lg border border-light-color6 dark:border-color5 bg-light-color1 dark:bg-color1 text-light-color2 dark:text-color2"
-                                    aria-label="روش پرداخت"
-                                >
-                                    <option>درگاه پرداخت آنلاین</option>
-                                    <option>کیف پول</option>
-                                    <option>کارت به کارت</option>
-                                </select>
-                            </div>
-                            <div className="flex justify-between mt-6">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPaymentModal(false)}
-                                    className="px-4 py-2 bg-light-color1 dark:bg-color1 text-light-color7 dark:text-color7 rounded-lg hover:bg-light-color6 dark:hover:bg-color5 transition-colors"
-                                    aria-label="انصراف از پرداخت"
-                                >
-                                    انصراف
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                                    aria-label="تایید و پرداخت"
-                                >
-                                    تایید و پرداخت
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+
         </div>
     );
 };

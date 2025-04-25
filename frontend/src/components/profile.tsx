@@ -1,9 +1,16 @@
 'use client';
-
 import { JSX, useEffect, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
-import { FaUser, FaPhone, FaMapMarkerAlt, FaUniversity, FaCheckCircle } from 'react-icons/fa';
+import {
+    FaUser,
+    FaPhone,
+    FaMapMarkerAlt,
+    FaUniversity,
+    FaCheckCircle,
+    FaProjectDiagram,
+    FaClipboardList, FaWallet, FaEnvelope, FaBell
+} from 'react-icons/fa';
 import Success from './Toast/success';
 import ProfileLoadingSkeleton from './loading/lsF-P';
 import API from "@/components/utils/api";
@@ -58,6 +65,14 @@ const Profile = () => {
         baseURL: API,
         withCredentials: true,
     });
+    const [userStats, setUserStats] = useState({
+        projectsPosted: 5,
+        activeProjects: 3,
+        completedProjects: 12,
+        walletBalance: 2500000,
+        unreadMessages: 4,
+        notifications: 2
+    });
 
     api.interceptors.request.use((config) => {
         const token = Cookies.get('token');
@@ -96,7 +111,7 @@ const Profile = () => {
                 console.error('❌ Error fetching profile:', error.response?.data || error.message);
                 if (error.response?.status === 401) {
                     setError('لطفاً دوباره وارد شوید.');
-                } else if (error.response?.status === 404 || response.data.status === 'new_user') {
+                } else if (error.response?.status === 404 ) {
                     setProfileExists(false);
                     setProfileData({ ...profileData, user: { id: userId } });
                     setError(null);
@@ -215,7 +230,6 @@ const Profile = () => {
         { icon: <FaMapMarkerAlt />, placeholder: 'آدرس', key: 'address' },
         { icon: <FaUniversity />, placeholder: 'محل تحصیل', key: 'placeOfStudy' },
     ];
-
     const calculateProfileCompletion = () => {
         const requiredFields: (keyof ProfileData)[] = ['firstName', 'lastName', 'phoneNumber', 'address', 'placeOfStudy'];
         // @ts-ignore
@@ -223,7 +237,6 @@ const Profile = () => {
         if (profileData.profileImageUrl) filledFields += 1;
         return Math.round((filledFields / (requiredFields.length + 1)) * 100);
     };
-
     const profileCompletion = calculateProfileCompletion();
     const incompleteFields = fields
         .filter(({ key }) => !profileData[key]?.trim())
@@ -233,8 +246,8 @@ const Profile = () => {
         <div className="text-white max-w-screen-xl mx-auto my-8 relative dark:bg-color1 dark:text-color2">
             {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
-                <div
-                    className="bg-light-color1 text-light-color2 p-4 rounded-2xl shadow-xl border border-light-color5 transition-all hover:shadow-2xl md:mx-2 mx-auto self-start w-full dark:bg-color1 dark:text-color2 dark:border-color5">
+                {/*start profile Information*/}
+                <div className="bg-light-color1 text-light-color2 p-4 rounded-2xl shadow-xl border border-light-color5 transition-all hover:shadow-2xl md:mx-2 mx-auto self-start w-full dark:bg-color1 dark:text-color2 dark:border-color5">
                     <div className="grid grid-cols-1 items-center font-primaryMedium">
                         <div className="flex flex-col justify-center items-center border-b-2 border-light-color3 mb-4 pb-4 dark:border-color3">
                             <img
@@ -327,6 +340,7 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
+                {/*end profile Information*/}
                 <div className="col-span-2 border border-light-color5 shadow-md p-4 rounded-xl dark:border-color5">
                     <div className="bg-light-color1 text-light-color2 p-4 rounded-xl shadow-lg mb-4 border border-light-color5 dark:bg-color1 dark:text-color2 dark:border-color5">
                         <h2 className="text-xl font-primaryBold mb-4">پیشرفت تکمیل پروفایل</h2>
@@ -348,10 +362,72 @@ const Profile = () => {
                             ))}
                         </div>
                     )}
+
+                    {/* Stats Overview Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+                        <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های فعال</p>
+                                <p className="text-xl font-bold">{userStats.activeProjects}</p>
+                            </div>
+                            <div className="text-light-color4 dark:text-color4 text-2xl">
+                                <FaProjectDiagram />
+                            </div>
+                        </div>
+
+                        <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های منتشر شده</p>
+                                <p className="text-xl font-bold">{userStats.projectsPosted}</p>
+                            </div>
+                            <div className="text-light-color4 dark:text-color4 text-2xl">
+                                <FaClipboardList />
+                            </div>
+                        </div>
+
+                        <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های تکمیل شده</p>
+                                <p className="text-xl font-bold">{userStats.completedProjects}</p>
+                            </div>
+                            <div className="text-light-color4 dark:text-color4 text-2xl">
+                                <FaClipboardList />
+                            </div>
+                        </div>
+
+                        <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-light-color7 dark:text-color7">موجودی کیف پول</p>
+                                <p className="text-xl font-bold">{userStats.walletBalance.toLocaleString()} تومان</p>
+                            </div>
+                            <div className="text-light-color4 dark:text-color4 text-2xl">
+                                <FaWallet />
+                            </div>
+                        </div>
+
+                        <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-light-color7 dark:text-color7">پیام‌های جدید</p>
+                                <p className="text-xl font-bold">{userStats.unreadMessages}</p>
+                            </div>
+                            <div className="text-light-color4 dark:text-color4 text-2xl">
+                                <FaEnvelope />
+                            </div>
+                        </div>
+
+                        <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-light-color7 dark:text-color7">اعلان‌ها</p>
+                                <p className="text-xl font-bold">{userStats.notifications}</p>
+                            </div>
+                            <div className="text-light-color4 dark:text-color4 text-2xl">
+                                <FaBell />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
-
 export default Profile;
