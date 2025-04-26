@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { Pencil, Trash2, X, Save } from 'lucide-react';
+import API from "@/components/utils/api";
 
 interface Category {
     id: number;
@@ -24,7 +25,7 @@ const CreateCategoryForm: React.FC = () => {
         const token = Cookies.get('adminToken');
         if (!token) return;
 
-        const res = await fetch('/api/app/getCategories', {
+        const res = await fetch(`${API}/app/getCategories`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -72,7 +73,7 @@ const CreateCategoryForm: React.FC = () => {
             : { name, parentCategory: null };
 
         try {
-            const res = await fetch('/api/app/createCategory', {
+            const res = await fetch(`${API}/app/createCategory`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -107,7 +108,7 @@ const CreateCategoryForm: React.FC = () => {
         if (!category) return;
 
         try {
-            const res = await fetch('/api/app/updateCategory', {
+            const res = await fetch(`${API}/app/updateCategory`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -148,7 +149,7 @@ const CreateCategoryForm: React.FC = () => {
                 }
             }
 
-            const res = await fetch(`/api/app/delById/${categoryId}`, {
+            const res = await fetch(`${API}/app/delById/${categoryId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -157,7 +158,7 @@ const CreateCategoryForm: React.FC = () => {
             });
 
             if (res.ok) {
-                fetchCategories(); 
+                fetchCategories();
             } else {
                 console.error('خطا در حذف دسته');
             }
@@ -171,7 +172,7 @@ const CreateCategoryForm: React.FC = () => {
         if (!token) return;
 
         try {
-            const res = await fetch(`/api/app/delById/${id}`, {
+            const res = await fetch(`${API}/app/delById/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

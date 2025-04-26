@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import Cookies from "js-cookie"
 import { FiUser, FiMail, FiKey, FiRefreshCw } from "react-icons/fi"
 import { FaUserShield, FaUserCog } from "react-icons/fa"
+import API from "@/components/utils/api";
 
 interface UserData {
     id: number,
@@ -24,7 +25,7 @@ const UserList = () => {
     const fetchUsers = async (pageNumber: number) => {
         try {
             setLoading(true)
-            const response = await fetch(`/api/auth/user/${pageNumber}`, {
+            const response = await fetch(`${API}/auth/user/${pageNumber}`, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,7 +52,7 @@ const UserList = () => {
             }
         } catch (err) {
             setError('خطا در دریافت لیست کاربران')
-            console.error('Error fetching users:', err)
+            console.error('Error fetching userInfo:', err)
         } finally {
             setLoading(false)
         }

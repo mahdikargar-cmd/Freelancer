@@ -1,13 +1,15 @@
-import React, {useState, useEffect} from "react";
-import {Check, X, ChevronLeft, ChevronRight, AlertCircle, Clock, ArrowUpDown, Filter, FileText} from "lucide-react";
-import {motion, AnimatePresence} from "framer-motion";
-import {toast} from "react-toastify";
-import {useRouter} from "next/navigation";
-import axios from "axios";
-import Cookies from "js-cookie";
-import {useAdminAuth} from "@/components/lib/useAdminAuth";
+"use client";
 
-// Interfaces (as defined above)
+import React, { useState, useEffect } from "react";
+import { Check, X, AlertCircle, Clock, ArrowUpDown, Filter, FileText } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { api } from "@/components/lib/api";
+import Cookies from "js-cookie";
+import { useAdminAuth } from "@/components/lib/useAdminAuth";
+
+// Interfaces
 interface File {
     id: number;
     name: string;
@@ -27,8 +29,14 @@ interface Category {
 
 interface User {
     id: number;
-    username: string;
+    username?: string;
     email?: string;
+    password?: string;
+    role?: string;
+    rating?: number;
+    ratingCount?: number;
+    phone?: string;
+    createdAt?: string;
 }
 
 interface Project {
@@ -71,17 +79,9 @@ const ProjectCheckOut = () => {
     const [filterActive, setFilterActive] = useState("all");
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
-    const [showDetailsModal, setShowDetailsModal] = useState(false); // New state for details modal
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
     const router = useRouter();
-    const {userId, isLoggedIn, isLoading: authLoading} = useAdminAuth();
-
-    // Axios setup (unchanged)
-    const api = axios.create({
-        baseURL: "http://localhost:8080/app",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+    const { userId, isLoggedIn, isLoading: authLoading } = useAdminAuth();
 
     api.interceptors.request.use((config) => {
         const token = Cookies.get("adminToken");
@@ -95,7 +95,7 @@ const ProjectCheckOut = () => {
         if (authLoading) return;
 
         if (!isLoggedIn) {
-            toast.error("لطفاً ابتدا وارد پنل ادمین شوید", {position: "bottom-right", rtl: true});
+            toast.error("لطفاً ابتدا وارد پنل ادمین شوید", { position: "bottom-right", rtl: true });
             router.push("/adminlog");
             return;
         }
@@ -112,12 +112,19 @@ const ProjectCheckOut = () => {
                 page: currentPage,
                 size: 6,
                 sort: `${sortField},${sortDirection}`,
-                ...(filterActive !== "all" && {active: filterActive === "active"}),
+                ...(filterActive !== "all" && { active: filterActive === "active" }),
             };
 
-            const response = await api.get<ProjectsResponse>("/getProjects", {params});
-
-            setProjects(response.data.content || []);
+            const response = await api.get<ProjectsResponse>("app/getProjects", { params });
+            const filteredProjects = response.data.content.map((project) => ({
+                ...project,
+                employerId: {
+                    id: project.employerId.id,
+                    username: project.employerId.username,
+                    email: project.employerId.email,
+                },
+            }));
+            setProjects(filteredProjects || []);
             setTotalPages(response.data.totalPages || 0);
         } catch (err: any) {
             let errorMessage = "خطا در دریافت پروژه‌ها";
@@ -133,7 +140,7 @@ const ProjectCheckOut = () => {
                 errorMessage = err.message || "خطا در ارتباط با سرور";
             }
             setError(errorMessage);
-            toast.error(errorMessage, {position: "bottom-right", rtl: true});
+            toast.error(errorMessage, { position: "bottom-right", rtl: true });
             console.error("Error fetching projects:", err);
         } finally {
             setLoading(false);
@@ -142,7 +149,7 @@ const ProjectCheckOut = () => {
 
     const handleApproveProject = async (project: Project) => {
         try {
-            await api.put(`/updateProjectStatus/${project.id}`, { active: true });
+            await api.put(`app/updateProjectStatus/${project.id}`, { active: true });
             setProjects(projects.map((p) => (p.id === project.id ? { ...p, active: true, status: "OPEN" } : p)));
             setShowConfirmModal(false);
             toast.success("پروژه با موفقیت تأیید شد", { position: "bottom-right", rtl: true });
@@ -158,16 +165,16 @@ const ProjectCheckOut = () => {
 
     const handleRejectProject = async (project: Project) => {
         try {
-            await api.put(`/updateProjectStatus/${project.id}`, {active: false});
-            setProjects(projects.map((p) => (p.id === project.id ? {...p, active: false,status:"PENDING"} : p)));
+            await api.put(`app/updateProjectStatus/${project.id}`, { active: false });
+            setProjects(projects.map((p) => (p.id === project.id ? { ...p, active: false, status: "PENDING" } : p)));
             setShowConfirmModal(false);
-            toast.warn("پروژه رد شد", {position: "bottom-right", rtl: true});
+            toast.warn("پروژه رد شد", { position: "bottom-right", rtl: true });
         } catch (err: any) {
             let errorMessage = "خطا در رد پروژه";
             if (err.response) {
                 errorMessage = err.response.data?.message || err.message;
             }
-            toast.error(errorMessage, {position: "bottom-right", rtl: true});
+            toast.error(errorMessage, { position: "bottom-right", rtl: true });
         }
     };
 
@@ -185,7 +192,6 @@ const ProjectCheckOut = () => {
         setShowConfirmModal(true);
     };
 
-    // New function to open details modal
     const openDetailsModal = (project: Project) => {
         setSelectedProject(project);
         setShowDetailsModal(true);
@@ -210,11 +216,10 @@ const ProjectCheckOut = () => {
         return number.toLocaleString("fa-IR");
     };
 
-    // Existing EmptyState, LoadingState, ConfirmModal, renderPagination (unchanged)
     const EmptyState = () => (
         <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
             <div className="bg-color5 p-6 rounded-xl">
-                <AlertCircle size={60} className="mx-auto mb-4 text-color7"/>
+                <AlertCircle size={60} className="mx-auto mb-4 text-color7" />
                 <h3 className="text-xl font-primaryBold mb-2">پروژه‌ای برای بررسی یافت نشد</h3>
                 <p className="text-color7 mb-6">
                     در حال حاضر پروژه‌ای برای بررسی وجود ندارد یا فیلتر انتخابی شما نتیجه‌ای ندارد.
@@ -241,8 +246,8 @@ const ProjectCheckOut = () => {
     const ConfirmModal = () => (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <motion.div
-                initial={{scale: 0.9, opacity: 0}}
-                animate={{scale: 1, opacity: 1}}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
                 className="bg-color5 rounded-xl p-6 max-w-md w-full mx-4"
             >
                 <h3 className="text-xl font-primaryBold mb-4">
@@ -275,15 +280,14 @@ const ProjectCheckOut = () => {
         </div>
     );
 
-    // New Details Modal Component
     const DetailsModal = () => (
         <AnimatePresence>
             {showDetailsModal && selectedProject && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <motion.div
-                        initial={{scale: 0.9, opacity: 0}}
-                        animate={{scale: 1, opacity: 1}}
-                        exit={{scale: 0.9, opacity: 0}}
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
                         className="bg-color5 rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
                     >
                         <h3 className="text-2xl font-primaryBold mb-4">جزئیات پروژه</h3>
@@ -325,8 +329,7 @@ const ProjectCheckOut = () => {
                                     <div>
                                         <span className="text-color7">محدوده قیمت:</span>
                                         <p>
-                                            {formatNumber(selectedProject.priceStarted)} -{" "}
-                                            {formatNumber(selectedProject.priceEnded)} تومان
+                                            {formatNumber(selectedProject.priceStarted)} - {formatNumber(selectedProject.priceEnded)} تومان
                                         </p>
                                     </div>
                                     <div>
@@ -360,16 +363,11 @@ const ProjectCheckOut = () => {
                                 <div className="bg-color6 p-4 rounded-lg">
                                     <div className="flex flex-wrap gap-2">
                                         {selectedProject.skills?.map((skill) => (
-                                            <span
-                                                key={skill.id}
-                                                className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full"
-                                            >
-                                                {skill.name}
-                                            </span>
+                                            <span key={skill.id} className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full">
+                        {skill.name}
+                      </span>
                                         ))}
-                                        {!selectedProject.skills?.length && (
-                                            <span className="text-color7">بدون مهارت</span>
-                                        )}
+                                        {!selectedProject.skills?.length && <span className="text-color7">بدون مهارت</span>}
                                     </div>
                                 </div>
                             </div>
@@ -379,16 +377,11 @@ const ProjectCheckOut = () => {
                                 <div className="bg-color6 p-4 rounded-lg">
                                     <div className="flex flex-wrap gap-2">
                                         {selectedProject.suggestions?.map((suggestion, index) => (
-                                            <span
-                                                key={index}
-                                                className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full"
-                                            >
-                                                {suggestion}
-                                            </span>
+                                            <span key={index} className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full">
+                        {suggestion}
+                      </span>
                                         ))}
-                                        {!selectedProject.suggestions?.length && (
-                                            <span className="text-color7">بدون پیشنهاد</span>
-                                        )}
+                                        {!selectedProject.suggestions?.length && <span className="text-color7">بدون پیشنهاد</span>}
                                     </div>
                                 </div>
                             </div>
@@ -398,11 +391,11 @@ const ProjectCheckOut = () => {
                                 <div className="grid grid-cols-2 gap-4 bg-color6 p-4 rounded-lg">
                                     <div>
                                         <span className="text-color7">نام کاربری:</span>
-                                        <p>{selectedProject.employerId?.username || "نامشخص"}</p>
+                                        <p>{selectedProject.employerId?.username ?? "نامشخص"}</p>
                                     </div>
                                     <div>
                                         <span className="text-color7">ایمیل:</span>
-                                        <p>{selectedProject.employerId?.email || "نامشخص"}</p>
+                                        <p>{selectedProject.employerId?.email ?? "نامشخص"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -420,7 +413,7 @@ const ProjectCheckOut = () => {
                                                         rel="noopener noreferrer"
                                                         className="flex items-center text-color4 hover:underline"
                                                     >
-                                                        <FileText size={16} className="ml-2"/>
+                                                        <FileText size={16} className="ml-2" />
                                                         {file.name}
                                                     </a>
                                                 </li>
@@ -476,7 +469,7 @@ const ProjectCheckOut = () => {
                     <h2 className="text-2xl font-primaryBold">بررسی پروژه‌ها</h2>
                     <div className="flex space-x-3 space-x-reverse">
                         <div className="bg-color6 rounded-lg flex items-center p-2">
-                            <Filter size={18} className="text-color7 ml-2"/>
+                            <Filter size={18} className="text-color7 ml-2" />
                             <select
                                 value={filterActive}
                                 onChange={(e) => {
@@ -492,96 +485,85 @@ const ProjectCheckOut = () => {
                         </div>
                     </div>
                 </div>
-                <div
-                    className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 bg-color6 rounded-lg mb-3 font-primaryBold text-sm">
+                <div className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 bg-color6 rounded-lg mb-3 font-primaryBold text-sm">
                     <div className="col-span-1">#</div>
-                    <div
-                        className="col-span-3 flex items-center cursor-pointer"
-                        onClick={() => handleSort("subject")}
-                    >
+                    <div className="col-span-3 flex items-center cursor-pointer" onClick={() => handleSort("subject")}>
                         عنوان
-                        <ArrowUpDown size={16} className="mr-1 text-color7"/>
+                        <ArrowUpDown size={16} className="mr-1 text-color7" />
                     </div>
                     <div className="col-span-2">دسته‌بندی</div>
-                    <div
-                        className="col-span-2 flex items-center cursor-pointer"
-                        onClick={() => handleSort("createdDate")}
-                    >
+                    <div className="col-span-2 flex items-center cursor-pointer" onClick={() => handleSort("createdDate")}>
                         تاریخ ایجاد
-                        <ArrowUpDown size={16} className="mr-1 text-color7"/>
+                        <ArrowUpDown size={16} className="mr-1 text-color7" />
                     </div>
                     <div className="col-span-2">وضعیت</div>
                     <div className="col-span-2 text-center">عملیات</div>
                 </div>
-                {loading && <LoadingState/>}
+                {loading && <LoadingState />}
                 {error && (
                     <div className="bg-red-500 bg-opacity-10 text-red-500 p-4 rounded-lg text-center">
                         <p>{error}</p>
                         <button
-                            onClick={() =>
-                                error.includes("وارد شوید") ? router.push("/adminlog") : fetchProjects()
-                            }
+                            onClick={() => (error.includes("وارد شوید") ? router.push("/adminlog") : fetchProjects())}
                             className="mt-2 bg-color4 hover:bg-color8 text-color1 font-primaryMedium py-2 px-4 rounded-lg"
                         >
                             {error.includes("وارد شوید") ? "ورود" : "تلاش مجدد"}
                         </button>
                     </div>
                 )}
-                {!loading && !error && projects.length === 0 && <EmptyState/>}
+                {!loading && !error && projects.length === 0 && <EmptyState />}
                 {!loading && !error && projects.length > 0 && (
                     <div className="space-y-3">
                         {projects.map((project) => (
                             <motion.div
                                 key={project.id}
-                                initial={{opacity: 0, y: 10}}
-                                animate={{opacity: 1, y: 0}}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
                                 className="bg-color5 border border-color6 rounded-lg p-4 hover:border-color4 transition-colors cursor-pointer"
-                                onClick={() => openDetailsModal(project)} // Click row/card to open modal
+                                onClick={() => openDetailsModal(project)}
                             >
                                 <div className="hidden md:grid grid-cols-12 gap-4 items-center text-sm">
                                     <div className="col-span-1 font-primaryBold">{project.id}</div>
                                     <div className="col-span-3 font-primaryMedium truncate">{project.subject}</div>
-                                    <div className="col-span-2 text-color7">
-                                        {project.category?.name || "بدون دسته‌بندی"}
-                                    </div>
+                                    <div className="col-span-2 text-color7">{project.category?.name || "بدون دسته‌بندی"}</div>
                                     <div className="col-span-2 flex items-center text-color7">
-                                        <Clock size={16} className="ml-2"/>
+                                        <Clock size={16} className="ml-2" />
                                         {formatDate(project.createdDate)}
                                     </div>
                                     <div className="col-span-2">
-                                        <span
-                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-primaryMedium ${
-                                                project.active
-                                                    ? "bg-green-500 bg-opacity-20 text-green-500"
-                                                    : "bg-yellow-500 bg-opacity-20 text-yellow-500"
-                                            }`}
-                                        >
-                                            {project.active ? "تأیید شده" : "در انتظار تأیید"}
-                                        </span>
+                    <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-primaryMedium ${
+                            project.active
+                                ? "bg-green-500 bg-opacity-20 text-green-500"
+                                : "bg-yellow-500 bg-opacity-20 text-yellow-500"
+                        }`}
+                    >
+                      {project.active ? "تأیید شده" : "در انتظار تأیید"}
+                    </span>
                                     </div>
                                     <div className="col-span-2 flex justify-center space-x-2 space-x-reverse">
                                         {!project.active && (
                                             <button
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent modal from opening
+                                                    e.stopPropagation();
                                                     openConfirmModal(project, "approve");
                                                 }}
                                                 className="p-2 bg-color4 hover:bg-color8 text-color1 rounded-lg transition-colors"
                                                 title="تأیید پروژه"
                                             >
-                                                <Check size={18}/>
+                                                <Check size={18} />
                                             </button>
                                         )}
                                         {project.active && (
                                             <button
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent modal from opening
+                                                    e.stopPropagation();
                                                     openConfirmModal(project, "reject");
                                                 }}
                                                 className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
                                                 title="رد پروژه"
                                             >
-                                                <X size={18}/>
+                                                <X size={18} />
                                             </button>
                                         )}
                                     </div>
@@ -596,17 +578,15 @@ const ProjectCheckOut = () => {
                                                     : "bg-yellow-500 bg-opacity-20 text-yellow-500"
                                             }`}
                                         >
-                                            {project.active ? "تأیید شده" : "در انتظار تأیید"}
-                                        </span>
+                      {project.active ? "تأیید شده" : "در انتظار تأیید"}
+                    </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-color7">
-                                            {project.category?.name || "بدون دسته‌بندی"}
-                                        </span>
+                                        <span className="text-color7">{project.category?.name || "بدون دسته‌بندی"}</span>
                                         <span className="flex items-center text-color7">
-                                            <Clock size={14} className="ml-1"/>
+                      <Clock size={14} className="ml-1" />
                                             {formatDate(project.createdDate)}
-                                        </span>
+                    </span>
                                     </div>
                                     <div className="flex justify-end space-x-2 space-x-reverse pt-2">
                                         {!project.active && (
@@ -617,7 +597,7 @@ const ProjectCheckOut = () => {
                                                 }}
                                                 className="py-1.5 px-3 bg-color4 hover:bg-color8 text-color1 rounded-lg transition-colors text-sm flex items-center"
                                             >
-                                                <Check size={16} className="ml-1"/>
+                                                <Check size={16} className="ml-1" />
                                                 تأیید
                                             </button>
                                         )}
@@ -629,7 +609,7 @@ const ProjectCheckOut = () => {
                                                 }}
                                                 className="py-1.5 px-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm flex items-center"
                                             >
-                                                <X size={16} className="ml-1"/>
+                                                <X size={16} className="ml-1" />
                                                 رد
                                             </button>
                                         )}
@@ -640,8 +620,8 @@ const ProjectCheckOut = () => {
                     </div>
                 )}
                 {!loading && !error && totalPages > 0}
-                {showConfirmModal && <ConfirmModal/>}
-                <DetailsModal/>
+                {showConfirmModal && <ConfirmModal />}
+                <DetailsModal />
             </div>
         </div>
     );

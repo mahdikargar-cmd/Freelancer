@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -24,25 +25,37 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors().and()
-                .csrf().disable()
-
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {}) // default CORS config
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/admin/auth/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/register/initiate", "/auth/validate","auth/register/verify").permitAll()
-                        .requestMatchers("/api/profileImages/**", "/api/getHeader", "/api/footer", "/api/notfound").permitAll()
-                        // Profile endpoints that need authentication
-                        .requestMatchers("/api/getProfileInformation").authenticated()
-                        .requestMatchers("/api/createProfileInformation").authenticated()
-                        .requestMatchers("/api/uploadProfileImage/**").authenticated()
-                        .requestMatchers("/api/updateProfileImage/**").authenticated()
-                        .requestMatchers("/api/getPInfoById/**").authenticated()
-                        .requestMatchers("/app/**").authenticated()
-                        .requestMatchers("/ws/chat/**").authenticated() // Require authentication for WebSocket
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/admin/auth/**"),
+                                new AntPathRequestMatcher("/auth/login"),
+                                new AntPathRequestMatcher("/auth/register/initiate"),
+                                new AntPathRequestMatcher("/auth/validate"),
+                                new AntPathRequestMatcher("/auth/register/verify"),
+                                new AntPathRequestMatcher("/auth/password-reset/initiate"),
+                                new AntPathRequestMatcher("/auth/password-reset/verify"),
+                                new AntPathRequestMatcher("/api/profileImages/**"),
+                                new AntPathRequestMatcher("/api/getHeader"),
+                                new AntPathRequestMatcher("/api/footer"),
+                                new AntPathRequestMatcher("/api/notfound")
+                        ).permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/auth/users"),
+                                new AntPathRequestMatcher("/api/getProfileInformation"),
+                                new AntPathRequestMatcher("/api/createProfileInformation"),
+                                new AntPathRequestMatcher("/api/uploadProfileImage/**"),
+                                new AntPathRequestMatcher("/api/updateProfileImage/**"),
+                                new AntPathRequestMatcher("/api/getPInfoById/**"),
+                                new AntPathRequestMatcher("/app/**"),
+                                new AntPathRequestMatcher("/ws/chat/**")
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

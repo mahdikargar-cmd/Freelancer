@@ -2,13 +2,8 @@
 import { FaClock, FaRegCommentDots, FaDollarSign } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import axios from "axios";
 import Cookies from "js-cookie";
-import { useAuth } from "@/components/lib/useAuth";
-
-const api = axios.create({
-    baseURL: "http://localhost:8080",
-});
+import {api} from "@/components/lib/api";
 
 interface Skill {
     id: number;
@@ -41,7 +36,6 @@ interface Project {
         role: string;
     };
 }
-
 interface ApiResponse {
     content: Project[];
     pageable: unknown;
@@ -57,7 +51,6 @@ const Project = () => {
     const [status, setStatus] = useState<string>("");
     const [sortBy, setSortBy] = useState<string>("");
     const [getProject, setGetProject] = useState<Project[]>([]);
-    const { userId } = useAuth();
 
     useEffect(() => {
         getProjects();
@@ -89,12 +82,6 @@ const Project = () => {
     useEffect(() => {
         getProjects();
     }, [search, category, priceRange, status, sortBy]);
-
-    const formatDate = (dateArray: [number, number, number] | undefined): string => {
-        if (!dateArray || dateArray.length !== 3) return "نامشخص";
-        const [year, month, day] = dateArray;
-        return `${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")}`;
-    };
 
     return (
         <div className="max-w-screen-lg mx-2 md:mx-auto p-6 rounded-2xl shadow-lg my-4 border bg-light-color1 text-light-color2 dark:bg-color1 dark:text-color2 border-color5">

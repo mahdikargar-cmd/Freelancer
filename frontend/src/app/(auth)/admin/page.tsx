@@ -1,6 +1,7 @@
 "use client";
 import React, {useEffect, useState} from "react";
-import {DashboardAd} from "@/app/admin/dashboardAd/page";
+import {DashboardAd} from "@/app/(auth)/admin/dashboardAd/page";
+
 import {
     BadgeIcon,
     BarChart3,
@@ -15,13 +16,14 @@ import {
     Menu,
 } from "lucide-react";
 import {motion, AnimatePresence} from "framer-motion";
-import ProjectSetting from "./test/page";
 import ProjectsList from "@/components/ProjectsList";
 import UserList from "@/components/userList";
 import Cookies from "js-cookie"
 import {useRouter} from "next/navigation";
 import {AiFillProject} from "react-icons/ai";
 import ProjectCheckOut from "@/components/ProjectCheckOut";
+import UserInfo from "@/app/(auth)/admin/userInfo/page";
+import CategorySetting from "@/app/(auth)/admin/category/page";
 // انیمیشن‌های انطباق نوار کناری
 const sidebarVariants = {
     open: {width: "240px", transition: {duration: 0.3}},
@@ -55,7 +57,7 @@ const Admin = () => {
     // منوهای اصلی و تنظیمات
     const mainMenuItems = [
         {text: "داشبورد", id: 1, component: "dashboardAd", icon: <BadgeIcon size={20}/>},
-        {text: "کاربران", id: 2, component: "users", icon: <Users size={20}/>},
+        {text: "کاربران", id: 2, component: "userInfo", icon: <Users size={20}/>},
         {text: "گزارش‌ها", id: 3, component: "reports", icon: <BarChart3 size={20}/>},
         {text: "پیام‌ها", id: 4, component: "messages", icon: <MessageSquare size={20}/>},
         {text: "بررسی پروژه ها", id: 5, component: "checkoutProject", icon: <AiFillProject size={20}/>},
@@ -65,7 +67,7 @@ const Admin = () => {
 
     const settingsMenuItems = [
         {text: "تنظیمات", id: 6, component: "settings", icon: <Settings size={20}/>},
-        {text: "تنظیمات پروژه", id: 7, component: "ProjectSetting", icon: <Settings size={20}/>},
+        {text: "تنظیمات دسته بندی", id: 7, component: "CategorySetting", icon: <Settings size={20}/>},
         {text: "لیست پروژه ها", id: 8, component: "ProjectsList", icon: <MessageSquare size={20}/>},
         {text: "لیست کاربران", id: 9, component: "UserList", icon: <User size={20}/>},
     ];
@@ -75,14 +77,16 @@ const Admin = () => {
         switch (component) {
             case "dashboardAd":
                 return <DashboardAd/>;
-            case "ProjectSetting":
-                return <ProjectSetting/>;
+            case "CategorySetting":
+                return <CategorySetting/>;
             case "ProjectsList":
                 return <ProjectsList/>;
             case "UserList":
                 return <UserList/>
             case "checkoutProject":
                 return <ProjectCheckOut/>
+            case "userInfo":
+                return <UserInfo/>
             default:
                 return <DashboardAd/>;
         }

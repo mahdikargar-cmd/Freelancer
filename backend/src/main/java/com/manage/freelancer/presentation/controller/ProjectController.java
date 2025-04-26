@@ -22,6 +22,7 @@ import java.util.Map;
 public class ProjectController {
     private final ProjectUCImpl projectUC;
 
+
     @GetMapping("/getProjects")
     public ResponseEntity<Page<ProjectDTO>> getProjects(
             @RequestParam(defaultValue = "0") int page,

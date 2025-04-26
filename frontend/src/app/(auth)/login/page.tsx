@@ -8,7 +8,7 @@ import Success from '@/components/Toast/success';
 import Failed from '@/components/Toast/failed';
 import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
 import Link from 'next/link';
-import r_c from '../../img/right-corner.png';
+import r_c from '../../../img/right-corner.png';
 import {useAuth} from "@/components/lib/useAuth";
 import API from "@/components/utils/api";
 

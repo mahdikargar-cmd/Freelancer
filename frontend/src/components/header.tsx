@@ -9,6 +9,9 @@ import Humberger from "./SVG/HumbergerMenu";
 import ThemeSwitcher from "./ThemeSwitcher";
 import SignHead from "@/components/signUpheader";
 import { FaHome, FaInfoCircle, FaPhone, FaShoppingCart } from "react-icons/fa";
+import {BiNotification} from "react-icons/bi";
+import {AiFillNotification} from "react-icons/ai";
+import {IoIosNotifications} from "react-icons/io";
 
 interface HeaderLink {
     id: number;
@@ -121,6 +124,7 @@ const Header = () => {
 
                     {/* آیکون ورود سمت چپ */}
                     <div className="flex items-center space-x-4 rtl:space-x-reverse order-3">
+                        <IoIosNotifications className={'size-6 dark:text-color4'}/>
                         <SignHead />
                         <div className="md:hidden" onClick={toggleMobileMenu}>
                             {/* از Humberger به عنوان یک کامپوننت استفاده می‌کنیم، بدون اینکه آن را داخل دکمه دیگری قرار دهیم */}

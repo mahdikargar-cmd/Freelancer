@@ -12,4 +12,6 @@ public interface UserRepository {
     Optional<UserDTO> findByUsername(String username);
 
     List<UserDTO> findFreelancersByProjectId(Long projectId);
+
+    List<UserDTO> findAll();
 }

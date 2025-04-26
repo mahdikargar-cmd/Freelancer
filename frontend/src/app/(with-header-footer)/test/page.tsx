@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import API from "@/components/utils/api";
 interface Employer {
   id: number;
   email: string;
@@ -56,7 +57,7 @@ const ProjectList: React.FC = () => {
 
     try {
       const response = await fetch(
-        `/api/app/getProjects?page=${page}&size=${size}`, {
+        `${API}/app/getProjects?page=${page}&size=${size}`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',

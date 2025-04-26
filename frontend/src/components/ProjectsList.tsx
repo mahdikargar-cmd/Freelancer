@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { FiClock, FiDollarSign, FiCalendar, FiFolder, FiAlertCircle, FiChevronDown } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { CategorySelect } from "./CategoryCustom";
+import API from "@/components/utils/api";
 
 interface Skill {
   id: number;
@@ -57,7 +58,7 @@ const ProjectsList: React.FC = () => {
 
   const fetchProjects = async (page: number) => {
     try {
-      const res = await fetch(`/api/app/getProjects?page=${page}&size=10`, {
+      const res = await fetch(`${API}/app/getProjects?page=${page}&size=10`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ const ProjectsList: React.FC = () => {
   
   const fetchCategories = async () => {
     try {
-      const categoriesRes = await fetch("/api/app/getCategories", {
+      const categoriesRes = await fetch(`${API}/app/getCategories`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +126,7 @@ const ProjectsList: React.FC = () => {
     if (!window.confirm("آیا از حذف این پروژه مطمئن هستید؟")) return;
 
     try {
-      const res = await fetch(`/api/app/deleteProject/${id}`, {
+      const res = await fetch(`${API}/app/deleteProject/${id}`, {
         method: "DELETE",
         headers: {
           'Content-Type': 'application/json',

@@ -2,9 +2,11 @@ package com.manage.freelancer.AAA.Interface.controller;
 
 import com.manage.freelancer.AAA.Interface.dto.AuthResponse;
 import com.manage.freelancer.AAA.Interface.dto.LoginRequest;
+import com.manage.freelancer.AAA.Interface.dto.PasswordResetRequest;
 import com.manage.freelancer.AAA.Interface.dto.RegisterRequest;
 import com.manage.freelancer.AAA.application.usecase.EmailTestService;
 import com.manage.freelancer.AAA.application.usecase.LoginUserUseCase;
+import com.manage.freelancer.AAA.application.usecase.PasswordResetUseCase;
 import com.manage.freelancer.AAA.application.usecase.RegisterUserUseCase;
 import com.manage.freelancer.AAA.config.JwtService;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
@@ -17,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/auth")
@@ -26,6 +30,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final EmailTestService emailTestService;
+    private final PasswordResetUseCase passwordResetUseCase;
 
     @PostMapping("/register/initiate")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
@@ -76,7 +81,15 @@ public class AuthController {
                     .body(new AuthResponse("ایمیل یا رمز عبور اشتباه است  ", null, null, null));
         }
     }
-
+    @GetMapping("/users")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        try {
+            List<UserDTO> users = loginUserUseCase.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
@@ -113,6 +126,38 @@ public class AuthController {
         } catch (MessagingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("خطا در ارسال ایمیل: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/password-reset/initiate")
+    public ResponseEntity<AuthResponse> initiatePasswordReset(@RequestBody PasswordResetRequest request) {
+        try {
+            System.out.println("🔍 Initiating password reset for email: " + request.getEmail());
+            passwordResetUseCase.initiatePasswordReset(request.getEmail());
+            return ResponseEntity.ok(new AuthResponse("کد بازنشانی به ایمیل شما ارسال شد", null, null, null));
+        } catch (Exception e) {
+            System.err.println("🔍 Error in initiate password reset: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(e.getMessage(), null, null, null));
+        }
+    }
+
+
+
+    @PostMapping("/password-reset/verify")
+    public ResponseEntity<AuthResponse> completePasswordReset(@RequestBody PasswordResetRequest request, @RequestParam String code) {
+        try {
+            System.out.println("🔍 Starting completePasswordReset for email: " + request.getEmail() + ", code: " + code);
+            String token = passwordResetUseCase.completePasswordReset(
+                    request.getEmail().toLowerCase(),
+                    request.getNewPassword(),
+                    code
+            );
+            UserDTO user = loginUserUseCase.getByEmail(request.getEmail().toLowerCase());
+            String roleStr = user.getRole() != null ? user.getRole().toString() : "UNKNOWN";
+            return ResponseEntity.ok(new AuthResponse("رمز عبور با موفقیت بازنشانی شد", token, roleStr, user.getId().toString()));
+        } catch (Exception e) {
+            System.err.println("🔍 Error in completePasswordReset: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(e.getMessage(), null, null, null));
         }
     }
 

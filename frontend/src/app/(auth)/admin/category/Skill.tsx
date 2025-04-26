@@ -19,7 +19,7 @@ const Skill = () => {
     const [searchQuery, setSearchQuery] = useState(""); // تغییر نام متغیر برای شفافیت بیشتر
 
     useEffect(() => {
-        fetch("/api/app/skills", {
+        fetch(`${API}/app/skills`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ const Skill = () => {
     const handleUpdate = async (id: number) => {
         if (!editValue.trim()) return alert("لطفاً مقدار جدید مهارت را وارد کنید.");
         try {
-            const res = await fetch(`/api/app/skills/${id}`, {
+            const res = await fetch(`${API}/api/app/skills/${id}`, {
                 method: "PUT",
                 headers: {
                     'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const Skill = () => {
     const handleDelete = async (id: number) => {
         if (!window.confirm("آیا از حذف این مهارت مطمئن هستید؟")) return;
         try {
-            const res = await fetch(`/api/app/skills/${id}`, {
+            const res = await fetch(`${API}/api/app/skills/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`

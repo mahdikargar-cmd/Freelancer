@@ -1,5 +1,6 @@
 package com.manage.freelancer.application.usecaseimpl;
 
+import com.manage.freelancer.AAA.application.usecase.EmailService;
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import com.manage.freelancer.application.usecase.ProjectUC;
@@ -30,6 +31,9 @@ public class ProjectUCImpl implements ProjectUC {
     private final SkillUCImpl skillUC;
     private final CategoryJpaRepo categoryRepo;
     private final UserRepository userRepo;
+    private final EmailService emailService; // اضافه کردن سرویس ایمیل
+
+
 
     @Override
     public Page<ProjectDTO> getAllProjects(Pageable pageable) {
@@ -83,20 +87,23 @@ public class ProjectUCImpl implements ProjectUC {
         }
 
         Long employerId;
+        String employerEmail;
         if (authentication.getPrincipal() instanceof UserDTO) {
-            employerId = ((UserDTO) authentication.getPrincipal()).getId();
+            UserDTO user = (UserDTO) authentication.getPrincipal();
+            employerId = user.getId();
+            employerEmail = user.getEmail();
         } else {
             String email = authentication.getName();
             UserDTO user = userRepo.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("کاربر احراز هویت‌شده یافت نشد"));
             employerId = user.getId();
+            employerEmail = user.getEmail();
         }
 
         UserDTO fullUser = userRepo.findById(employerId)
                 .orElseThrow(() -> new IllegalArgumentException("شناسه کارفرما نامعتبر است"));
         projectDTO.setEmployerId(fullUser);
 
-        // Validate and set skills
         if (projectDTO.getSkills() != null && !projectDTO.getSkills().isEmpty()) {
             List<Long> skillIds = projectDTO.getSkills()
                     .stream()
@@ -106,7 +113,6 @@ public class ProjectUCImpl implements ProjectUC {
             projectDTO.setSkills(dbSkills);
         }
 
-        // Validate and set category
         if (projectDTO.getCategory() != null && projectDTO.getCategory().getId() != null) {
             CategoryDTO fullCategory = categoryRepo.findByIdWithDetails(projectDTO.getCategory().getId());
             if (fullCategory == null) {
@@ -117,7 +123,18 @@ public class ProjectUCImpl implements ProjectUC {
             throw new IllegalArgumentException("Category is required");
         }
 
-        return projectRepo.save(projectDTO);
+        // ذخیره پروژه و نگه داشتن نتیجه در متغیر savedProject
+        ProjectDTO savedProject = projectRepo.save(projectDTO);
+
+        // ارسال ایمیل به ادمین بعد از ثبت پروژه
+        try {
+            emailService.sendProjectCreatedNotification(savedProject.getSubject(), savedProject.getId(), employerEmail);
+        } catch (Exception e) {
+            // لاگ کردن خطا (برای اینکه ثبت پروژه متوقف نشه)
+            System.err.println("خطا در ارسال ایمیل به ادمین: " + e.getMessage());
+        }
+
+        return savedProject;
     }
 
     @Override

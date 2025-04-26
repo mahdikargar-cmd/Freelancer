@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
-import r_c from '../../img/right-corner.png';
+import r_c from '../../../img/right-corner.png';
 import { useRouter } from 'next/navigation';
 import Success from '@/components/Toast/success';
 import { FiMail, FiLock, FiUserPlus, FiArrowLeft, FiKey } from 'react-icons/fi';

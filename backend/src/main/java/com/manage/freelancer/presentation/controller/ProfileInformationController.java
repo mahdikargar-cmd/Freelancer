@@ -1,6 +1,4 @@
 package com.manage.freelancer.presentation.controller;
-
-import com.codingapi.security.jwt.Jwt;
 import com.manage.freelancer.AAA.application.usecase.CustomUserDetails;
 import com.manage.freelancer.AAA.infrastructure.repository.UserRepository;
 import com.manage.freelancer.application.usecase.ProfileInformationUseCase;

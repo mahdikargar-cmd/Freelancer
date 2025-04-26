@@ -55,4 +55,9 @@ public class UserRepositoryImpl implements UserRepository {
     public List<UserDTO> findFreelancersByProjectId(Long projectId) {
         return List.of();
     }
+
+    @Override
+    public List<UserDTO> findAll() {
+        return jpaUserRepository.findAll();
+    }
 }

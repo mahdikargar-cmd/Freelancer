@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ProjectListChat from "@/components/ProjectListChat/page";
-import DetailSuggest from "@/app/detailSuggest/[id]/page";
+import DetailSuggest from "@/app/(with-header-footer)/detailSuggest/[id]/page";
 import ChatInterface from "@/components/ChatInterface";
 import { useAuth } from "@/components/lib/useAuth";
 

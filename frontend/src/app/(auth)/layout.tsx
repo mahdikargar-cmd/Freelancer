@@ -1,9 +1,8 @@
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import "./globals.css";
+import "../globals.css";
 import React from "react";
+import Header from "@/components/header";
 
-export default function RootLayout({
+export default function AuthLayout({
                                        children,
                                    }: Readonly<{
     children: React.ReactNode;
@@ -13,7 +12,6 @@ export default function RootLayout({
         <body className="dark:bg-color6 bg-light-color1">
         <Header/>
         {children}
-        <Footer/>
         </body>
         </html>
     );
