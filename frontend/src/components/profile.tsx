@@ -9,7 +9,10 @@ import {
     FaUniversity,
     FaCheckCircle,
     FaProjectDiagram,
-    FaClipboardList, FaWallet, FaEnvelope, FaBell
+    FaClipboardList,
+    FaWallet,
+    FaEnvelope,
+    FaBell
 } from 'react-icons/fa';
 import Success from './Toast/success';
 import ProfileLoadingSkeleton from './loading/lsF-P';
@@ -32,7 +35,6 @@ interface ProfileData {
     completedProjects: number;
     unreadMessages: number;
     notifications: number;
-
 }
 
 type ProfileResponse = ProfileData & {
@@ -59,9 +61,8 @@ const Profile = () => {
         projectsPosted: 0,
         activeProjects: 0,
         completedProjects: 0,
-        unreadMessages:0,
+        unreadMessages: 0,
         notifications: 0,
-
     });
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -107,11 +108,11 @@ const Profile = () => {
                         address: response.data.address || '',
                         placeOfStudy: response.data.placeOfStudy || '',
                         user: { id: response.data.user?.id || userId },
-                        projectsPosted:response.data.projectsPosted || 0,
-                        activeProjects:response.data.activeProjects || 0,
-                        completedProjects:response.data.completedProjects || 0,
-                        unreadMessages:response.data.unreadMessages || 0,
-                        notifications:response.data.notifications || 0,
+                        projectsPosted: response.data.projectsPosted || 0,
+                        activeProjects: response.data.activeProjects || 0,
+                        completedProjects: response.data.completedProjects || 0,
+                        unreadMessages: response.data.unreadMessages || 0,
+                        notifications: response.data.notifications || 0,
                     });
                     setProfileExists(true);
                 }
@@ -119,7 +120,7 @@ const Profile = () => {
                 console.error('❌ Error fetching profile:', error.response?.data || error.message);
                 if (error.response?.status === 401) {
                     setError('لطفاً دوباره وارد شوید.');
-                } else if (error.response?.status === 404 ) {
+                } else if (error.response?.status === 404) {
                     setProfileExists(false);
                     setProfileData({ ...profileData, user: { id: userId } });
                     setError(null);
@@ -183,6 +184,7 @@ const Profile = () => {
             }
         }
     };
+
     const handleUploadImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -238,17 +240,22 @@ const Profile = () => {
         { icon: <FaMapMarkerAlt />, placeholder: 'آدرس', key: 'address' },
         { icon: <FaUniversity />, placeholder: 'محل تحصیل', key: 'placeOfStudy' },
     ];
+
     const calculateProfileCompletion = () => {
         const requiredFields: (keyof ProfileData)[] = ['firstName', 'lastName', 'phoneNumber', 'address', 'placeOfStudy'];
-        // @ts-ignore
-        let filledFields = requiredFields.filter((field) => profileData[field]?.trim()).length;
-        if (profileData.profileImageUrl) filledFields += 1;
+        let filledFields = requiredFields.filter((field) => {
+            const value = profileData[field];
+            return typeof value === 'string' && value.trim().length > 0;
+        }).length;
+        if (profileData.profileImageUrl && profileData.profileImageUrl.trim().length > 0) filledFields += 1;
         return Math.round((filledFields / (requiredFields.length + 1)) * 100);
     };
+
     const profileCompletion = calculateProfileCompletion();
-    const incompleteFields = fields
-        .filter(({ key }) => !profileData[key]?.trim())
-        .map(({ placeholder }) => placeholder);
+    const incompleteFields = fields.filter(({ key }) => {
+        const value = profileData[key];
+        return !(typeof value === 'string' && value.trim().length > 0);
+    }).map(({ placeholder }) => placeholder);
 
     return (
         <div className="text-white max-w-screen-xl mx-auto my-8 relative dark:bg-color1 dark:text-color2">
@@ -438,4 +445,5 @@ const Profile = () => {
         </div>
     );
 };
+
 export default Profile;

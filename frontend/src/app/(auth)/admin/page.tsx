@@ -1,6 +1,5 @@
 "use client";
 import React, {useEffect, useState} from "react";
-import {DashboardAd} from "@/app/(auth)/admin/dashboardAd/page";
 
 import {
     BadgeIcon,
@@ -24,6 +23,7 @@ import {AiFillProject} from "react-icons/ai";
 import ProjectCheckOut from "@/components/ProjectCheckOut";
 import UserInfo from "@/app/(auth)/admin/userInfo/page";
 import CategorySetting from "@/app/(auth)/admin/category/page";
+import DashboardAd from "@/app/(auth)/admin/dashboardAd/page";
 // انیمیشن‌های انطباق نوار کناری
 const sidebarVariants = {
     open: {width: "240px", transition: {duration: 0.3}},

@@ -3,49 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
 import { useAuth } from "@/components/lib/useAuth";
 import { api } from "@/components/lib/api";
-
-interface Project {
-    id: number;
-    subject: string;
-    description: string;
-    priceStarted: number;
-    priceEnded: number;
-    deadline: number;
-    status: "PENDING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-    employerId?: { id: number; email: string; firstName?: string; lastName?: string };
-}
-
-interface Proposal {
-    id: number;
-    projectId: {
-        id: number;
-        subject: string;
-        description: string;
-        priceStarted: number;
-        priceEnded: number;
-        deadline: number;
-        createdDate: string;
-        endDate: string;
-        type: string;
-        status: string;
-        active: boolean;
-        suggested: number;
-        employerId: { id: number; email: string; role: string } | null;
-        category: { id: number; name: string; parentCategory: { id: number; name: string } | null } | null;
-        skills: { id: number; name: string }[] | null;
-        suggestions: any[] | null;
-    };
-    freelancerId: { id: number; email: string; role: string };
-    title: string;
-    content: string;
-    proposedBudget: number;
-    estimatedDuration: number;
-    submittedAt: string;
-    status: string;
-    assigned: boolean;
-    milestones: any[] | null;
-    startChat?: boolean;
-}
+import { Proposal } from "@/types"; // وارد کردن تایپ مشترک
 
 interface FreelancerProjectsProps {
     onViewProposals?: (proposal: Proposal) => void;
@@ -139,17 +97,17 @@ const FreelancerProjects: React.FC<FreelancerProjectsProps> = ({ onViewProposals
                                                 ? "پذیرفته شده"
                                                 : proposal.status === "REJECTED"
                                                     ? "رد شده"
-                                                    : proposal.status}
+                                                    : proposal.status || "نامشخص"}
                                 </span>
                             </div>
                             <p className="text-sm text-light-color7 dark:text-color7 mb-3">
                                 {proposal.projectId.description}
                             </p>
                             <p className="text-sm text-light-color7 dark:text-color7 mb-3">
-                                بودجه پیشنهادی: {proposal.proposedBudget} تومان
+                                بودجه پیشنهادی: {proposal.proposedBudget || "نامشخص"} تومان
                             </p>
                             <p className="text-sm text-light-color7 dark:text-color7 mb-3">
-                                مدت زمان تخمینی: {proposal.estimatedDuration} روز
+                                مدت زمان تخمینی: {proposal.estimatedDuration || "نامشخص"} روز
                             </p>
                             <div className="flex justify-between items-center">
                                 <span className="text-light-color4 dark:text-color4 text-sm">
@@ -170,13 +128,17 @@ const FreelancerProjects: React.FC<FreelancerProjectsProps> = ({ onViewProposals
                                             مشاهده جزئیات
                                         </button>
                                         <button
-                                            onClick={() =>
-                                                handleStartChat(
-                                                    proposal.projectId.id,
-                                                    proposal.projectId.employerId.id,
-                                                    proposal
-                                                )
-                                            }
+                                            onClick={() => {
+                                                if (proposal.projectId.employerId?.id) {
+                                                    handleStartChat(
+                                                        proposal.projectId.id,
+                                                        proposal.projectId.employerId.id,
+                                                        proposal
+                                                    );
+                                                } else {
+                                                    console.error("Employer ID is null");
+                                                }
+                                            }}
                                             className="bg-light-color4 dark:bg-color4 text-white px-3 py-1 rounded-lg hover:bg-light-color8 dark:hover:bg-color8 transition-colors text-sm flex items-center"
                                         >
                                             <svg

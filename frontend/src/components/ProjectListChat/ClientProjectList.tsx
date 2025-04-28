@@ -1,80 +1,9 @@
 "use client";
-
-import React, {useState, useEffect, useCallback} from "react";
-import {useAuth} from "@/components/lib/useAuth";
+import React, { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
-import {api} from "@/components/lib/api";
-
-interface Employer {
-    id: number;
-    email?: string;
-}
-
-interface Skill {
-    id: number;
-    name: string;
-}
-
-interface Category {
-    id: number;
-    name: string;
-    parentCategory: Category | null;
-}
-
-interface Project {
-    id: number;
-    subject: string;
-    description: string;
-    priceStarted: number;
-    priceEnded: number;
-    deadline: number;
-    createdDate: string | null;
-    endDate: string | null;
-    type: "FIXED" | "HOURLY";
-    status: "PENDING" | "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-    active: boolean;
-    suggested: number;
-    employerId: Employer;
-    category: Category | null;
-    skills: Skill[] | null;
-    suggestions: any[] | null;
-}
-
-interface Proposal {
-    id: number;
-    projectId: {
-        id: number;
-        subject: string;
-        description: string;
-        priceStarted: number;
-        priceEnded: number;
-        deadline: number;
-        createdDate: string;
-        endDate: string;
-        type: string;
-        status: string;
-        active: boolean;
-        suggested: number;
-        employerId: Employer | null;
-        category: Category | null;
-        skills: Skill[] | null;
-        suggestions: any[] | null;
-    };
-    freelancerId: {
-        id: number;
-        email: string;
-        role: string;
-    };
-    title: string | null;
-    content: string | null;
-    proposedBudget: number | null;
-    estimatedDuration: number | null;
-    submittedAt: string;
-    status: string | null;
-    assigned: boolean;
-    milestones: any[] | null;
-    startChat: boolean;
-}
+import { api } from "@/components/lib/api";
+import { Project, Proposal } from "@/types"; // وارد کردن تایپ‌های مشترک
 
 interface ClientProjectsProps {
     projects?: Project[];
@@ -83,8 +12,8 @@ interface ClientProjectsProps {
 }
 
 const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
-    ({projects = [], onViewProposals, onStartChat}) => {
-        const {userId} = useAuth();
+    ({ projects = [], onViewProposals, onStartChat }) => {
+        const { userId } = useAuth();
         const [showPaymentModal, setShowPaymentModal] = useState(false);
         const [fetchedProjects, setFetchedProjects] = useState<Project[]>(Array.isArray(projects) ? projects : []);
         const [isLoading, setIsLoading] = useState(false);
@@ -103,14 +32,17 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                 return "نامشخص";
             }
         };
+
         const handlePaymentSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             alert("پرداخت با موفقیت انجام شد.");
             setShowPaymentModal(false);
         }, []);
+
         const handlePaymentClick = useCallback(() => {
             setShowPaymentModal(true);
         }, []);
+
         const getClientProjects = useCallback(async () => {
             if (!userId || isLoading) {
                 setError("لطفاً وارد حساب کاربری خود شوید.");
@@ -120,24 +52,24 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
             try {
                 setIsLoading(true);
                 const response = await api.get(`/app/getEmployer?id=${userId}`, {
-                    headers: {Authorization: `Bearer ${Cookies.get("token")}`},
+                    headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                     withCredentials: true,
                 });
                 console.log("resss", response.data);
                 const data = Array.isArray(response.data) ? response.data : [];
                 // تبدیل تاریخ‌ها از آرایه به رشته
-                const formattedData = data.map((project) => {
+                const formattedData = data.map((project: Project) => {
                     let createdDate = project.createdDate;
                     if (Array.isArray(project.createdDate)) {
-                        const [year, month, day] = project.createdDate;
+                        const [year, month, day] = project.createdDate as unknown as [number, number, number];
                         createdDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     }
                     let endDate = project.endDate;
                     if (Array.isArray(project.endDate)) {
-                        const [year, month, day] = project.endDate;
+                        const [year, month, day] = project.endDate as unknown as [number, number, number];
                         endDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     }
-                    return {...project, createdDate, endDate};
+                    return { ...project, createdDate, endDate };
                 });
                 setFetchedProjects(formattedData);
                 setError(null);
@@ -164,7 +96,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                 setIsLoading(true);
                 setSelectedProjectId(projectId);
                 const response = await api.get(`/app/IdSuggest/${projectId}`, {
-                    headers: {Authorization: `Bearer ${Cookies.get("token")}`},
+                    headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                     withCredentials: true,
                 });
 
@@ -172,22 +104,22 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                 const proposalsWithStartChat = (Array.isArray(response.data) ? response.data : []).map((p: Proposal) => {
                     let createdDate = p.projectId.createdDate;
                     if (Array.isArray(p.projectId.createdDate)) {
-                        const [year, month, day] = p.projectId.createdDate;
+                        const [year, month, day] = p.projectId.createdDate as unknown as [number, number, number];
                         createdDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     }
                     let endDate = p.projectId.endDate;
                     if (Array.isArray(p.projectId.endDate)) {
-                        const [year, month, day] = p.projectId.endDate;
+                        const [year, month, day] = p.projectId.endDate as unknown as [number, number, number];
                         endDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     }
                     let submittedAt = p.submittedAt;
                     if (Array.isArray(p.submittedAt)) {
-                        const [year, month, day, hour, minute, second] = p.submittedAt;
+                        const [year, month, day, hour, minute, second] = p.submittedAt as unknown as [number, number, number, number, number, number];
                         submittedAt = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
                     }
                     return {
                         ...p,
-                        projectId: {...p.projectId, createdDate, endDate},
+                        projectId: { ...p.projectId, createdDate, endDate },
                         submittedAt,
                         startChat: p.startChat ?? false,
                     };
@@ -204,12 +136,12 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
 
         const upChatStart = async (proposalId: number, proposal: Proposal) => {
             try {
-                const updatedProposal = {...proposal, startChat: true, status: "OPEN"};
+                const updatedProposal = { ...proposal, startChat: true, status: "OPEN" };
                 const updateStartChat = await api.put(
                     `/app/updateSuggest/${proposalId}`,
                     updatedProposal,
                     {
-                        headers: {Authorization: `Bearer ${Cookies.get("token")}`},
+                        headers: { Authorization: `Bearer ${Cookies.get("token")}` },
                     }
                 );
                 console.log("update start chat response:", updateStartChat.data);
@@ -237,12 +169,12 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
             if (updated) {
                 setProposals((prevProposals) =>
                     prevProposals.map((p) =>
-                        p.id === selectedProposal.id ? {...p, startChat: true} : p
+                        p.id === selectedProposal.id ? { ...p, startChat: true } : p
                     )
                 );
 
                 if (onStartChat) {
-                    onStartChat(projectId, freelancerId, {...selectedProposal, startChat: true});
+                    onStartChat(projectId, freelancerId, { ...selectedProposal, startChat: true });
                 }
 
                 setShowChatConfirmModal(false);
@@ -536,7 +468,7 @@ const ClientProjects: React.FC<ClientProjectsProps> = React.memo(
                                 </button>
                                 <button
                                     onClick={handleConfirmChat}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                    className="px-4(py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                                 >
                                     تایید و شروع گفتگو
                                 </button>

@@ -1,41 +1,11 @@
 "use client";
+
 import { useState } from "react";
 import ProjectListChat from "@/components/ProjectListChat/page";
-import DetailSuggest from "@/app/(with-header-footer)/detailSuggest/[id]/page";
 import ChatInterface from "@/components/ChatInterface";
 import { useAuth } from "@/components/lib/useAuth";
-
-interface Proposal {
-    id: number;
-    projectId: {
-        id: number;
-        subject: string;
-        description: string;
-        priceStarted: number;
-        priceEnded: number;
-        deadline: number;
-        createdDate: string;
-        endDate: string;
-        type: string;
-        status: string;
-        active: boolean;
-        suggested: number;
-        employerId: { id: number; email: string; role: string } | null;
-        category: { id: number; name: string; parentCategory: { id: number; name: string } | null } | null;
-        skills: { id: number; name: string }[] | null;
-        suggestions: any[] | null;
-    };
-    freelancerId: { id: number; email: string; role: string };
-    title: string;
-    content: string;
-    proposedBudget: number;
-    estimatedDuration: number;
-    submittedAt: string;
-    status: string;
-    assigned: boolean;
-    milestones: any[] | null;
-    startChat?: boolean;
-}
+import DetailSuggest from "@/app/(with-header-footer)/detailSuggest/DetailSuggest";
+import { Proposal } from "@/types"; // وارد کردن تایپ مشترک
 
 const FreelanceDashboard = () => {
     const { userId } = useAuth(); // دریافت userId و role (کارفرما یا فریلنسر)
@@ -83,7 +53,6 @@ const FreelanceDashboard = () => {
                         <div className="bg-light-color5 mt-6 dark:bg-color5 rounded-2xl shadow-lg">
                             <DetailSuggest
                                 key={selectedProposal.id}
-                                projectId={selectedProposal.projectId.id}
                                 proposal={selectedProposal}
                             />
                         </div>

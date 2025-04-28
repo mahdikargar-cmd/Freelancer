@@ -84,7 +84,7 @@ const SignUp = () => {
                 setShowVerificationForm(true); // نمایش فرم کد تأیید
                 setTimeout(() => setShowToast(false), 3000);
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 setEmailWarning(error.message);
             })
             .finally(() => {
@@ -130,7 +130,7 @@ const SignUp = () => {
                     throw new Error('اطلاعات توکن یا شناسه کاربر دریافت نشد!');
                 }
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 console.error('🔍 Verify error:', error.message);
                 setCodeWarning(error.message);
             })
@@ -235,11 +235,11 @@ const SignUp = () => {
                     <div className="grid gap-4 my-4 w-full max-w-[500px] place-items-center py-4">
                         <button
                             className={`rounded-xl dark:text-color1 text-light-color1 font-primaryMedium p-4 w-full flex items-center justify-center gap-2 transition-all duration-300 text-lg
-                            ${(showVerificationForm ? !verificationCode || codeWarning : !info.email || !info.password || emailWarning || passwordWarning) || isLoading
+                            ${(showVerificationForm ? !verificationCode || !!codeWarning : !info.email || !info.password || !!emailWarning || !!passwordWarning) || isLoading
                                 ? 'dark:bg-color7/50 bg-light-color7/50 cursor-not-allowed'
                                 : 'dark:bg-color4 bg-light-color4 dark:hover:bg-color8 hover:bg-light-color8 active:scale-98'}`}
                             onClick={showVerificationForm ? handleVerifyCode : handleInitiateRegistration}
-                            disabled={(showVerificationForm ? !verificationCode || codeWarning : !info.email || !info.password || emailWarning || passwordWarning) || isLoading}
+                            disabled={(showVerificationForm ? !verificationCode || !!codeWarning : !info.email || !info.password || !!emailWarning || !!passwordWarning) || isLoading}
                         >
                             {isLoading ? (
                                 <div className="w-5 h-5 border-2 dark:border-color1 border-light-color1 border-t-transparent rounded-full animate-spin"></div>

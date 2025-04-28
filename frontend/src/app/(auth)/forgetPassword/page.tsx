@@ -1,10 +1,11 @@
-"use client"
-import { useState } from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import { FiMail, FiKey, FiLock } from 'react-icons/fi';
-import { useRouter } from 'next/navigation'; // Changed from next/router to next/navigation
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import r_c from '../../../img/right-corner.png';
-import {api} from "@/components/lib/api";
+import { api } from "@/components/lib/api";
 
 const ForPass = () => {
     const [step, setStep] = useState(1); // 1 برای مرحله ایمیل، 2 برای مرحله کد و رمز جدید
@@ -16,7 +17,7 @@ const ForPass = () => {
     const router = useRouter();
 
     // مدیریت ارسال ایمیل (مرحله 1)
-    const handleEmailSubmit = async (e) => {
+    const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         setLoading(true);
@@ -26,7 +27,7 @@ const ForPass = () => {
             if (response.status === 200) {
                 setStep(2); // انتقال به مرحله دوم
             }
-        } catch (err) {
+        } catch (err: any) {
             setError(err.response?.data?.message || 'خطایی رخ داد. لطفاً دوباره امتحان کنید.');
         } finally {
             setLoading(false);
@@ -34,7 +35,7 @@ const ForPass = () => {
     };
 
     // مدیریت تأیید کد و رمز جدید (مرحله 2)
-    const handleVerifySubmit = async (e) => {
+    const handleVerifySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         setLoading(true);
@@ -47,7 +48,7 @@ const ForPass = () => {
             if (response.status === 200) {
                 router.push('/login'); // هدایت به صفحه ورود پس از موفقیت
             }
-        } catch (err) {
+        } catch (err: any) {
             setError(err.response?.data?.message || 'خطایی رخ داد. لطفاً دوباره امتحان کنید.');
         } finally {
             setLoading(false);

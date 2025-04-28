@@ -1,19 +1,15 @@
 import API from "@/components/utils/api";
-
 interface Link {
   id: number,
   first: string,
   second: string
 }
-
 interface list {
   list: Link[]
 }
-
 const NotFound = async () => {
   const res = await fetch(`${API}/api/notfound`, { cache: "no-store" });
   const posts: list = await res.json();
-
   return (
     <>
       {

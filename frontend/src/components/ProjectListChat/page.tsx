@@ -1,40 +1,9 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/lib/useAuth";
 import ClientProjects from "@/components/ProjectListChat/ClientProjectList";
 import FreelancerProjects from "@/components/ProjectListChat/FreelancerProjectList";
-
-interface Proposal {
-    id: number;
-    projectId: {
-        id: number;
-        subject: string;
-        description: string;
-        priceStarted: number;
-        priceEnded: number;
-        deadline: number;
-        createdDate: string;
-        endDate: string;
-        type: string;
-        status: string;
-        active: boolean;
-        suggested: number;
-        employerId: { id: number; email: string; role: string } | null;
-        category: { id: number; name: string; parentCategory: { id: number; name: string } | null } | null;
-        skills: { id: number; name: string }[] | null;
-        suggestions: any[] | null;
-    };
-    freelancerId: { id: number; email: string; role: string };
-    title: string;
-    content: string;
-    proposedBudget: number;
-    estimatedDuration: number;
-    submittedAt: string;
-    status: string;
-    assigned: boolean;
-    milestones: any[] | null;
-    startChat?: boolean;
-}
+import { Proposal } from "@/types";
 
 interface ProjectListChatProps {
     onViewProposals?: (proposal: Proposal) => void;

@@ -1,7 +1,7 @@
-import React from 'react'
+import React from 'react';
 import { BarChart3, Briefcase, Calendar, User, Users } from "lucide-react";
 
-export const DashboardAd = () => {
+export default function DashboardAd() {
     return (
         <div className="w-full animate-fade animate-once animate-duration-500 animate-ease-in">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -95,5 +95,5 @@ export const DashboardAd = () => {
                 </div>
             </div>
         </div>
-    )
+    );
 }
