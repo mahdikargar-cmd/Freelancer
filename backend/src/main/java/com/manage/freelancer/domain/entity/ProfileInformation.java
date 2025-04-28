@@ -1,4 +1,5 @@
 package com.manage.freelancer.domain.entity;
+
 import com.manage.freelancer.AAA.infrastructure.entity.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +19,10 @@ public class ProfileInformation {
     private String address;
     private String placeOfStudy;
     private UserDTO user;
+
+    private Long projectsPosted = 0L;
+    private Long activeProjects = 0L;
+    private Long completedProjects = 0L;
+    private Long unreadMessages = 0L;
+    private Long notifications = 0L;
 }

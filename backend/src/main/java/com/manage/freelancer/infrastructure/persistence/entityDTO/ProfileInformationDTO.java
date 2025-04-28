@@ -31,5 +31,10 @@ public class ProfileInformationDTO {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserDTO user;
 
+    private Long projectsPosted = 0L;
+    private Long activeProjects = 0L;
+    private Long completedProjects = 0L;
+    private Long unreadMessages = 0L;
+    private Long notifications = 0L;
 
 }

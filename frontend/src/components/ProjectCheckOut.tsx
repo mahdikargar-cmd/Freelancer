@@ -149,17 +149,32 @@ const ProjectCheckOut = () => {
 
     const handleApproveProject = async (project: Project) => {
         try {
+            // تأیید پروژه
             await api.put(`app/updateProjectStatus/${project.id}`, { active: true });
+
+            // به‌روزرسانی حالت پروژه در فرانت‌اند
             setProjects(projects.map((p) => (p.id === project.id ? { ...p, active: true, status: "OPEN" } : p)));
             setShowConfirmModal(false);
             toast.success("پروژه با موفقیت تأیید شد", { position: "bottom-right", rtl: true });
+
+            // ارسال نوتیفیکیشن به کارفرما
+            const notificationData = {
+                userId: project.employerId.id,
+                type: "project_approved",
+                title: "تأیید پروژه",
+                message: `پروژه "${project.subject}" توسط ادمین تأیید شد و اکنون برای کاربران قابل مشاهده است.`,
+                action: "مشاهده پروژه",
+                data: { projectId: project.id },
+            };
+
+            await api.post("app/notifications", notificationData);
         } catch (err: any) {
-            let errorMessage = "خطا در تأیید پروژه";
+            let errorMessage = "خطا در تأیید پروژه یا ارسال نوتیفیکیشن";
             if (err.response) {
                 errorMessage = err.response.data?.message || err.response.data || err.message;
             }
             toast.error(errorMessage, { position: "bottom-right", rtl: true });
-            console.error("Error approving project:", err);
+            console.error("Error approving project or sending notification:", err);
         }
     };
 
@@ -329,7 +344,8 @@ const ProjectCheckOut = () => {
                                     <div>
                                         <span className="text-color7">محدوده قیمت:</span>
                                         <p>
-                                            {formatNumber(selectedProject.priceStarted)} - {formatNumber(selectedProject.priceEnded)} تومان
+                                            {formatNumber(selectedProject.priceStarted)} -{" "}
+                                            {formatNumber(selectedProject.priceEnded)} تومان
                                         </p>
                                     </div>
                                     <div>
@@ -363,11 +379,16 @@ const ProjectCheckOut = () => {
                                 <div className="bg-color6 p-4 rounded-lg">
                                     <div className="flex flex-wrap gap-2">
                                         {selectedProject.skills?.map((skill) => (
-                                            <span key={skill.id} className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full">
-                        {skill.name}
-                      </span>
+                                            <span
+                                                key={skill.id}
+                                                className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full"
+                                            >
+                                                {skill.name}
+                                            </span>
                                         ))}
-                                        {!selectedProject.skills?.length && <span className="text-color7">بدون مهارت</span>}
+                                        {!selectedProject.skills?.length && (
+                                            <span className="text-color7">بدون مهارت</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -377,11 +398,16 @@ const ProjectCheckOut = () => {
                                 <div className="bg-color6 p-4 rounded-lg">
                                     <div className="flex flex-wrap gap-2">
                                         {selectedProject.suggestions?.map((suggestion, index) => (
-                                            <span key={index} className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full">
-                        {suggestion}
-                      </span>
+                                            <span
+                                                key={index}
+                                                className="bg-color5 text-color2 text-xs px-2 py-1 rounded-full"
+                                            >
+                                                {suggestion}
+                                            </span>
                                         ))}
-                                        {!selectedProject.suggestions?.length && <span className="text-color7">بدون پیشنهاد</span>}
+                                        {!selectedProject.suggestions?.length && (
+                                            <span className="text-color7">بدون پیشنهاد</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -487,12 +513,18 @@ const ProjectCheckOut = () => {
                 </div>
                 <div className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 bg-color6 rounded-lg mb-3 font-primaryBold text-sm">
                     <div className="col-span-1">#</div>
-                    <div className="col-span-3 flex items-center cursor-pointer" onClick={() => handleSort("subject")}>
+                    <div
+                        className="col-span-3 flex items-center cursor-pointer"
+                        onClick={() => handleSort("subject")}
+                    >
                         عنوان
                         <ArrowUpDown size={16} className="mr-1 text-color7" />
                     </div>
                     <div className="col-span-2">دسته‌بندی</div>
-                    <div className="col-span-2 flex items-center cursor-pointer" onClick={() => handleSort("createdDate")}>
+                    <div
+                        className="col-span-2 flex items-center cursor-pointer"
+                        onClick={() => handleSort("createdDate")}
+                    >
                         تاریخ ایجاد
                         <ArrowUpDown size={16} className="mr-1 text-color7" />
                     </div>
@@ -525,21 +557,23 @@ const ProjectCheckOut = () => {
                                 <div className="hidden md:grid grid-cols-12 gap-4 items-center text-sm">
                                     <div className="col-span-1 font-primaryBold">{project.id}</div>
                                     <div className="col-span-3 font-primaryMedium truncate">{project.subject}</div>
-                                    <div className="col-span-2 text-color7">{project.category?.name || "بدون دسته‌بندی"}</div>
+                                    <div className="col-span-2 text-color7">
+                                        {project.category?.name || "بدون دسته‌بندی"}
+                                    </div>
                                     <div className="col-span-2 flex items-center text-color7">
                                         <Clock size={16} className="ml-2" />
                                         {formatDate(project.createdDate)}
                                     </div>
                                     <div className="col-span-2">
-                    <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-primaryMedium ${
-                            project.active
-                                ? "bg-green-500 bg-opacity-20 text-green-500"
-                                : "bg-yellow-500 bg-opacity-20 text-yellow-500"
-                        }`}
-                    >
-                      {project.active ? "تأیید شده" : "در انتظار تأیید"}
-                    </span>
+                                        <span
+                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-primaryMedium ${
+                                                project.active
+                                                    ? "bg-green-500 bg-opacity-20 text-green-500"
+                                                    : "bg-yellow-500 bg-opacity-20 text-yellow-500"
+                                            }`}
+                                        >
+                                            {project.active ? "تأیید شده" : "در انتظار تأیید"}
+                                        </span>
                                     </div>
                                     <div className="col-span-2 flex justify-center space-x-2 space-x-reverse">
                                         {!project.active && (
@@ -578,15 +612,17 @@ const ProjectCheckOut = () => {
                                                     : "bg-yellow-500 bg-opacity-20 text-yellow-500"
                                             }`}
                                         >
-                      {project.active ? "تأیید شده" : "در انتظار تأیید"}
-                    </span>
+                                            {project.active ? "تأیید شده" : "در انتظار تأیید"}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-color7">{project.category?.name || "بدون دسته‌بندی"}</span>
+                                        <span className="text-color7">
+                                            {project.category?.name || "بدون دسته‌بندی"}
+                                        </span>
                                         <span className="flex items-center text-color7">
-                      <Clock size={14} className="ml-1" />
+                                            <Clock size={14} className="ml-1" />
                                             {formatDate(project.createdDate)}
-                    </span>
+                                        </span>
                                     </div>
                                     <div className="flex justify-end space-x-2 space-x-reverse pt-2">
                                         {!project.active && (

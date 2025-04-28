@@ -1,5 +1,5 @@
 'use client';
-import { JSX, useEffect, useState } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import {
@@ -27,6 +27,12 @@ interface ProfileData {
     user: { id: string | number | null };
     status?: string;
     message?: string;
+    projectsPosted: number;
+    activeProjects: number;
+    completedProjects: number;
+    unreadMessages: number;
+    notifications: number;
+
 }
 
 type ProfileResponse = ProfileData & {
@@ -37,7 +43,6 @@ type ProfileResponse = ProfileData & {
 
 const Profile = () => {
     const { userId } = useAuth();
-    console.log("user", userId);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [profileExists, setProfileExists] = useState(false);
@@ -51,6 +56,12 @@ const Profile = () => {
         address: '',
         placeOfStudy: '',
         user: { id: null },
+        projectsPosted: 0,
+        activeProjects: 0,
+        completedProjects: 0,
+        unreadMessages:0,
+        notifications: 0,
+
     });
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -64,14 +75,6 @@ const Profile = () => {
     const api = axios.create({
         baseURL: API,
         withCredentials: true,
-    });
-    const [userStats, setUserStats] = useState({
-        projectsPosted: 5,
-        activeProjects: 3,
-        completedProjects: 12,
-        walletBalance: 2500000,
-        unreadMessages: 4,
-        notifications: 2
     });
 
     api.interceptors.request.use((config) => {
@@ -104,6 +107,11 @@ const Profile = () => {
                         address: response.data.address || '',
                         placeOfStudy: response.data.placeOfStudy || '',
                         user: { id: response.data.user?.id || userId },
+                        projectsPosted:response.data.projectsPosted || 0,
+                        activeProjects:response.data.activeProjects || 0,
+                        completedProjects:response.data.completedProjects || 0,
+                        unreadMessages:response.data.unreadMessages || 0,
+                        notifications:response.data.notifications || 0,
                     });
                     setProfileExists(true);
                 }
@@ -368,7 +376,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های فعال</p>
-                                <p className="text-xl font-bold">{userStats.activeProjects}</p>
+                                <p className="text-xl font-bold">{profileData.activeProjects}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaProjectDiagram />
@@ -378,7 +386,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های منتشر شده</p>
-                                <p className="text-xl font-bold">{userStats.projectsPosted}</p>
+                                <p className="text-xl font-bold">{profileData.projectsPosted}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaClipboardList />
@@ -388,7 +396,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های تکمیل شده</p>
-                                <p className="text-xl font-bold">{userStats.completedProjects}</p>
+                                <p className="text-xl font-bold">{profileData.completedProjects}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaClipboardList />
@@ -398,7 +406,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">موجودی کیف پول</p>
-                                <p className="text-xl font-bold">{userStats.walletBalance.toLocaleString()} تومان</p>
+                                <p className="text-xl font-bold">0 تومان</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaWallet />
@@ -408,7 +416,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">پیام‌های جدید</p>
-                                <p className="text-xl font-bold">{userStats.unreadMessages}</p>
+                                <p className="text-xl font-bold">{profileData.unreadMessages}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaEnvelope />
@@ -418,7 +426,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">اعلان‌ها</p>
-                                <p className="text-xl font-bold">{userStats.notifications}</p>
+                                <p className="text-xl font-bold">{profileData.notifications}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaBell />

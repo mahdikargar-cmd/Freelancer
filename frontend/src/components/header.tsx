@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import img from "../img/logo-2.ico";
@@ -8,9 +7,7 @@ import API from "./utils/api";
 import Humberger from "./SVG/HumbergerMenu";
 import ThemeSwitcher from "./ThemeSwitcher";
 import SignHead from "@/components/signUpheader";
-import { FaHome, FaInfoCircle, FaPhone, FaShoppingCart } from "react-icons/fa";
-import {BiNotification} from "react-icons/bi";
-import {AiFillNotification} from "react-icons/ai";
+import {FaHome, FaInfoCircle, FaPhone, FaShoppingCart} from "react-icons/fa";
 import {IoIosNotifications} from "react-icons/io";
 
 interface HeaderLink {
@@ -30,13 +27,13 @@ const getLinkIcon = (title: string, link: string) => {
     const linkLower = link.toLowerCase();
 
     if (link === "/" || titleLower.includes("خانه") || titleLower.includes("اصلی") || linkLower.includes("home")) {
-        return <FaHome className="text-xl mb-1" />;
+        return <FaHome className="text-xl mb-1"/>;
     } else if (titleLower.includes("درباره") || linkLower.includes("about")) {
-        return <FaInfoCircle className="text-xl mb-1" />;
+        return <FaInfoCircle className="text-xl mb-1"/>;
     } else if (titleLower.includes("تماس") || linkLower.includes("contact")) {
-        return <FaPhone className="text-xl mb-1" />;
+        return <FaPhone className="text-xl mb-1"/>;
     } else if (titleLower.includes("فروشگاه") || linkLower.includes("shop")) {
-        return <FaShoppingCart className="text-xl mb-1" />;
+        return <FaShoppingCart className="text-xl mb-1"/>;
     }
 
     // آیکون پیش‌فرض
@@ -44,7 +41,7 @@ const getLinkIcon = (title: string, link: string) => {
 };
 
 const Header = () => {
-    const [headerData, setHeaderData] = useState<HeaderData>({ links: [] });
+    const [headerData, setHeaderData] = useState<HeaderData>({links: []});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -53,7 +50,7 @@ const Header = () => {
         const fetchHeaderData = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`${API}/api/getHeader`, { cache: "no-store" });
+                const res = await fetch(`${API}/api/getHeader`, {cache: "no-store"});
                 if (!res.ok) {
                     throw new Error("خطا در دریافت داده‌های هدر");
                 }
@@ -78,14 +75,16 @@ const Header = () => {
     if (loading) {
         return (
             <div className="w-full h-16 flex items-center justify-center bg-light-color1 dark:bg-color6">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4"></div>
+                <div
+                    className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-light-color4 dark:border-color4"></div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="w-full h-16 flex items-center justify-center bg-light-color1 dark:bg-color6 text-light-color9 dark:text-color9">
+            <div
+                className="w-full h-16 flex items-center justify-center bg-light-color1 dark:bg-color6 text-light-color9 dark:text-color9">
                 {error}
             </div>
         );
@@ -95,14 +94,15 @@ const Header = () => {
         <>
             {/* هدر اصلی */}
             <nav className="w-full z-20 top-0 start-0 mt-6 sticky bg-light-color1 dark:bg-color6 dir-rtl">
-                <div className="max-w-screen-xl xl:w-[1000px] flex items-center justify-between mx-auto px-4 py-2 bg-light-color5 dark:bg-color1 rounded-full border border-light-color6 dark:border-color5 transition-all duration-300">
+                <div
+                    className="max-w-screen-xl xl:w-[1000px] flex items-center justify-between mx-auto px-4 py-2 bg-light-color5 dark:bg-color1 rounded-full border border-light-color6 dark:border-color5 transition-all duration-300">
 
                     {/* لوگو و سوئیچر حالت شب - سمت راست */}
                     <div className="flex items-center space-x-4 rtl:space-x-reverse order-1">
                         <Link href="/" className="flex items-center">
-                            <Image src={img} className="h-12 w-12" alt="لوگو" width={100} height={128} loading="lazy" />
+                            <Image src={img} className="h-12 w-12" alt="لوگو" width={100} height={128} loading="lazy"/>
                         </Link>
-                        <ThemeSwitcher />
+                        <ThemeSwitcher/>
                     </div>
 
                     {/* لینک‌های هدر - وسط در دسکتاپ */}
@@ -124,18 +124,22 @@ const Header = () => {
 
                     {/* آیکون ورود سمت چپ */}
                     <div className="flex items-center space-x-4 rtl:space-x-reverse order-3">
-                        <IoIosNotifications className={'size-6 dark:text-color4'}/>
-                        <SignHead />
+                        <Link href={'../notification'}>
+                            <IoIosNotifications className={'size-6 dark:text-color4'}/>
+
+                        </Link>
+                        <SignHead/>
                         <div className="md:hidden" onClick={toggleMobileMenu}>
                             {/* از Humberger به عنوان یک کامپوننت استفاده می‌کنیم، بدون اینکه آن را داخل دکمه دیگری قرار دهیم */}
-                            <Humberger />
+                            <Humberger/>
                         </div>
                     </div>
                 </div>
 
                 {/* منوی کشویی موبایل (فقط زمانی که همبرگر کلیک شود) */}
                 {showMobileMenu && (
-                    <div className="md:hidden mt-2 px-4 pb-4 bg-light-color5 dark:bg-color1 rounded-lg border border-light-color6 dark:border-color5 mx-2">
+                    <div
+                        className="md:hidden mt-2 px-4 pb-4 bg-light-color5 dark:bg-color1 rounded-lg border border-light-color6 dark:border-color5 mx-2">
                         <ul className="flex flex-col gap-2 font-primaryMedium text-sm">
                             {headerData.links.map((item) => (
                                 <li key={item.id}>
@@ -155,7 +159,8 @@ const Header = () => {
             </nav>
 
             {/* منوی ثابت پایین صفحه (فقط در حالت موبایل) */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-light-color5 dark:bg-color1 border-t border-light-color6 dark:border-color5 z-50">
+            <div
+                className="md:hidden fixed bottom-0 left-0 right-0 bg-light-color5 dark:bg-color1 border-t border-light-color6 dark:border-color5 z-50">
                 <div className="flex justify-around items-center px-2 py-3">
                     {headerData.links.slice(0, 5).map((item) => (
                         <Link

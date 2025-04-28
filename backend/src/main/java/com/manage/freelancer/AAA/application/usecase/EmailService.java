@@ -4,7 +4,6 @@ import com.manage.freelancer.AAA.infrastructure.entity.VerificationCode;
 import com.manage.freelancer.AAA.infrastructure.repository.VerificationCodeRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value; // ایمپورت درست برای @Value
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;

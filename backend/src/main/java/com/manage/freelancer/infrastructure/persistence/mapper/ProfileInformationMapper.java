@@ -17,6 +17,11 @@ public class ProfileInformationMapper {
                 .user(profileInformationdto.getUser())
                 .placeOfStudy(profileInformationdto.getPlaceOfStudy())
                 .profileImageUrl(profileInformationdto.getProfileImageUrl())
+                .projectsPosted(profileInformationdto.getProjectsPosted())
+                .activeProjects(profileInformationdto.getActiveProjects())
+                .completedProjects(profileInformationdto.getCompletedProjects())
+                .unreadMessages(profileInformationdto.getUnreadMessages())
+                .notifications(profileInformationdto.getNotifications())
                 .build();
     }
 
@@ -31,6 +36,11 @@ public class ProfileInformationMapper {
                 .user(profileInformation.getUser())
                 .placeOfStudy(profileInformation.getPlaceOfStudy())
                 .profileImageUrl(profileInformation.getProfileImageUrl())
+                .projectsPosted(profileInformation.getProjectsPosted())
+                .activeProjects(profileInformation.getActiveProjects())
+                .completedProjects(profileInformation.getCompletedProjects())
+                .unreadMessages(profileInformation.getUnreadMessages())
+                .notifications(profileInformation.getNotifications())
                 .build();
     }
 }
