@@ -1,27 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8080/:path*',
+        destination: `${API_URL}/:path*`,
       },
       {
         source: '/app/:path*',
-        destination: 'http://localhost:8080/app/:path*',
+        destination: `${API_URL}/app/:path*`,
       },
     ];
   },
   reactStrictMode: true,
   eslint: {
-    ignoreDuringBuilds: true, // نادیده گرفتن خطاهای ESLint موقع بیلد
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true, // نادیده گرفتن خطاهای TypeScript موقع بیلد
+    ignoreBuildErrors: true,
   },
 };
 
-// تنظیمات PWA
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,

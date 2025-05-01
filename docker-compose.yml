@@ -1,37 +1,41 @@
 version: '3.8'
-
 services:
-  postgres:
-    image: postgres:16
-    env_file: .env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    expose:
+      - "3000"
     networks:
-      - app_network
+      - app-network
 
   backend:
     build: ./backend
-    ports:
-      - "8080:8080"
-    env_file: .env
-    depends_on:
-      - postgres
+    container_name: backend
+    expose:
+      - "8080"
+    volumes:
+      - uploads:/app/uploads
     networks:
-      - app_network
+      - app-network
 
-  frontend:
-    build: ./frontend
+  nginx:
+    build: ./nginx
+    container_name: nginx
     ports:
-      - "7070:7070"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - uploads:/uploads
     depends_on:
+      - frontend
       - backend
     networks:
-      - app_network
+      - app-network
 
 volumes:
-  postgres_data:
+  uploads:
 
 networks:
-  app_network:
+  app-network:
+    driver: bridge

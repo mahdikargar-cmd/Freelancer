@@ -42,14 +42,6 @@ export function middleware(request: NextRequest) {
     const publicPaths = ['/login', '/signUp', '/', '/adminlog','/forgetPassword','/projects']; // اضافه کردن /signUp
     // اگر مسیر عمومی باشد
     if (publicPaths.includes(pathname)) {
-        // اگر کاربر عمومی لاگین کرده و در /login, /register, یا / است، به داشبورد هدایت شود
-/*        if (
-            isUserAuthenticated &&
-            ['/login', '/register', '/'].includes(pathname)
-        ) {
-            return NextResponse.redirect(new URL('/dashboard', request.url));
-        }*/
-        // اگر ادمین لاگین کرده و در /adminlog است، به داشبورد ادمین هدایت شود
         if (isAdminAuthenticated && pathname === '/adminlog') {
             return NextResponse.redirect(new URL('/admin', request.url));
         }

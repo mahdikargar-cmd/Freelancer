@@ -28,6 +28,7 @@ ext {
 }
 
 dependencies {
+    implementation 'ch.qos.logback:logback-classic'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation group: 'com.codingapi.security', name: 'springboot-starter-security-jwt', version: '0.0.7'
@@ -48,7 +49,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.18.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
@@ -58,6 +59,8 @@ dependencies {
 
 // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 }
 
