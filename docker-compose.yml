@@ -1,10 +1,23 @@
-version: '3.8'
 services:
-  frontend:
-    build: ./frontend
-    container_name: frontend
+  redis:
+    image: redis:alpine
+    container_name: redis
     expose:
-      - "3000"
+      - "6379"
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_DB: deadlinee
+      POSTGRES_USER: freelancer
+      POSTGRES_PASSWORD: 13521380Mm$$#
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -15,6 +28,23 @@ services:
       - "8080"
     volumes:
       - uploads:/app/uploads
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/deadlinee
+      - SPRING_DATASOURCE_USERNAME=freelancer
+      - SPRING_DATASOURCE_PASSWORD=13521380Mm$$#
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    expose:
+      - "3000"
     networks:
       - app-network
 
@@ -35,7 +65,9 @@ services:
 
 volumes:
   uploads:
+  pgdata:
 
 networks:
   app-network:
     driver: bridge
+

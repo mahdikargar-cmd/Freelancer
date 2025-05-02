@@ -44,7 +44,9 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/api/profileImages/**"),
                                 new AntPathRequestMatcher("/api/getHeader"),
                                 new AntPathRequestMatcher("/api/footer"),
-                                new AntPathRequestMatcher("/api/notfound")
+                                new AntPathRequestMatcher("/api/notfound"),
+                                new AntPathRequestMatcher("/api/placeholder/**")
+
                         ).permitAll()
                         .requestMatchers(
                                 new AntPathRequestMatcher("/auth/users"),
