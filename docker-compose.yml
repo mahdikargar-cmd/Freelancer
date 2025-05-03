@@ -13,7 +13,7 @@ services:
     environment:
       POSTGRES_DB: deadlinee
       POSTGRES_USER: freelancer
-      POSTGRES_PASSWORD: 13521380Mm$#
+      POSTGRES_PASSWORD: 13521380Mm$$#
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -28,7 +28,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/deadlinee
       SPRING_DATASOURCE_USERNAME: freelancer
-      SPRING_DATASOURCE_PASSWORD: 13521380Mm$#
+      SPRING_DATASOURCE_PASSWORD: 13521380Mm$$#
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
     volumes:
@@ -45,7 +45,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: https://deadlinee.ir/api
+      NEXT_PUBLIC_API_URL: https://deadlinee.ir
     networks:
       - app-network
 

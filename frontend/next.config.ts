@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  trailingSlash: true,
+  trailingSlash: false,
   async rewrites() {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://backend:8080';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL ;
     return [
       {
         source: '/api/:path*',

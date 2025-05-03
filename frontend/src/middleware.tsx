@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
     const publicPaths = ['/login', '/signUp', '/', '/adminlog', '/forgetPassword', '/projects'];
     
     // اگر مسیر عمومی باشد
-    if (publicPaths.includes(pathname)) {
+    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
         if (isAdminAuthenticated && pathname === '/adminlog') {
             return NextResponse.redirect(new URL('/admin', request.url));
         }
@@ -50,7 +50,8 @@ export function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/dashboard', request.url)); // به مسیر داشبورد هدایت می‌شود
         }
         return NextResponse.next();
-    }
+}
+
 
     // مسیرهای ادمین (مثل /admin و زیرمسیرهای آن)
     if (pathname.startsWith('/admin')) {
