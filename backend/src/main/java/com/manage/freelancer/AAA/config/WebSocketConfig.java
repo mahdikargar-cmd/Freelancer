@@ -15,6 +15,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(customWebSocketHandler, "/ws/chat")
-                .setAllowedOriginPatterns("http://localhost:*", "https://deadlinee.ir", "www.deadlinee.ir", "www.deadlinee.ir", "deadlinee.ir");
+                .setAllowedOriginPatterns(
+                        "http://localhost:*",
+                        "https://deadlinee.ir",
+                        "https://www.deadlinee.ir",
+                        "https://*.deadlinee.ir"
+                );
     }
 }
+

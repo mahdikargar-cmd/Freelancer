@@ -1,15 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  trailingSlash: true,
   async rewrites() {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://backend:8080';
     return [
       {
         source: '/api/:path*',
-        destination: `${API_URL}/:path*`,
+        destination: `${API_URL}/api/:path*`,
       },
       {
         source: '/app/:path*',
         destination: `${API_URL}/app/:path*`,
+      },
+         {
+        source: '/auth/:path*',
+        destination: `${API_URL}/auth/:path*`,
       },
     ];
   },
@@ -26,6 +31,7 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
 });
 
 module.exports = withPWA(nextConfig);

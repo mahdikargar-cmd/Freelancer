@@ -39,11 +39,15 @@ export function middleware(request: NextRequest) {
     });
 
     // مسیرهای عمومی که نیازی به احراز هویت ندارند
-    const publicPaths = ['/login', '/signUp', '/', '/adminlog','/forgetPassword','/projects']; // اضافه کردن /signUp
+    const publicPaths = ['/login', '/signUp', '/', '/adminlog', '/forgetPassword', '/projects'];
+    
     // اگر مسیر عمومی باشد
     if (publicPaths.includes(pathname)) {
         if (isAdminAuthenticated && pathname === '/adminlog') {
             return NextResponse.redirect(new URL('/admin', request.url));
+        }
+        if (isUserAuthenticated && pathname === '/login') {
+            return NextResponse.redirect(new URL('/dashboard', request.url)); // به مسیر داشبورد هدایت می‌شود
         }
         return NextResponse.next();
     }
@@ -51,13 +55,11 @@ export function middleware(request: NextRequest) {
     // مسیرهای ادمین (مثل /admin و زیرمسیرهای آن)
     if (pathname.startsWith('/admin')) {
         if (!isAdminAuthenticated) {
-            // ذخیره مسیر قبلی برای بازگشت پس از ورود
             const redirectUrl = new URL('/adminlog', request.url);
-            redirectUrl.searchParams.set('callbackUrl', pathname);
+            redirectUrl.searchParams.set('callbackUrl', pathname); // ذخیره مسیر قبلی برای بازگشت پس از ورود
             return NextResponse.redirect(redirectUrl);
         }
         const response = NextResponse.next();
-        // تنظیم هدر برای ادمین
         response.headers.set('x-admin', 'true');
         return response;
     }
@@ -65,9 +67,8 @@ export function middleware(request: NextRequest) {
     // مسیرهای غیرعمومی برای کاربران عمومی
     if (!isUserAuthenticated) {
         console.warn('🔍 Middleware: Access denied to protected path', { pathname });
-        // ذخیره مسیر قبلی برای بازگشت پس از ورود
         const redirectUrl = new URL('/login', request.url);
-        redirectUrl.searchParams.set('callbackUrl', pathname);
+        redirectUrl.searchParams.set('callbackUrl', pathname); // ذخیره مسیر قبلی برای بازگشت پس از ورود
         return NextResponse.redirect(redirectUrl);
     }
 
