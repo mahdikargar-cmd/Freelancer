@@ -9,12 +9,10 @@ import Failed from '@/components/Toast/failed';
 import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
 import Link from 'next/link';
 import r_c from '../../../img/right-corner.png';
-import {useAuth} from "@/components/lib/useAuth";
 import API from "@/components/utils/api";
 
 const Login = () => {
     const router = useRouter();
-    const { isLoggedIn } = useAuth();
     const [info, setInfo] = useState({ email: '', password: '' });
     const [warning, setWarning] = useState('');
     const [showToast, setShowToast] = useState({ success: false, failed: false });
@@ -49,8 +47,6 @@ const Login = () => {
             });
 
             const data = await response.json();
-            console.log('🔍 Login Response:', JSON.stringify(data, null, 2));
-
             if (!response.ok) {
                 throw new Error(data.message || 'رمز عبور یا ایمیل اشتباه است.');
             }
@@ -64,11 +60,8 @@ const Login = () => {
 
                 Cookies.set('token', data.token, { expires: 1, path: '/', sameSite: 'strict' });
                 Cookies.set('userId', userId, { expires: 1, path: '/', sameSite: 'strict' });
-                console.log('🔍 Cookies after set:', Cookies.get());
-
                 setWarning('خوش آمدید.');
                 setShowToast({ success: true, failed: false });
-
                 setTimeout(() => {
                     setShowToast({ success: false, failed: false });
                     router.push('/dashboard');

@@ -32,8 +32,6 @@ const getLinkIcon = (title: string, link: string) => {
         return <FaInfoCircle className="text-xl mb-1"/>;
     } else if (titleLower.includes("تماس") || linkLower.includes("contact")) {
         return <FaPhone className="text-xl mb-1"/>;
-    } else if (titleLower.includes("فروشگاه") || linkLower.includes("shop")) {
-        return <FaShoppingCart className="text-xl mb-1"/>;
     }
 
     // آیکون پیش‌فرض

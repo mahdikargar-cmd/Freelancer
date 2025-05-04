@@ -51,6 +51,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 
 // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "@/components/lib/api";
 import Cookies from "js-cookie";
 import { Proposal } from "@/types"; // وارد کردن تایپ مشترک

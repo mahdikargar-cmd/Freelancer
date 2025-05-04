@@ -5,10 +5,9 @@ import ProjectListChat from "@/components/ProjectListChat/page";
 import ChatInterface from "@/components/ChatInterface";
 import { useAuth } from "@/components/lib/useAuth";
 import DetailSuggest from "@/app/(with-header-footer)/detailSuggest/DetailSuggest";
-import { Proposal } from "@/types"; // وارد کردن تایپ مشترک
+import { Proposal } from "@/types";
 
 const FreelanceDashboard = () => {
-    const { userId } = useAuth(); // دریافت userId و role (کارفرما یا فریلنسر)
     const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
     const [showChat, setShowChat] = useState<boolean>(false);
     const [chatProjectId, setChatProjectId] = useState<number | null>(null);

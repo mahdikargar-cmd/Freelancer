@@ -56,7 +56,6 @@ const AdminLogin = () => {
     } catch (err: any) {
       setError(err.message || "خطا در ارتباط با سرور");
       toast.error(err.message || "خطا در ورود", { position: "bottom-right", rtl: true });
-      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }

@@ -7,6 +7,7 @@ import Success from '@/components/Toast/success';
 import { FiMail, FiLock, FiUserPlus, FiArrowLeft, FiKey } from 'react-icons/fi';
 import { useAuth } from '@/components/lib/useAuth';
 import Cookies from "js-cookie";
+import API from "@/components/utils/api";
 
 const SignUp = () => {
     const router = useRouter();
@@ -63,7 +64,7 @@ const SignUp = () => {
         if (emailWarning || passwordWarning || !info.email || !info.password) return;
 
         setIsLoading(true);
-        fetch('http://localhost:8080/auth/register/initiate', {
+        fetch(`${API}/auth/register/initiate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(info),
@@ -81,7 +82,7 @@ const SignUp = () => {
             .then((data) => {
                 setToastMessage(data.message || 'کد تأیید به ایمیل شما ارسال شد');
                 setShowToast(true);
-                setShowVerificationForm(true); // نمایش فرم کد تأیید
+                setShowVerificationForm(true);
                 setTimeout(() => setShowToast(false), 3000);
             })
             .catch((error: any) => {
@@ -98,15 +99,13 @@ const SignUp = () => {
         setIsLoading(true);
         const cleanedCode = verificationCode.trim();
         const cleanedEmail = info.email.trim().toLowerCase();
-        console.log('🔍 Sending verification request:', { email: cleanedEmail, code: cleanedCode });
-        fetch(`http://localhost:8080/auth/register/verify?code=${encodeURIComponent(cleanedCode)}`, {
+        fetch(`${API}/auth/register/verify?code=${encodeURIComponent(cleanedCode)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: cleanedEmail, password: info.password }),
             credentials: 'include',
         })
             .then((response) => {
-                console.log('🔍 Response status:', response.status);
                 if (!response.ok) {
                     return response.json().then((errorData) => {
                         throw new Error(errorData.message || 'خطایی در تأیید کد رخ داد.');
@@ -115,7 +114,6 @@ const SignUp = () => {
                 return response.json();
             })
             .then((data) => {
-                console.log('🔍 Verify response:', data);
                 if (data.token && data.userId) {
                     Cookies.set('token', data.token, { expires: 7, path: '/', sameSite: 'strict', secure: process.env.NODE_ENV === 'production' });
                     Cookies.set('userId', String(data.userId), { expires: 7, path: '/', sameSite: 'strict', secure: process.env.NODE_ENV === 'production' });
@@ -131,7 +129,6 @@ const SignUp = () => {
                 }
             })
             .catch((error: any) => {
-                console.error('🔍 Verify error:', error.message);
                 setCodeWarning(error.message);
             })
             .finally(() => {
@@ -140,8 +137,8 @@ const SignUp = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen dark:bg-color6 bg-light-color1">
-            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 flex flex-col justify-center dark:bg-color1 bg-light-color6 rounded-3xl border dark:border-color5 border-light-color5 my-10 text-center px-6 py-12 space-y-8 md:mx-0 mx-4 shadow-xl transition-all duration-300 dark:hover:shadow-color4/20 hover:shadow-light-color4/20">
+        <div className="flex items-center  justify-center min-h-screen  dark:bg-color6 bg-light-color1">
+            <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 flex flex-col justify-center dark:bg-color1 bg-light-color6 rounded-3xl border dark:border-color5 border-light-color5  text-center px-6 py-4 space-y-8 md:mx-0 mx-4 shadow-xl transition-all duration-300 dark:hover:shadow-color4/20 hover:shadow-light-color4/20">
                 {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
                 <Image
                     className="absolute top-0 right-0 transform rotate-0 w-[200px] h-[200px] pointer-events-none opacity-70"
