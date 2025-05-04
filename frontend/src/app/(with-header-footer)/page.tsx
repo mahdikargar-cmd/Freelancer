@@ -1,22 +1,12 @@
-"use client"
-import HeroSection from "@/components/Hero";
-import CategoriesSection from "@/components/CategoriesSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-import FreelancerSection from "@/components/FreelancerSection";
-import CTA from "@/components/CTA";
-import StarAnime from "@/components/Star";
+import ClientHome from "@/components/ClientHome";
+
+export const metadata = {
+    title: "ددلاین | سیستم فریلنسری و انجام پروژه",
+    description: "در ددلاین پروژه‌های برنامه‌نویسی، طراحی و تولید محتوا را به بهترین فریلنسرها بسپارید.",
+    keywords: ["ددلاین", "freelancer", "فریلنسری", "انجام پروژه", "deadline", "پروژه دانشجویی","project","فریلنسر","فریلنسری"
+    ,"طراحی","برنامه نویسی","deadlinee","deadlinee.ir"],
+};
 
 export default function Home() {
-   
-
-    return (
-        <div className="min-h-screen dark:bg-color6 bg-light-color1">
-            <HeroSection />
-            <CategoriesSection />
-            <HowItWorksSection />
-            <FreelancerSection />
-            <CTA />
-            <StarAnime />
-        </div>
-    );
+    return <ClientHome />;
 }
