@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
-import axios from "axios";
 import { api } from "@/components/lib/api";
 
 interface Message {
@@ -53,7 +52,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/app/${projectId}`, {
+                const response = await api.get(`/app/${projectId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 let projectData = response.data;

@@ -43,7 +43,7 @@ public class ProjectController {
         return ResponseEntity.ok(projects);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("getProject/{id}")
     public ResponseEntity<Object> getProject(@PathVariable Long id) {
         try {
             ProjectDTO projectDTO = projectUC.getProjectById(id);

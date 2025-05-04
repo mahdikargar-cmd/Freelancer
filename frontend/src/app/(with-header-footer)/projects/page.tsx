@@ -59,10 +59,6 @@ const Project = () => {
     const getProjects = async () => {
         try {
             const response = await api.get<ApiResponse>("/app/getProjects", {
-                headers: {
-                    Authorization: `Bearer ${Cookies.get("token")}`,
-                    withCredentials: true,
-                },
                 params: {
                     search,
                     category,

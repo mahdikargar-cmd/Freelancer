@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "@/components/lib/api";
 import Cookies from "js-cookie";
-import { Proposal } from "@/types"; // وارد کردن تایپ مشترک
+import { Proposal } from "@/types";
 
 // تایپ برای props کامپوننت
 interface DetailSuggestProps {

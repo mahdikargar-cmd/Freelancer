@@ -30,7 +30,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // default CORS config
+                .cors(cors -> {
+                }) // default CORS config
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -45,9 +46,10 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/api/getHeader"),
                                 new AntPathRequestMatcher("/api/footer"),
                                 new AntPathRequestMatcher("/api/notfound"),
-                                new AntPathRequestMatcher("/api/placeholder/**")
-
-                        ).permitAll()
+                                new AntPathRequestMatcher("/api/placeholder/**"),
+                                new AntPathRequestMatcher("/app/getProjects"),
+                                new AntPathRequestMatcher("/app/getProject/**")
+                                ).permitAll()
                         .requestMatchers(
                                 new AntPathRequestMatcher("/auth/users"),
                                 new AntPathRequestMatcher("/api/getProfileInformation"),

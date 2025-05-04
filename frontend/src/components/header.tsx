@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import img from "../img/logo-2.ico";
 import API from "./utils/api";
-import Humberger from "./SVG/HumbergerMenu";
 import ThemeSwitcher from "./ThemeSwitcher";
 import SignHead from "@/components/signUpheader";
 import {FaHome, FaInfoCircle, FaPhone, FaShoppingCart} from "react-icons/fa";
@@ -42,7 +41,6 @@ const Header = () => {
     const [headerData, setHeaderData] = useState<HeaderData>({links: []});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     useEffect(() => {
         const fetchHeaderData = async () => {
@@ -66,10 +64,6 @@ const Header = () => {
         fetchHeaderData();
     }, []);
 
-    const toggleMobileMenu = () => {
-        setShowMobileMenu(!showMobileMenu);
-    };
-
     if (loading) {
         return (
             <div className="w-full h-16 flex items-center justify-center bg-light-color1 dark:bg-color6">
@@ -91,7 +85,7 @@ const Header = () => {
     return (
         <>
             {/* هدر اصلی */}
-            <nav className="w-full z-20 top-0 start-0 mt-6 sticky bg-light-color1 dark:bg-color6 dir-rtl">
+            <nav className="w-full  z-20 top-0 start-0 mt-6  sticky bg-light-color1 dark:bg-color6 dir-rtl">
                 <div
                     className="max-w-screen-xl xl:w-[1000px] flex items-center justify-between mx-auto px-4 py-2 bg-light-color5 dark:bg-color1 rounded-full border border-light-color6 dark:border-color5 transition-all duration-300">
 
@@ -127,33 +121,8 @@ const Header = () => {
 
                         </Link>
                         <SignHead/>
-                        <div className="md:hidden" onClick={toggleMobileMenu}>
-                            {/* از Humberger به عنوان یک کامپوننت استفاده می‌کنیم، بدون اینکه آن را داخل دکمه دیگری قرار دهیم */}
-                            <Humberger/>
-                        </div>
                     </div>
                 </div>
-
-                {/* منوی کشویی موبایل (فقط زمانی که همبرگر کلیک شود) */}
-                {showMobileMenu && (
-                    <div
-                        className="md:hidden mt-2 px-4 pb-4 bg-light-color5 dark:bg-color1 rounded-lg border border-light-color6 dark:border-color5 mx-2">
-                        <ul className="flex flex-col gap-2 font-primaryMedium text-sm">
-                            {headerData.links.map((item) => (
-                                <li key={item.id}>
-                                    <Link
-                                        href={item.link}
-                                        className="block py-2 px-4 text-light-color2 dark:text-color2 hover:text-light-color4 dark:hover:text-color4 hover:bg-light-color6 dark:hover:bg-color5 rounded-full transition-all duration-300"
-                                        aria-label={`لینک به ${item.title}`}
-                                        onClick={() => setShowMobileMenu(false)}
-                                    >
-                                        {item.title}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
             </nav>
 
             {/* منوی ثابت پایین صفحه (فقط در حالت موبایل) */}
@@ -174,8 +143,6 @@ const Header = () => {
                 </div>
             </div>
 
-            {/* فضای خالی در پایین صفحه برای جلوگیری از پوشاندن محتوا توسط منوی ثابت پایین (فقط در حالت موبایل) */}
-            <div className="md:hidden h-16 w-full"></div>
         </>
     );
 };

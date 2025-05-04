@@ -4,6 +4,7 @@ import { Bell, Check, X, AlertCircle, Users, Briefcase, MessageSquare, Wallet, A
 import axios from 'axios';
 import API from "@/components/utils/api";
 import Success from "@/components/Toast/success";
+import {api} from "@/components/lib/api";
 
 const NotificationType = {
     PROJECT_INVITE: 'project_invite',
@@ -60,7 +61,7 @@ export default function Notification() {
 
     const markAllAsRead = async () => {
         try {
-            await axios.put(`${API}/api/notifications/mark-all-read`, {}, { withCredentials: true });
+            await api.put('/api/notifications/mark-all-read', {}, { withCredentials: true });
             setNotifications(notifications.map((n) => ({ ...n, read: true })));
             setUnreadCount(0);
             handleShowToast('همه نوتیفیکیشن‌ها به عنوان خوانده‌شده علامت‌گذاری شدند');
@@ -72,7 +73,7 @@ export default function Notification() {
 
     const markAsRead = async (id: number) => {
         try {
-            await axios.put(`${API}/api/notifications/${id}/mark-read`, {}, { withCredentials: true });
+            await api.put('/api/notifications/${id}/mark-read', {}, { withCredentials: true });
             setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)));
             setUnreadCount((prev) => Math.max(0, prev - 1));
             handleShowToast('نوتیفیکیشن به عنوان خوانده‌شده علامت‌گذاری شد');
@@ -84,7 +85,7 @@ export default function Notification() {
 
     const removeNotification = async (id: number) => {
         try {
-            await axios.delete(`${API}/api/notifications/${id}`, { withCredentials: true });
+            await api.delete('/api/notifications/${id}', { withCredentials: true });
             const notif = notifications.find((n) => n.id === id);
             setNotifications(notifications.filter((n) => n.id !== id));
             if (!notif?.read) {

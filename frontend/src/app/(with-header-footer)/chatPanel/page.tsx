@@ -3,7 +3,6 @@
 import { useState } from "react";
 import ProjectListChat from "@/components/ProjectListChat/page";
 import ChatInterface from "@/components/ChatInterface";
-import { useAuth } from "@/components/lib/useAuth";
 import DetailSuggest from "@/app/(with-header-footer)/detailSuggest/DetailSuggest";
 import { Proposal } from "@/types";
 

@@ -137,7 +137,7 @@ const SignUp = () => {
     };
 
     return (
-        <div className="flex items-center  justify-center min-h-screen  dark:bg-color6 bg-light-color1">
+        <div className="flex items-center  justify-center mt-10 dark:bg-color6 bg-light-color1">
             <div className="relative w-full md:w-3/4 lg:w-3/4 xl:w-1/2 flex flex-col justify-center dark:bg-color1 bg-light-color6 rounded-3xl border dark:border-color5 border-light-color5  text-center px-6 py-4 space-y-8 md:mx-0 mx-4 shadow-xl transition-all duration-300 dark:hover:shadow-color4/20 hover:shadow-light-color4/20">
                 {showToast && <Success showToast={() => setShowToast(false)} text={toastMessage} />}
                 <Image

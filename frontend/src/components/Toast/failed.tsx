@@ -1,3 +1,5 @@
+import React from "react";
+
 interface FailedProps {
     showToast: () => void;
     text: string

@@ -80,7 +80,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen dark:bg-color6 bg-light-color1">
+        <div className="flex items-center justify-center dark:bg-color6 bg-light-color1 ">
             <div className="relative w-full max-w-[600px] flex flex-col justify-center dark:bg-color1 bg-light-color6 rounded-3xl border dark:border-color5 border-light-color5 my-10 text-center px-6 py-12 space-y-8 mx-4 shadow-xl transition-all duration-300 dark:hover:shadow-color4/20 hover:shadow-light-color4/20">
                 {showToast.success && (
                     <Success

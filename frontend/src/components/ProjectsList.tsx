@@ -79,8 +79,8 @@ const ProjectsList: React.FC = () => {
         const filteredNewProjects = newProjects.filter(p => !existingIds.has(p.id));
         return [...prev, ...filteredNewProjects];
       });
-      setHasMore(!data.last); // اگه صفحه آخره، دیگه "بارگذاری بیشتر" نشون داده نشه
-      setCurrentPage(data.number + 1); // افزایش شماره صفحه برای بعدی
+      setHasMore(!data.last);
+      setCurrentPage(data.number + 1);
 
     } catch (err: any) {
       setError(err.message);
@@ -91,8 +91,8 @@ const ProjectsList: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchProjects(0); // بار اول صفحه 0
-    fetchCategories(); // دسته‌بندی‌ها جداگانه
+    fetchProjects(0);
+    fetchCategories();
   }, []);
   
   const fetchCategories = async () => {

@@ -77,14 +77,8 @@ const ProjectId = () => {
     const fetchProject = useCallback(async () => {
         try {
             setLoading(true);
-            if (!projectId) {
-                throw new Error('شناسه پروژه نامعتبر است');
-            }
-            if (!Cookies.get('token')) {
-                throw new Error('لطفاً وارد حساب کاربری خود شوید.');
-            }
 
-            const { data } = await api.get<Project>(`app/${projectId}`, {
+            const { data } = await api.get<Project>(`app/getProject/${projectId}`, {
                 headers: {
                     Authorization: `Bearer ${Cookies.get('token')}`,
                 },
