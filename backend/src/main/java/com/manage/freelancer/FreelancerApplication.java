@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = {
         "com.manage.freelancer.infrastructure.persistence.entity",
         "com.manage.freelancer.AAA.infrastructure.entity",
-        "com.manage.freelancer.AAA.infrastructure.entity",
         "com.manage.freelancer.infrastructure.persistence.entityDTO"
 })
 public class FreelancerApplication {
