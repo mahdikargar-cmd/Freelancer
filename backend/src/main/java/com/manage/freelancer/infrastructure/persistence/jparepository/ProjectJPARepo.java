@@ -43,6 +43,18 @@ public interface ProjectJPARepo extends JpaRepository<ProjectDTO, Long> {
 
     Page<ProjectDTO> findByActive(boolean active, Pageable pageable);
 
+    @Query("SELECT p FROM ProjectDTO p " +
+            "WHERE (:active IS NULL OR p.active = :active) " +
+            "AND (:category IS NULL OR p.category.name = :category) " +
+            "AND (:minPrice IS NULL OR p.priceStarted >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR p.priceEnded <= :maxPrice)")
+    @EntityGraph(attributePaths = {"skills", "category", "employerId"})
+    Page<ProjectDTO> findByFilters(
+            @Param("active") Boolean active,
+            @Param("category") String category,
+            @Param("minPrice") Double minPrice,
+            @Param("maxPrice") Double maxPrice,
+            Pageable pageable);
 
 }
 

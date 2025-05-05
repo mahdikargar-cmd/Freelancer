@@ -27,5 +27,7 @@ public interface ProjectRepo {
     Page<ProjectDTO> findAll(Pageable pageable);
 
     Page<ProjectDTO> findByActive(boolean active, Pageable pageable);
+
+    Page<ProjectDTO> findByFilters(Boolean active, String category, Double minPrice, Double maxPrice, Pageable pageable);
 }
 

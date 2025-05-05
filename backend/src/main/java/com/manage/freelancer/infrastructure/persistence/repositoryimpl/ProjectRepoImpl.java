@@ -28,6 +28,10 @@ public class ProjectRepoImpl implements ProjectRepo {
         return projectJPARepo.findByActive(active, pageable);
     }
 
+    @Override
+    public Page<ProjectDTO> findByFilters(Boolean active, String category, Double minPrice, Double maxPrice, Pageable pageable) {
+        return projectJPARepo.findByFilters(active, category, minPrice, maxPrice, pageable);
+    }
 
     @Override
     public List<ProjectDTO> findByProjectName(String projectName) {

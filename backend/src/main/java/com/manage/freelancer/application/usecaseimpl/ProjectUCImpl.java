@@ -45,6 +45,27 @@ public class ProjectUCImpl implements ProjectUC {
         return projectRepo.findById(id);
     }
 
+
+    @Override
+    public Page<ProjectDTO> getFilteredProjects(Boolean active, String category, String priceRange, Pageable pageable) {
+        // پردازش محدوده قیمت
+        Double minPrice = null;
+        Double maxPrice = null;
+        if (priceRange != null && !priceRange.isEmpty()) {
+            String[] prices = priceRange.split("-");
+            if (prices.length == 2) {
+                try {
+                    minPrice = Double.parseDouble(prices[0]);
+                    maxPrice = Double.parseDouble(prices[1]);
+                } catch (NumberFormatException e) {
+                    // خطا رو لاگ کن یا نادیده بگیر
+                }
+            }
+        }
+
+        return projectRepo.findByFilters(active, category, minPrice, maxPrice, pageable);
+    }
+
     @Override
     public ProjectDTO addSuggestion(Long projectId, Long freelancerId) {
         // Fetch the existing project

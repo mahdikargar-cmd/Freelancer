@@ -22,26 +22,33 @@ import java.util.Map;
 public class ProjectController {
     private final ProjectUCImpl projectUC;
 
-
     @GetMapping("/getProjects")
     public ResponseEntity<Page<ProjectDTO>> getProjects(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size,
-            @RequestParam(defaultValue = "id,desc") String sort,
-            @RequestParam(required = false) Boolean active) {
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String priceRange) {
 
-        String[] sortParams = sort.split(",");
-        String sortField = sortParams[0];
-        Sort.Direction sortDirection = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("asc")
-                ? Sort.Direction.ASC
-                : Sort.Direction.DESC;
+        // پردازش sortBy
+        String sortField = "id";
+        Sort.Direction sortDirection = Sort.Direction.DESC;
+        if (sortBy != null && !sortBy.isEmpty()) {
+            String[] sortParams = sortBy.split(",");
+            sortField = sortParams[0];
+            sortDirection = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("asc")
+                    ? Sort.Direction.ASC
+                    : Sort.Direction.DESC;
+        }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortField));
-        Page<ProjectDTO> projects = active != null
-                ? projectUC.getProjectsByActive(active, pageable)
-                : projectUC.getAllProjects(pageable);
+        Page<ProjectDTO> projects = projectUC.getFilteredProjects(active, category, priceRange, pageable);
         return ResponseEntity.ok(projects);
     }
+
+
+
 
     @GetMapping("getProject/{id}")
     public ResponseEntity<Object> getProject(@PathVariable Long id) {
