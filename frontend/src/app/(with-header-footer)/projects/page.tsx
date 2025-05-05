@@ -60,7 +60,6 @@ const formatDate = (date: [number, number, number]): string => {
 };
 
 const Project = () => {
-    const [search, setSearch] = useState<string>("");
     const [category, setCategory] = useState<string>("");
     const [priceRange, setPriceRange] = useState<string>("");
     const [sortBy, setSortBy] = useState<string>("");
@@ -80,6 +79,7 @@ const Project = () => {
                     sortBy: sortBy || undefined,
                     active: true, // فقط پروژه‌های فعال
                 },
+                withCredentials: true
             });
             setProjects(response.data.content);
             console.log("پروژه‌ها:", response.data);

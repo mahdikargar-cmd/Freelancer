@@ -29,6 +29,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        String path = request.getRequestURI();
+
+        // مستثنی کردن مسیرهای permitAll
+        if (path.startsWith("/app/getProjects") ||
+                path.startsWith("/app/getProject/") ||
+                path.startsWith("/auth/") ||
+                path.startsWith("/api/profileImages/") ||
+                path.startsWith("/api/getHeader") ||
+                path.startsWith("/api/footer") ||
+                path.startsWith("/api/notfound") ||
+                path.startsWith("/api/placeholder/") ||
+                path.startsWith("/admin/auth/")) {
+            logger.debug("Skipping JWT validation for path: {}", path);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String jwt = extractToken(request);
         String username = null;
 
@@ -44,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = null;
 
-            // Try loading as a regular user first
             try {
                 userDetails = userDetailsService.loadUserByUsername(username);
                 logger.debug("User found in users table: {}", username);
@@ -52,7 +68,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 logger.debug("User not found in users table, trying admins: {}", username);
             }
 
-            // If not found in users, try loading as an admin
             if (userDetails == null) {
                 try {
                     userDetails = adminDetailsService.loadUserByUsername(username);

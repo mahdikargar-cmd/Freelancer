@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaSliders } from 'react-icons/fa6';
 
 interface PriceRangeSelectorProps {
@@ -99,19 +99,19 @@ const PriceRangeSelector: React.FC<PriceRangeSelectorProps> = ({ onPriceRangeCha
                             onClick={() => handleQuickOption(0, 2000000)}
                             className="p-1 text-sm rounded bg-light-color6 dark:bg-color6 hover:bg-light-color4 dark:hover:bg-color8"
                         >
-                            تا ۲,۰۰۰ تومان
+                            تا ۲ میلیون تومان
                         </button>
                         <button
                             onClick={() => handleQuickOption(2000000, 5000000)}
                             className="p-1 text-sm rounded bg-light-color6 dark:bg-color6 hover:bg-light-color4 dark:hover:bg-color8"
                         >
-                            ۲,۰۰۰ تا ۵,۰۰۰ تومان
+                            ۲ تا ۵ میلیون تومان
                         </button>
                         <button
-                            onClick={() => handleQuickOption(5000000, 10000000)}
+                            onClick={() => handleQuickOption(5000000, 1000000000)}
                             className="p-1 text-sm rounded bg-light-color6 dark:bg-color6 hover:bg-light-color4 dark:hover:bg-color8"
                         >
-                            بیش از ۵,۰۰۰ تومان
+                            بیش از ۵ میلیون تومان
                         </button>
                     </div>
 

@@ -2,9 +2,7 @@
 package com.manage.freelancer.presentation.controller;
 
 import com.manage.freelancer.application.usecaseimpl.ProjectUCImpl;
-import com.manage.freelancer.domain.entity.ProjectStatus;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.ProjectDTO;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

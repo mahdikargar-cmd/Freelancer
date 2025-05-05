@@ -22,7 +22,6 @@ public class ProjectMapper {
     private final SkillsMapper skillsMapper;
     private final UserMapper userMapper;
     private final CategoryMapper categoryMapper;
-    private final @Lazy SuggestProjectMapper suggestProjectMapper;
 
     public Project toDomain(ProjectDTO projectDTO) {
         if (projectDTO == null) return null;
