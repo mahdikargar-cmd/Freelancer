@@ -16,6 +16,10 @@ const nextConfig = {
         source: '/auth/:path*',
         destination: `${API_URL}/auth/:path*`,
       },
+      {
+        source: '/pub/:path*',
+        destination: `${API_URL}/pub/:path*`,
+      },
     ];
   },
   reactStrictMode: true,
