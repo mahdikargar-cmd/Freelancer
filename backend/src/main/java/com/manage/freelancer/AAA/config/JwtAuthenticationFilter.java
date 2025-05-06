@@ -32,8 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // مستثنی کردن مسیرهای permitAll
-        if (path.startsWith("/app/getProjects") ||
-                path.startsWith("/app/getProject/") ||
+        if (
                 path.startsWith("/auth/") ||
                 path.startsWith("/api/profileImages/") ||
                 path.startsWith("/api/getHeader") ||
