@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/deadlinee
+    url: jdbc:postgresql://45.159.150.47:5432/deadlinee
     username: freelancer
     password: 13521380Mm$$#
     driver-class-name: org.postgresql.Driver
@@ -17,7 +17,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: deadlineefl@gmail.com
-    password: ${SPRING_MAIL_PASSWORD}
+    password: chxihcpykqipbjdz
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
