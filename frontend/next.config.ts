@@ -17,8 +17,8 @@ const nextConfig = {
         destination: `${API_URL}/auth/:path*`,
       },
       {
-        source: '/pub/:path*',
-        destination: `${API_URL}/pub/:path*`,
+        source: '/pro/:path*',
+        destination: `${API_URL}/pro/:path*`,
       },
     ];
   },
