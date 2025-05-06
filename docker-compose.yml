@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   redis:
-    image: redis:7.0
+    image: redis
     container_name: redis
     networks:
       - app-network
