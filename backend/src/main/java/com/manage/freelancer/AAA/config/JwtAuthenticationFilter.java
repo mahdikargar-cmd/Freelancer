@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/api/footer") ||
                 path.startsWith("/api/notfound") ||
                 path.startsWith("/api/placeholder/") ||
-                        path.startsWith("/pub/getProjects/") ||
+                        path.startsWith("/pub/") ||
                         path.startsWith("/admin/auth/")) {
 
             logger.debug("Skipping JWT validation for path: {}", path);
