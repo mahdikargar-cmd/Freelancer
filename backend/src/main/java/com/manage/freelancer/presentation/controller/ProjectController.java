@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+@RequestMapping("/pro")
 @RestController
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectUCImpl projectUC;
 
-    @GetMapping("pub/getProjects")
+    @GetMapping("/getProjects")
     public ResponseEntity<Page<ProjectDTO>> getProjects(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size,
@@ -47,7 +47,7 @@ public class ProjectController {
 
 
 
-    @GetMapping("app/getProject/{id}")
+    @GetMapping("/getProject/{id}")
     public ResponseEntity<Object> getProject(@PathVariable Long id) {
         try {
             ProjectDTO projectDTO = projectUC.getProjectById(id);
@@ -59,7 +59,7 @@ public class ProjectController {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
-    @PostMapping("app/createProject")
+    @PostMapping("/createProject")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDTO) {
         try {
             ProjectDTO createdProject = projectUC.createProject(projectDTO);
@@ -68,7 +68,7 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-    @PutMapping("app/projects/{projectId}/addSuggestion")
+    @PutMapping("/projects/{projectId}/addSuggestion")
     public ResponseEntity<ProjectDTO> addSuggestion(
             @PathVariable Long projectId,
             @RequestBody Map<String, Long> request){
@@ -84,7 +84,7 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("app/updateProjectStatus/{id}")
+    @PutMapping("/updateProjectStatus/{id}")
     public ResponseEntity<String> updateProjectStatus(@PathVariable Long id, @RequestBody ProjectStatusUpdate statusUpdate) {
         ProjectDTO existingProject = projectUC.getProjectById(id);
         if (existingProject == null) {
@@ -98,28 +98,28 @@ public class ProjectController {
         return ResponseEntity.ok("Project status updated successfully");
     }
 
-    @DeleteMapping("app/deleteProject/{id}")
+    @DeleteMapping("/deleteProject/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         projectUC.deleteProject(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("app/getSubject")
+    @GetMapping("/getSubject")
     public ResponseEntity<ProjectDTO> getSubject(@RequestParam String subject) {
         return ResponseEntity.ok(projectUC.getProjectBySubject(subject));
     }
 
-    @GetMapping("app/getSkills")
+    @GetMapping("/getSkills")
     public ResponseEntity<List<ProjectDTO>> getSkills(@RequestParam String skills) {
         return ResponseEntity.ok(projectUC.getProjectBySkills(skills));
     }
 
-    @GetMapping("app/getCategory")
+    @GetMapping("/getCategory")
     public ResponseEntity<ProjectDTO> getCategory(@RequestParam String category) {
         return ResponseEntity.ok(projectUC.getProjectByCategory(category));
     }
 
-    @GetMapping("app/employer/{userId}")
+    @GetMapping("/employer/{userId}")
     public ResponseEntity<List<ProjectDTO>> getProjectsByEmployer(@PathVariable Long userId) {
         List<ProjectDTO> projects = projectUC.getProjectByEmployerId(userId);
         if (projects == null || projects.isEmpty()) {
@@ -128,7 +128,7 @@ public class ProjectController {
         return ResponseEntity.ok(projects);
     }
 
-    @GetMapping("app/getEmployer")
+    @GetMapping("/getEmployer")
     public ResponseEntity<List<ProjectDTO>> getEmployer(@RequestParam Long id) {
         List<ProjectDTO> projects = projectUC.getProjectByEmployerId(id);
         if (projects == null || projects.isEmpty()) {

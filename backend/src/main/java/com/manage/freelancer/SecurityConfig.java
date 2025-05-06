@@ -46,7 +46,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                             new AntPathRequestMatcher("/api/footer"),
                             new AntPathRequestMatcher("/api/notfound"),
                             new AntPathRequestMatcher("/api/placeholder/**"),
-                            new AntPathRequestMatcher("/pub/**")
+                            new AntPathRequestMatcher("/pro/**")
                             ).permitAll()
                     .requestMatchers(
                             new AntPathRequestMatcher("/auth/users"),

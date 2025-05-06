@@ -7,7 +7,6 @@ interface DecodedToken {
     exp: number;
     [key: string]: any;
 }
-
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
