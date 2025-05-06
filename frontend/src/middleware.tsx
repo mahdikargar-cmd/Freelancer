@@ -41,7 +41,7 @@ export function middleware(request: NextRequest) {
     const publicPaths = ['/login', '/signUp', '/', '/adminlog', '/forgetPassword', '/projects',  '/pro/getProjects', '/googleebb9475d40e7e023.html' ];
     
     // اگر مسیر عمومی باشد
-    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/') || pathname.startsWith('/pro'))) {
+    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/')  )) {
         if (isAdminAuthenticated && pathname === '/adminlog') {
             return NextResponse.redirect(new URL('/admin', request.url));
         }
