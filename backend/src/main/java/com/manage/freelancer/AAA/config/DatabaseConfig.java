@@ -11,17 +11,17 @@ import javax.sql.DataSource;
 @Configuration
 public class DatabaseConfig {
 
-    @Bean
-    public DataSource dataSource() {
-        Dotenv dotenv = Dotenv.configure()
-                .directory(".")
-                .load();
+  //  @Bean
+   // public DataSource dataSource() {
+     //   Dotenv dotenv = Dotenv.configure()
+       //         .directory(".")
+         //       .load();
 
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(dotenv.get("DB_URL"));  // فقط URL از .env
-        config.setUsername("freelancer");          // مستقیم اینجا
-        config.setPassword("13521380Mm$$#");
+     //   HikariConfig config = new HikariConfig();
+     //   config.setJdbcUrl(dotenv.get("DB_URL"));  // فقط URL از .env
+      //  config.setUsername("freelancer");          // مستقیم اینجا
+      //  config.setPassword("13521380Mm$$#");
 
-        return new HikariDataSource(config);
-    }
+      //  return new HikariDataSource(config);
+   // }
 }

@@ -18,6 +18,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
+ 
     
   backend:
     build: ./backend
