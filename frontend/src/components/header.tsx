@@ -2,12 +2,15 @@
 import {useState, useEffect} from "react";
 import Link from "next/link";
 import Image from "next/image";
-import img from "../img/logo-2.ico";
+import img from "../img/logo.svg";
 import API from "./utils/api";
 import ThemeSwitcher from "./ThemeSwitcher";
 import SignHead from "@/components/signUpheader";
-import {FaHome, FaInfoCircle, FaPhone, FaShoppingCart} from "react-icons/fa";
+import {FaHome} from "react-icons/fa";
 import {IoIosNotifications} from "react-icons/io";
+import {ImBubble} from "react-icons/im";
+import {AiFillProduct} from "react-icons/ai";
+import {RiFolderUserFill} from "react-icons/ri";
 
 interface HeaderLink {
     id: number;
@@ -27,10 +30,12 @@ const getLinkIcon = (title: string, link: string) => {
 
     if (link === "/" || titleLower.includes("خانه") || titleLower.includes("اصلی") || linkLower.includes("home")) {
         return <FaHome className="text-xl mb-1"/>;
-    } else if (titleLower.includes("درباره") || linkLower.includes("about")) {
-        return <FaInfoCircle className="text-xl mb-1"/>;
-    } else if (titleLower.includes("تماس") || linkLower.includes("contact")) {
-        return <FaPhone className="text-xl mb-1"/>;
+    } else if (titleLower.includes("پروژه ها") || linkLower.includes("about")) {
+        return <AiFillProduct className="text-xl mb-1"/>;
+    } else if (titleLower.includes("پنل چت") || linkLower.includes("contact")) {
+        return <ImBubble className="text-xl mb-1"/>;
+    }else if (titleLower.includes("داشبورد") || linkLower.includes("contact")) {
+        return <RiFolderUserFill className="text-xl mb-1"/>;
     }
 
     // آیکون پیش‌فرض
@@ -92,7 +97,14 @@ const Header = () => {
                     {/* لوگو و سوئیچر حالت شب - سمت راست */}
                     <div className="flex items-center space-x-4 rtl:space-x-reverse order-1">
                         <Link href="/" className="flex items-center">
-                            <Image src={img} className="h-12 w-12" alt="لوگو" width={100} height={128} loading="lazy"/>
+                            <Image
+                                src={img}
+                                className="h-12 w-12 dark:filter dark:invert dark:brightness-0"
+                                alt="لوگو"
+                                width={100}
+                                height={128}
+                                loading="lazy"
+                            />
                         </Link>
                         <ThemeSwitcher/>
                     </div>

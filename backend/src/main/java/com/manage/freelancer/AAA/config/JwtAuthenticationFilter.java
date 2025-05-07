@@ -29,24 +29,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String path = request.getRequestURI();
-
-/*
-        // مستثنی کردن مسیرهای permitAll
-        if (
-                path.startsWith("/auth/") ||
-                path.startsWith("/api/profileImages/") ||
-                path.startsWith("/api/getHeader") ||
-                path.startsWith("/api/footer") ||
-                path.startsWith("/api/notfound") ||
-                path.startsWith("/api/placeholder/") ||
-                        path.startsWith("/pro/") ) {
-
-            logger.debug("Skipping JWT validation for path: {}", path);
-            filterChain.doFilter(request, response);
-            return;
-        }
-*/
 
         String jwt = extractToken(request);
         String username = null;
