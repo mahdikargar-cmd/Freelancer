@@ -2,7 +2,6 @@ package com.manage.freelancer.AAA.config;
 
 import com.manage.freelancer.AAA.domain.model.Admin;
 import com.manage.freelancer.AAA.infrastructure.repository.AdminRepo;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,7 +26,7 @@ public class AdminDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 admin.getUsername(),
                 admin.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                Collections.emptyList()
         );
     }
 }

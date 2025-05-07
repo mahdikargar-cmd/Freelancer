@@ -35,7 +35,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})
+                .cors(cors -> {
+                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -55,8 +56,9 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/error") // اضافه کردن /error
                         ).permitAll()
                         .requestMatchers(
+                                new AntPathRequestMatcher("/app/**"),
                                 new AntPathRequestMatcher("/app/**")
-                        ).authenticated() // فقط کاربران احراز هویت‌شده
+                                ).authenticated() // فقط کاربران احراز هویت‌شده
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

@@ -9,8 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
-
+import java.util.Collections;
 
 @Data
 @Entity
@@ -27,11 +26,9 @@ public class Admin implements UserDetails {
 
     private String password;
 
-    // می‌تونی به صورت ساده فقط یوزرنیم و پسورد استفاده کنی
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> "ROLE_ADMIN");
+        return Collections.emptyList(); // حذف نقش
     }
 
     @Override
@@ -52,4 +49,3 @@ public class Admin implements UserDetails {
     @Override
     public boolean isEnabled() { return true; }
 }
-
