@@ -1,7 +1,10 @@
 package com.manage.freelancer;
 
 import com.manage.freelancer.AAA.config.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,48 +26,50 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @AllArgsConstructor
 public class SecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> {}) // default CORS config
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(
-                            new AntPathRequestMatcher("/admin/auth/**"),
-                            new AntPathRequestMatcher("/auth/login"),
-                            new AntPathRequestMatcher("/auth/register/initiate"),
-                            new AntPathRequestMatcher("/auth/validate"),
-                            new AntPathRequestMatcher("/auth/register/verify"),
-                            new AntPathRequestMatcher("/auth/password-reset/initiate"),
-                            new AntPathRequestMatcher("/auth/password-reset/verify"),
-                            new AntPathRequestMatcher("/api/profileImages/**"),
-                            new AntPathRequestMatcher("/api/getHeader"),
-                            new AntPathRequestMatcher("/api/footer"),
-                            new AntPathRequestMatcher("/api/notfound"),
-                            new AntPathRequestMatcher("/api/placeholder/**"),
-                            new AntPathRequestMatcher("/pro/**")
-                            ).permitAll()
-                    .requestMatchers(
-                            new AntPathRequestMatcher("/auth/users"),
-                            new AntPathRequestMatcher("/api/getProfileInformation"),
-                            new AntPathRequestMatcher("/api/createProfileInformation"),
-                            new AntPathRequestMatcher("/api/uploadProfileImage/**"),
-                            new AntPathRequestMatcher("/api/updateProfileImage/**"),
-                            new AntPathRequestMatcher("/api/getPInfoById/**"),
-                            new AntPathRequestMatcher("/app/**"),
-                            new AntPathRequestMatcher("/ws/chat/**")
-                    ).authenticated()
-                    .anyRequest().authenticated()
-            )
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/admin/auth/**"),
+                                new AntPathRequestMatcher("/auth/login"),
+                                new AntPathRequestMatcher("/auth/register/initiate"),
+                                new AntPathRequestMatcher("/auth/validate"),
+                                new AntPathRequestMatcher("/auth/register/verify"),
+                                new AntPathRequestMatcher("/auth/password-reset/initiate"),
+                                new AntPathRequestMatcher("/auth/password-reset/verify"),
+                                new AntPathRequestMatcher("/api/profileImages/**"),
+                                new AntPathRequestMatcher("/api/getHeader"),
+                                new AntPathRequestMatcher("/api/footer"),
+                                new AntPathRequestMatcher("/api/notfound"),
+                                new AntPathRequestMatcher("/api/placeholder/**"),
+                                new AntPathRequestMatcher("/pro/**"),
+                                new AntPathRequestMatcher("/error") // اضافه کردن /error
+                        ).permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/app/**")
+                        ).authenticated() // فقط کاربران احراز هویت‌شده
+                        .anyRequest().authenticated()
+                )
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            logger.error("Access denied for request {}: {}", request.getRequestURI(), accessDeniedException.getMessage());
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+                        })
+                );
 
-    return http.build();
-}
+        return http.build();
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

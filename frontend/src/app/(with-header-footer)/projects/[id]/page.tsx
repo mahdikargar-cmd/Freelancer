@@ -78,7 +78,7 @@ const ProjectId = () => {
         try {
             setLoading(true);
 
-            const { data } = await api.get<Project>(`app/getProject/${projectId}`, {
+            const { data } = await api.get<Project>(`pro/getProject/${projectId}`, {
                 headers: {
                     Authorization: `Bearer ${Cookies.get('token')}`,
                 },
@@ -185,9 +185,9 @@ const ProjectId = () => {
                 milestones: [],
             });
         } catch (err: any) {
-            console.error('خطا در ارسال پیشنهاد:', err);
+            console.error('کاربر عزیز شما هنوز لاگین نکرده اید', err);
             console.log('جزئیات خطا:', err.response?.data, err.response?.status);
-            alert(`خطا در ارسال پیشنهاد: ${err.response?.data?.message || err.message}`);
+            alert(`کاربر عزیز شما هنوز لاگین نکرده اید: ${err.response?.data?.message || err.message}`);
         }
     }, [proposal, projectId, userId, updateSuggest]);
 
