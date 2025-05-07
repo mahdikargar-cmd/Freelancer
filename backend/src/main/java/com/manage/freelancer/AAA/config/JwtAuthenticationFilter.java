@@ -32,15 +32,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // مستثنی کردن مسیرهای permitAll
-        if (path.startsWith("/app/getProjects") ||
-                path.startsWith("/app/getProject/") ||
+        if (
                 path.startsWith("/auth/") ||
                 path.startsWith("/api/profileImages/") ||
                 path.startsWith("/api/getHeader") ||
                 path.startsWith("/api/footer") ||
                 path.startsWith("/api/notfound") ||
                 path.startsWith("/api/placeholder/") ||
-                path.startsWith("/admin/auth/")) {
+                        path.startsWith("/pro/") ||
+                        path.startsWith("/admin/auth/")) {
+
             logger.debug("Skipping JWT validation for path: {}", path);
             filterChain.doFilter(request, response);
             return;

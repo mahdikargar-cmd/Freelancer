@@ -72,7 +72,7 @@ const Project = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await api.get<ApiResponse>("/app/getProjects", {
+            const response = await api.get<ApiResponse>("/pro/getProjects", {
                 params: {
                     category: category || undefined,
                     priceRange: priceRange || undefined,

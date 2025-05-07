@@ -7,7 +7,6 @@ interface DecodedToken {
     exp: number;
     [key: string]: any;
 }
-
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -39,10 +38,10 @@ export function middleware(request: NextRequest) {
     });
 
     // مسیرهای عمومی که نیازی به احراز هویت ندارند
-    const publicPaths = ['/login', '/signUp', '/', '/adminlog', '/forgetPassword', '/projects',  '/googleebb9475d40e7e023.html' ];
+    const publicPaths = ['/login', '/signUp', '/', '/adminlog', '/forgetPassword', '/projects',  '/pro/getProjects','/pro/createProject', '/googleebb9475d40e7e023.html' ];
     
     // اگر مسیر عمومی باشد
-    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
+    if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/')  )) {
         if (isAdminAuthenticated && pathname === '/adminlog') {
             return NextResponse.redirect(new URL('/admin', request.url));
         }

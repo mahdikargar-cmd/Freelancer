@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+@RequestMapping("/pro")
 @RestController
-@RequestMapping("/app")
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectUCImpl projectUC;
@@ -48,7 +47,7 @@ public class ProjectController {
 
 
 
-    @GetMapping("getProject/{id}")
+    @GetMapping("/getProject/{id}")
     public ResponseEntity<Object> getProject(@PathVariable Long id) {
         try {
             ProjectDTO projectDTO = projectUC.getProjectById(id);
