@@ -6,16 +6,20 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import FreelancerSection from "@/components/FreelancerSection";
 import CTA from "@/components/CTA";
 import StarAnime from "@/components/Star";
+import SafePayment from "@/components/SafePayment";
+import Free from "@/components/Free";
 
 export default function ClientHome() {
     return (
         <div className="min-h-screen dark:bg-color6 bg-light-color1">
-            <HeroSection />
-            <CategoriesSection />
-            <HowItWorksSection />
-            <FreelancerSection />
-            <CTA />
-            <StarAnime />
+            <HeroSection/>
+            <CategoriesSection/>
+            <SafePayment/>
+            <HowItWorksSection/>
+            <FreelancerSection/>
+            <Free/>
+            <CTA/>
+            <StarAnime/>
         </div>
     );
 }

@@ -258,7 +258,7 @@ const Room = () => {
     };
     return (
         <div className="min-h-screen bg-light-color1 dark:bg-black text-light-color2 dark:text-color2">
-            <div className="max-w-screen-md mx-auto py-8 px-4 md:px-8">
+            <div className="max-w-screen-md mx-auto py-1 px-4 md:px-8">
                 {/* Header */}
                 <HeaderProject />
                 {/* Progress Bar */}
