@@ -53,12 +53,15 @@ export function middleware(request: NextRequest) {
 
 
     // مسیرهای ادمین (مثل /admin و زیرمسیرهای آن)
-    if (pathname.startsWith('/admin') && pathname !== '/admin/auth/login') {
+    if (pathname.startsWith('/admin')) {
         if (!isAdminAuthenticated) {
             const redirectUrl = new URL('/adminlog', request.url);
-            redirectUrl.searchParams.set('callbackUrl', pathname);
+            redirectUrl.searchParams.set('callbackUrl', pathname); // ذخیره مسیر قبلی برای بازگشت پس از ورود
             return NextResponse.redirect(redirectUrl);
         }
+        const response = NextResponse.next();
+        response.headers.set('x-admin', 'true');
+        return response;
     }
 
     // مسیرهای غیرعمومی برای کاربران عمومی
