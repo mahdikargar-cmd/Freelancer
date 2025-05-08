@@ -63,8 +63,8 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setTo(email);
-            helper.setFrom("deadlineefl@gmail.com", "ددلاین");
-            helper.setReplyTo("deadlineefl@gmail.com");
+            helper.setFrom("info@deadlinee.ir", "ددلاین");
+            helper.setReplyTo("info@deadlinee.ir");
             helper.setSubject(subject);
 
             String htmlContent = """
