@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const Footer = () => {
     return (
         <footer className="dark:bg-color6 bg-light-color6 dark:text-color7 text-light-color7 py-12">
@@ -23,11 +25,11 @@ const Footer = () => {
                     <div>
                         <h4 className="dark:text-color2 text-light-color2 font-primaryMedium mb-4">برای کارفرماها</h4>
                         <ul className="space-y-2 text-sm font-primaryLight">
-                            <li><a href="#" className="dark:hover:text-color4 hover:text-light-color4">راهنمای
-                                استخدام</a></li>
-                            <li><a href="#" className="dark:hover:text-color4 hover:text-light-color4">بازار
-                                استعدادها</a></li>
-                            <li><a href="#" className="dark:hover:text-color4 hover:text-light-color4">کاتالوگ پروژه</a>
+                            <li><Link href="/HiringGuide" className="dark:hover:text-color4 hover:text-light-color4">راهنمای
+                                استخدام</Link></li>
+                            <li><Link href="/TalentMarket" className="dark:hover:text-color4 hover:text-light-color4">بازار
+                                استعدادها</Link></li>
+                            <li><Link href="/ProjectCatalog" className="dark:hover:text-color4 hover:text-light-color4">کاتالوگ پروژه</Link>
                             </li>
                         </ul>
                     </div>
@@ -35,11 +37,11 @@ const Footer = () => {
                     <div>
                         <h4 className="dark:text-color2 text-light-color2 font-primaryMedium mb-4">برای فریلنسرها</h4>
                         <ul className="space-y-2 text-sm font-primaryLight">
-                            <li><a href="#" className="dark:hover:text-color4 hover:text-light-color4">چگونه کار پیدا
-                                کنیم</a></li>
-                            <li><a href="#" className="dark:hover:text-color4 hover:text-light-color4">قرارداد
-                                مستقیم</a></li>
-                            <li><a href="#" className="dark:hover:text-color4 hover:text-light-color4">دریافت دستمزد</a>
+                            <li><Link href="/HowToFindWork" className="dark:hover:text-color4 hover:text-light-color4">چگونه کار پیدا
+                                کنیم</Link></li>
+                            <li><Link href="/DirectContract" className="dark:hover:text-color4 hover:text-light-color4">قرارداد
+                                مستقیم</Link></li>
+                            <li><Link href="/GetPaid" className="dark:hover:text-color4 hover:text-light-color4">دریافت دستمزد</Link>
                             </li>
                         </ul>
                     </div>

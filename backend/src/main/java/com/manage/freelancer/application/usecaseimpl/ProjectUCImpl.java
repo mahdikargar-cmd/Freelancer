@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class ProjectUCImpl implements ProjectUC {
+public class    ProjectUCImpl implements ProjectUC {
     private final ProjectRepo projectRepo;
     private final ProjectMapper projectMapper;
     private final SkillUCImpl skillUC;
     private final CategoryJpaRepo categoryRepo;
     private final UserRepository userRepo;
-    private final EmailService emailService; // اضافه کردن سرویس ایمیل
+    private final EmailService emailService;
 
 
 

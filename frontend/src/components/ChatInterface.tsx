@@ -222,7 +222,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
 
             try {
                 const websocket = new WebSocket(
-                    `ws://localhost:8080/ws/chat?userId=${userId}&token=${encodeURIComponent(token)}`
+                    `ws://${api}/ws/chat?userId=${userId}&token=${encodeURIComponent(token)}`
                 );
                 wsRef.current = websocket;
                 setWs(websocket);
@@ -330,14 +330,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
     }, [userId, token, projectId, receiverId]);
 
 
-    // 滚动到聊天底部
     useEffect(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [messages]);
 
-    // 处理点击用户菜单外部
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -348,7 +346,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // 发送消息
     const handleSendMessage = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
@@ -381,7 +378,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ projectId, receiverId }) 
         },
         [newMessage, ws, projectId, receiverId, userId]
     );
-    // 处理选择自由职业者（将来实现）
     const handleAssignFreelancer = useCallback(async () => {
         try {
             // فرض می‌کنیم یک API برای تخصیص فریلنسر وجود دارد

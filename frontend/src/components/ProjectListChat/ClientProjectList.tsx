@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/lib/useAuth";
 import Cookies from "js-cookie";
 import { api } from "@/components/lib/api";
-import { Project, Proposal } from "@/types"; // وارد کردن تایپ‌های مشترک
+import { Project, Proposal } from "@/types";
 
 interface ClientProjectsProps {
     projects?: Project[];
