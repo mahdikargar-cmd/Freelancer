@@ -382,8 +382,8 @@ const Profile = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های فعال</p>
-                                <p className="text-xl font-bold">{profileData.activeProjects}</p>
+                                <p className="text-sm text-light-color7  dark:text-color7">پروژه‌های فعال</p>
+                                <p className="text-xl text-light-color7 dark:text-color2 font-bold">{profileData.activeProjects}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaProjectDiagram />
@@ -393,7 +393,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های منتشر شده</p>
-                                <p className="text-xl font-bold">{profileData.projectsPosted}</p>
+                                <p className="text-xl text-light-color7 dark:text-color2  font-bold">{profileData.projectsPosted}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaClipboardList />
@@ -403,7 +403,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">پروژه‌های تکمیل شده</p>
-                                <p className="text-xl font-bold">{profileData.completedProjects}</p>
+                                <p className="text-xl  text-light-color7 dark:text-color2  font-bold">{profileData.completedProjects}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaClipboardList />
@@ -413,7 +413,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">موجودی کیف پول</p>
-                                <p className="text-xl font-bold">0 تومان</p>
+                                <p className="text-xl text-light-color7 dark:text-color2  font-bold">0 تومان</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaWallet />
@@ -423,7 +423,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">پیام‌های جدید</p>
-                                <p className="text-xl font-bold">{profileData.unreadMessages}</p>
+                                <p className="text-xl text-light-color7 dark:text-color2  font-bold">{profileData.unreadMessages}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaEnvelope />
@@ -433,7 +433,7 @@ const Profile = () => {
                         <div className="bg-light-color1 dark:bg-color1 p-4 rounded-xl border border-light-color5 dark:border-color5 shadow-md flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-light-color7 dark:text-color7">اعلان‌ها</p>
-                                <p className="text-xl font-bold">{profileData.notifications}</p>
+                                <p className="text-xl text-light-color7 dark:text-color2  font-bold">{profileData.notifications}</p>
                             </div>
                             <div className="text-light-color4 dark:text-color4 text-2xl">
                                 <FaBell />

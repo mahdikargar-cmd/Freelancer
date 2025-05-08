@@ -26,7 +26,7 @@ public class ProjectDTO {
     @Column(nullable = false)
     private String subject;
 
-    @Column(length = 1000)
+    @Column(length = 4001)
     private String description;
 
     @Column(name = "price_started")

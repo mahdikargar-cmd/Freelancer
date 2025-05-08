@@ -68,7 +68,7 @@ const MultiStepForm: React.FC<MultiStepFormProps> = ({
             {/* Step 1: Project Name */}
             {step === 1 && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <h1 className="font-primaryDemibold text-xl text-light-color1 dark:text-white mb-3">1 از 8</h1>
+                    <h1 className="font-primaryDemibold text-xl text-light-color2 dark:text-white mb-3">1 از 8</h1>
                     <h2 className="text-lg font-primaryMedium mb-4 flex items-center gap-2">
                         <FaRegStickyNote className="text-light-color4 dark:text-color4 text-xl" /> اسم پروژه‌ات چی باشه؟
                     </h2>

@@ -2,7 +2,7 @@
 
 import * as Select from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
-import { JSX } from 'react';
+import {JSX, useMemo} from 'react';
 
 type Category = {
     id: number;
@@ -10,56 +10,87 @@ type Category = {
     parentCategory: Category | null;
 };
 
-export function CategorySelect({
-    categories,
-    value,
-    onChange,
-}: {
-    categories: Category[];
+interface CategorySelectProps {
+    categories: Category[] | null;
     value: number | null;
     onChange: (val: number | null) => void;
-}) {
-    const renderCategoryOptions = (
-        categories: Category[],
-        parentId: number | null = null,
-        level: number = 0
-    ): JSX.Element[] => {
-        return categories
-            .filter(cat => (cat.parentCategory ? cat.parentCategory.id : null) === parentId)
-            .flatMap(cat => {
-                const isTopLevel = level === 0;
-                const indent = '\u00A0\u00A0'.repeat(level);
-                const icon = isTopLevel ? '📁' : '🔖';
+    isLoading?: boolean;
+    error?: string | null;
+}
 
-                return [
-                    <Select.Item
-                        key={cat.id}
-                        value={cat.id.toString()}
-                        disabled={isTopLevel}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${
-                            isTopLevel
-                                ? 'opacity-50 cursor-not-allowed'
-                                : 'cursor-pointer hover:bg-light-color4 dark:hover:bg-color4'
-                        } text-light-color3 hover:dark:text-color6 dark:text-color3 transition-all duration-200 ease-in-out`}
-                    >
-                        <Select.ItemText>{`${indent}${icon} ${cat.name}`}</Select.ItemText>
-                        {!isTopLevel && (
-                            <Select.ItemIndicator className="ml-auto">
-                                <Check className="w-4 h-4" />
-                            </Select.ItemIndicator>
-                        )}
-                    </Select.Item>,
-                    ...renderCategoryOptions(categories, cat.id, level + 1),
-                ];
-            });
-    };
+export function CategorySelect({
+                                   categories,
+                                   value,
+                                   onChange,
+                                   isLoading = false,
+                                   error = null,
+                               }: CategorySelectProps) {
+    // بهینه‌سازی رندر دسته‌بندی‌ها با useMemo
+    const categoryOptions = useMemo(() => {
+        const renderCategoryOptions = (
+            categories: Category[],
+            parentId: number | null = null,
+            level: number = 0
+        ): JSX.Element[] => {
+            return categories
+                .filter(cat => (cat.parentCategory ? cat.parentCategory.id : null) === parentId)
+                .flatMap(cat => {
+                    const isTopLevel = level === 0;
+                    const indent = '\u00A0\u00A0'.repeat(level);
+                    const icon = isTopLevel ? '📁' : '🔖';
+
+                    return [
+                        <Select.Item
+                            key={cat.id}
+                            value={cat.id.toString()}
+                            disabled={isTopLevel}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${
+                                isTopLevel
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700'
+                            } text-gray-700 dark:text-gray-300 hover:dark:text-white transition-all duration-200 ease-in-out`}
+                        >
+                            <Select.ItemText>{`${indent}${icon} ${cat.name}`}</Select.ItemText>
+                            {!isTopLevel && (
+                                <Select.ItemIndicator className="ml-auto">
+                                    <Check className="w-4 h-4" />
+                                </Select.ItemIndicator>
+                            )}
+                        </Select.Item>,
+                        ...renderCategoryOptions(categories, cat.id, level + 1),
+                    ];
+                });
+        };
+
+        return categories && categories.length > 0 ? renderCategoryOptions(categories) : [];
+    }, [categories]);
+
+    // مدیریت حالت‌های لودینگ و خطا
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center w-full px-4 py-3 text-sm text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                در حال بارگذاری...
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center w-full px-4 py-3 text-sm text-red-600 bg-red-50 dark:bg-red-900 rounded-lg">
+                خطا: {error}
+            </div>
+        );
+    }
 
     return (
         <Select.Root
-            value={value !== null ? value.toString() : '-1'}
-            onValueChange={(val) => onChange(val === '-1' ? null : Number(val))}
+            value={value !== null ? value.toString() : 'none'}
+            onValueChange={(val) => onChange(val === 'none' ? null : Number(val))}
         >
-            <Select.Trigger className="inline-flex items-center justify-between w-full rounded-lg bg-light-color6 dark:bg-color6 px-4 py-3 text-light-color3 dark:text-color3 shadow-sm border border-light-color5 dark:border-color5 focus:outline-none focus:ring-2 focus:ring-light-color4 dark:focus:ring-color4 font-primaryMedium text-sm md:text-base">
+            <Select.Trigger
+                aria-label="انتخاب دسته‌بندی"
+                className="inline-flex  items-center justify-between w-full  rounded-lg bg-white dark:bg-gray-800 px-4 py-3 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 font-medium text-sm md:text-base transition-all duration-200"
+            >
                 <Select.Value placeholder="-- انتخاب دسته‌بندی --" />
                 <Select.Icon>
                     <ChevronDown className="w-4 h-4" />
@@ -68,16 +99,16 @@ export function CategorySelect({
 
             <Select.Portal>
                 <Select.Content
-                    className="z-50 bg-white dark:bg-color6 rounded-lg shadow-lg max-h-[250px] overflow-auto border border-light-color5 dark:border-color5 scrollbar-thin scrollbar-thumb-light-color4 dark:scrollbar-thumb-color4 scrollbar-track-transparent w-[var(--radix-select-trigger-width)] font-primaryMedium"
+                    className="z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg max-h-[250px] overflow-auto border border-gray-300 dark:border-gray-600 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-500 scrollbar-track-transparent w-[var(--radix-select-trigger-width)] font-medium"
                     dir="rtl"
                     position="popper"
                     sideOffset={5}
                 >
                     <Select.Viewport className="p-1">
-                        {/* آیتم مربوط به همه دسته‌بندی‌ها */}
+                        {/* گزینه پیش‌فرض: همه دسته‌بندی‌ها */}
                         <Select.Item
-                            value="-1"
-                            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-light-color4 dark:hover:bg-color4 text-light-color3 hover:dark:text-color6 dark:text-color3 transition-all duration-200 ease-in-out"
+                            value="none"
+                            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 hover:dark:text-white transition-all duration-200 ease-in-out"
                         >
                             <Select.ItemText>📂 همه دسته‌بندی‌ها</Select.ItemText>
                             {value === null && (
@@ -87,7 +118,18 @@ export function CategorySelect({
                             )}
                         </Select.Item>
 
-                        {renderCategoryOptions(categories)}
+                        {/* نمایش پیام در صورت خالی بودن دسته‌بندی‌ها */}
+                        {categoryOptions.length === 0 && (
+                            <Select.Item
+                                value="empty"
+                                disabled
+                                className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-gray-500 dark:text-gray-400"
+                            >
+                                <Select.ItemText>هیچ دسته‌بندی‌ای یافت نشد</Select.ItemText>
+                            </Select.Item>
+                        )}
+
+                        {categoryOptions}
                     </Select.Viewport>
                 </Select.Content>
             </Select.Portal>

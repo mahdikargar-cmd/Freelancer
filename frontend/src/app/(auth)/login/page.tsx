@@ -1,21 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import {useRouter} from 'next/navigation';
+import {useState} from 'react';
 import Cookies from 'js-cookie';
 import Success from '@/components/Toast/success';
 import Failed from '@/components/Toast/failed';
-import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
+import {FiMail, FiLock, FiArrowRight} from 'react-icons/fi';
 import Link from 'next/link';
 import r_c from '../../../img/right-corner.png';
 import API from "@/components/utils/api";
 
 const Login = () => {
     const router = useRouter();
-    const [info, setInfo] = useState({ email: '', password: '' });
+    const [info, setInfo] = useState({email: '', password: ''});
     const [warning, setWarning] = useState('');
-    const [showToast, setShowToast] = useState({ success: false, failed: false });
+    const [showToast, setShowToast] = useState({success: false, failed: false});
     const [isLoading, setIsLoading] = useState(false);
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -24,16 +24,16 @@ const Login = () => {
     const handleSubmit = async () => {
         if (!emailRegex.test(info.email)) {
             setWarning('ایمیل نامعتبر است!');
-            setShowToast({ success: false, failed: true });
-            setTimeout(() => setShowToast({ success: false, failed: false }), 3000);
+            setShowToast({success: false, failed: true});
+            setTimeout(() => setShowToast({success: false, failed: false}), 3000);
             return;
         }
         if (!passwordRegex.test(info.password)) {
             setWarning(
                 'رمز عبور باید حداقل 8 کاراکتر باشد و شامل حداقل یک حرف بزرگ، یک حرف کوچک، یک عدد و یک نماد خاص باشد.'
             );
-            setShowToast({ success: false, failed: true });
-            setTimeout(() => setShowToast({ success: false, failed: false }), 3000);
+            setShowToast({success: false, failed: true});
+            setTimeout(() => setShowToast({success: false, failed: false}), 3000);
             return;
         }
 
@@ -41,7 +41,7 @@ const Login = () => {
         try {
             const response = await fetch(`${API}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(info),
                 credentials: 'include',
             });
@@ -58,13 +58,13 @@ const Login = () => {
                     throw new Error('شناسه کاربر نامعتبر است.');
                 }
 
-                Cookies.set('token', data.token, { expires: 1, path: '/', sameSite: 'strict' });
-                Cookies.set('userId', userId, { expires: 1, path: '/', sameSite: 'strict' });
+                Cookies.set('token', data.token, {expires: 1, path: '/', sameSite: 'strict'});
+                Cookies.set('userId', userId, {expires: 1, path: '/', sameSite: 'strict'});
                 setWarning('خوش آمدید.');
-                setShowToast({ success: true, failed: false });
+                setShowToast({success: true, failed: false});
                 setTimeout(() => {
-                    setShowToast({ success: false, failed: false });
-                    router.push('/dashboard');
+                    setShowToast({success: false, failed: false});
+                    window.location.href = '/dashboard';
                 }, 2000);
             } else {
                 throw new Error('اطلاعات توکن یا شناسه کاربر دریافت نشد.');
@@ -72,8 +72,8 @@ const Login = () => {
         } catch (error: any) {
             console.error('❌ Login error:', error);
             setWarning(error.message);
-            setShowToast({ success: false, failed: true });
-            setTimeout(() => setShowToast({ success: false, failed: false }), 3000);
+            setShowToast({success: false, failed: true});
+            setTimeout(() => setShowToast({success: false, failed: false}), 3000);
         } finally {
             setIsLoading(false);
         }
@@ -81,16 +81,17 @@ const Login = () => {
 
     return (
         <div className="flex items-center justify-center dark:bg-color6 bg-light-color1 ">
-            <div className="relative w-full max-w-[600px] flex flex-col justify-center dark:bg-color1 bg-light-color6 rounded-3xl border dark:border-color5 border-light-color5 my-10 text-center px-6 py-12 space-y-8 mx-4 shadow-xl transition-all duration-300 dark:hover:shadow-color4/20 hover:shadow-light-color4/20">
+            <div
+                className="relative w-full max-w-[600px] flex flex-col justify-center dark:bg-color1 bg-light-color6 rounded-3xl border dark:border-color5 border-light-color5 my-10 text-center px-6 py-12 space-y-8 mx-4 shadow-xl transition-all duration-300 dark:hover:shadow-color4/20 hover:shadow-light-color4/20">
                 {showToast.success && (
                     <Success
-                        showToast={() => setShowToast({ success: false, failed: false })}
+                        showToast={() => setShowToast({success: false, failed: false})}
                         text={warning}
                     />
                 )}
                 {showToast.failed && (
                     <Failed
-                        showToast={() => setShowToast({ success: false, failed: false })}
+                        showToast={() => setShowToast({success: false, failed: false})}
                         text={warning}
                     />
                 )}
@@ -112,13 +113,14 @@ const Login = () => {
                 <div className="flex justify-center w-full">
                     <div className="grid gap-6 w-full max-w-[500px]">
                         <div className="relative">
-                            <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-xl dark:text-color7 text-light-color7" />
+                            <FiMail
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-xl dark:text-color7 text-light-color7"/>
                             <input
                                 type="email"
                                 className="dark:bg-color6 bg-light-color1 border-2 dark:border-color5 border-light-color5 dark:text-color3 text-light-color3 text-sm rounded-xl w-full p-4 pl-12 font-primaryRegular transition duration-300 dark:placeholder-color7/70 placeholder-light-color7/70 focus:outline-none focus:ring-2 focus:ring-color4"
                                 placeholder="ایمیل خود را وارد کنید..."
                                 value={info.email}
-                                onChange={(e) => setInfo({ ...info, email: e.target.value })}
+                                onChange={(e) => setInfo({...info, email: e.target.value})}
                                 required
                             />
                             {info.email && !emailRegex.test(info.email) && (
@@ -128,13 +130,14 @@ const Login = () => {
                             )}
                         </div>
                         <div className="relative">
-                            <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-xl dark:text-color7 text-light-color7" />
+                            <FiLock
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-xl dark:text-color7 text-light-color7"/>
                             <input
                                 type="password"
                                 className="dark:bg-color6 bg-light-color1 border-2 dark:border-color5 border-light-color5 dark:text-color3 text-light-color3 text-sm rounded-xl w-full p-4 pl-12 font-primaryRegular transition duration-300 dark:placeholder-color7/70 placeholder-light-color7/70 focus:outline-none focus:ring-2 focus:ring-color4"
                                 placeholder="رمز خود را وارد کنید..."
                                 value={info.password}
-                                onChange={(e) => setInfo({ ...info, password: e.target.value })}
+                                onChange={(e) => setInfo({...info, password: e.target.value})}
                                 required
                             />
                             {info.password && !passwordRegex.test(info.password) && (
@@ -165,18 +168,19 @@ const Login = () => {
                             disabled={!info.email || !info.password || isLoading}
                         >
                             {isLoading ? (
-                                <div className="w-5 h-5 border-2 border-color1 border-t-transparent rounded-full animate-spin" />
+                                <div
+                                    className="w-5 h-5 border-2 border-color1 border-t-transparent rounded-full animate-spin"/>
                             ) : (
                                 <>
                                     ورود به سیستم
-                                    <FiArrowRight className="text-lg" />
+                                    <FiArrowRight className="text-lg"/>
                                 </>
                             )}
                         </button>
                         <div className="flex items-center w-full my-2">
-                            <div className="flex-grow h-px dark:bg-color5 bg-light-color5" />
+                            <div className="flex-grow h-px dark:bg-color5 bg-light-color5"/>
                             <span className="px-4 dark:text-color7 text-light-color7 text-sm">یا</span>
-                            <div className="flex-grow h-px dark:bg-color5 bg-light-color5" />
+                            <div className="flex-grow h-px dark:bg-color5 bg-light-color5"/>
                         </div>
                         <button
                             className="bg-transparent rounded-xl border-2 dark:border-color5 border-light-color5 text-center dark:text-color3 text-light-color3 font-primaryMedium p-4 w-full dark:hover:border-color4 hover:border-light-color4 dark:hover:text-color4 hover:text-light-color4 transition-all duration-300 text-lg"

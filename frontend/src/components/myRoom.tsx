@@ -267,7 +267,7 @@ const Room = () => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="bg-light-color6 dark:bg-black border border-light-color5 dark:border-color5 rounded-2xl shadow-lg p-6"
+                    className="bg-light-color5  dark:bg-black border border-light-color5 dark:border-color5 rounded-2xl shadow-2xl p-6"
                 >
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <MultiStepForm

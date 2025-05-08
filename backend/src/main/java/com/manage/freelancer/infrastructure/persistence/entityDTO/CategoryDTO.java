@@ -1,5 +1,6 @@
 package com.manage.freelancer.infrastructure.persistence.entityDTO;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,8 +22,10 @@ public class CategoryDTO {
 
     @Column(nullable = false)
     private String name;
+
     @ManyToOne
     @JoinColumn(name = "parent_category_id")
+    @JsonBackReference
     private CategoryDTO parentCategory;
 
     public CategoryDTO(String upperCase) {

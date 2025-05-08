@@ -11,7 +11,7 @@ const HeaderProject = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-8 text-center"
             >
-                <div className="inline-block p-3 rounded-full bg-light-color5/20 dark:bg-color5/20 mb-4">
+                <div className="inline-block p-3 rounded-full  bg-light-color5/20 dark:bg-color5/20 mb-4">
                     <FaProjectDiagram className="text-3xl text-light-color4 dark:text-color4" />
                 </div>
                 <h1 className="text-2xl md:text-3xl font-primaryBold mb-2 text-light-color4 dark:text-color4">

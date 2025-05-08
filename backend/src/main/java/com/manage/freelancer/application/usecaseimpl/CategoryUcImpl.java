@@ -3,8 +3,10 @@ package com.manage.freelancer.application.usecaseimpl;
 import com.manage.freelancer.application.usecase.CategoryUc;
 import com.manage.freelancer.domain.entity.Category;
 import com.manage.freelancer.infrastructure.persistence.entityDTO.CategoryDTO;
+import com.manage.freelancer.infrastructure.persistence.jparepository.CategoryJpaRepo;
 import com.manage.freelancer.infrastructure.persistence.mapper.CategoryMapper;
 import com.manage.freelancer.infrastructure.persistence.repository.CategoryRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class CategoryUcImpl implements CategoryUc {
     private final CategoryRepo categoryRepo;
     private final CategoryMapper categoryMapper;
+    private final CategoryJpaRepo categoryJpaRepo;
 
     public List<CategoryDTO> getAllCategory() {
         return categoryRepo.findAll().stream()
@@ -28,12 +31,12 @@ public class CategoryUcImpl implements CategoryUc {
         Optional<Category> category = categoryRepo.findByName(name);
         return category.map(categoryMapper::toDTO).orElse(null);
     }
-
+    @Transactional
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
         Category savedCategory = categoryRepo.save(categoryDTO);
         return categoryMapper.toDTO(savedCategory);
     }
-
+    @Transactional
     public CategoryDTO updateCategory(CategoryDTO categoryDTO) {
         Category updatedCategory = categoryRepo.update(categoryDTO);
         return categoryMapper.toDTO(updatedCategory);
@@ -54,6 +57,10 @@ public class CategoryUcImpl implements CategoryUc {
     }
 
     public CategoryDTO deleteCategoryById(Long id) {
+        List<CategoryDTO> children = categoryJpaRepo.findByParentCategory(categoryJpaRepo.findById(id).orElse(null));
+        if (!children.isEmpty()) {
+            throw new IllegalStateException("Cannot delete category with subcategories");
+        }
         Category deletedCategory = categoryRepo.deleteById(id);
         return categoryMapper.toDTO(deletedCategory);
     }
