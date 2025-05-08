@@ -38,7 +38,7 @@ export function middleware(request: NextRequest) {
     });
 
     // مسیرهای عمومی که نیازی به احراز هویت ندارند
-    const publicPaths = ['/login', '/signUp', '/', '/adminlog', '/forgetPassword', '/projects', '/googleebb9475d40e7e023.html' ];
+    const publicPaths = ['/login', '/signUp', '/','/roundcube', '/adminlog', '/forgetPassword', '/projects', '/googleebb9475d40e7e023.html' ];
     
     // اگر مسیر عمومی باشد
     if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/')  )) {
