@@ -117,13 +117,14 @@ const SignUp = () => {
                 if (data.token && data.userId) {
                     Cookies.set('token', data.token, { expires: 7, path: '/', sameSite: 'strict', secure: process.env.NODE_ENV === 'production' });
                     Cookies.set('userId', String(data.userId), { expires: 7, path: '/', sameSite: 'strict', secure: process.env.NODE_ENV === 'production' });
-                    register(data.token, String(data.userId));
+                   const res= register(data.token, String(data.userId));
                     setToastMessage('ثبت‌نام با موفقیت انجام شد');
                     setShowToast(true);
+                 console.log("res: ",res)
                     setTimeout(() => {
                         setShowToast(false);
-                        router.push('/dashboard');
-                    }, 3000);
+                        window.location.href = '/dashboard';
+                        }, 3000);
                 } else {
                     throw new Error('اطلاعات توکن یا شناسه کاربر دریافت نشد!');
                 }
