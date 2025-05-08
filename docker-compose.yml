@@ -44,6 +44,8 @@ services:
       SPRING_MAIL_PASSWORD: chxihcpykqipbjdz
     volumes:
       - uploads:/app/uploads
+    ports:
+      - "8080:8080"
     networks:
       - app-network
     depends_on:
@@ -51,8 +53,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      ports:
-        - "8080:8080"
+    
 
   frontend:
     build: ./frontend
